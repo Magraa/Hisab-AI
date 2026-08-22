@@ -8,6 +8,15 @@ export function formatRupees(amount: number): string {
   return currencyFormatter.format(Math.round(amount));
 }
 
+const plainNumberFormatter = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
+
+// jsPDF's built-in fonts (Helvetica etc.) don't include the ₹ glyph — it
+// silently renders as a mangled superscript character. Use "Rs." instead of
+// the symbol anywhere text goes into a generated PDF.
+export function formatRupeesPlain(amount: number): string {
+  return `Rs. ${plainNumberFormatter.format(Math.round(amount))}`;
+}
+
 export function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString("en-IN", {
     hour: "numeric",

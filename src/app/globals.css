@@ -1,6 +1,19 @@
 @import "tailwindcss";
 
+/*
+ * Theming: every screen is built from the semantic tokens below (bg-canvas,
+ * text-ink, bg-primary, ...), never raw hex values. A theme is just a
+ * different set of values for the same token names, switched at runtime by
+ * setting `data-theme` on <html> (see ThemeProvider). To add a new theme:
+ *   1. Add its id to THEME_IDS in src/lib/themes.ts (with label + swatch).
+ *   2. Add a `[data-theme="<id>"] { ... }` block here overriding the
+ *      "Brand & surface" tokens only — the functional tokens (mint/rose/
+ *      amber/blue/peach/violet) stay constant across themes so category
+ *      colors and success/danger meanings don't change on switch.
+ */
+
 :root {
+  /* Brand & surface — these are what actually change between themes. */
   --color-canvas: #f4f5fa;
   --color-surface: #ffffff;
   --color-ink: #16171d;
@@ -12,6 +25,7 @@
   --color-primary-dark: #5a4bd6;
   --color-primary-soft: #eeecfd;
 
+  /* Functional — stable across themes. */
   --color-mint: #16a34a;
   --color-mint-soft: #e6f6ec;
 
@@ -29,6 +43,21 @@
 
   --color-violet: #7c3aed;
   --color-violet-soft: #ece9fe;
+}
+
+/* "Sage" — the warm cream + forest-green look from the onboarding mockups,
+   available anywhere in the app once selected in Settings. */
+[data-theme="sage"] {
+  --color-canvas: #faf6ec;
+  --color-surface: #ffffff;
+  --color-ink: #16241b;
+  --color-muted: #6b7566;
+  --color-subtle: #a8b3a2;
+  --color-border: #e4decf;
+
+  --color-primary: #2f6b47;
+  --color-primary-dark: #255939;
+  --color-primary-soft: #e4f0e4;
 }
 
 @theme inline {

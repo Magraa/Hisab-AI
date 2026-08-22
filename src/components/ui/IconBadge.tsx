@@ -21,7 +21,17 @@ export function IconBadge({
   );
 }
 
-export function InitialsBadge({ name, size = 44 }: { name: string; size?: number }) {
+export function InitialsBadge({
+  name,
+  size = 44,
+  bg,
+  fg,
+}: {
+  name: string;
+  size?: number;
+  bg?: string;
+  fg?: string;
+}) {
   const initials = name
     .split(/\s+/)
     .filter(Boolean)
@@ -31,8 +41,10 @@ export function InitialsBadge({ name, size = 44 }: { name: string; size?: number
 
   return (
     <div
-      className="flex shrink-0 items-center justify-center rounded-full bg-primary-soft font-semibold text-primary"
-      style={{ width: size, height: size, fontSize: size * 0.38 }}
+      className={`flex shrink-0 items-center justify-center rounded-full font-semibold ${
+        bg || fg ? "" : "bg-primary-soft text-primary"
+      }`}
+      style={{ width: size, height: size, fontSize: size * 0.38, backgroundColor: bg, color: fg }}
     >
       {initials || "?"}
     </div>

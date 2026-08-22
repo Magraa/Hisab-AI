@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
+import { ThemePicker } from "@/components/theme/ThemePicker";
 
 export default function SettingsPage() {
   const [notifications, setNotifications] = useState(true);
@@ -9,6 +10,11 @@ export default function SettingsPage() {
   return (
     <div className="pb-8">
       <SubPageHeader title="Settings" subtitle="Language, notifications, privacy" />
+
+      <p className="mx-5 mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Theme</p>
+      <div className="mx-5 mb-6">
+        <ThemePicker />
+      </div>
 
       <div className="mx-5 overflow-hidden rounded-2xl border border-border bg-surface">
         <div className="flex items-center justify-between border-b border-border px-4 py-3.5">

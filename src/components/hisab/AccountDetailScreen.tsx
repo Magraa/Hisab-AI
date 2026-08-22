@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, MoreHorizontal, Download, Printer, ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, Download, MessageCircle, ArrowDownLeft, ArrowUpRight, X } from "lucide-react";
 import { useHisab } from "@/lib/store";
 import { computeBalance, entityTransactions } from "@/lib/selectors";
 import { formatRupees, formatDayLabel } from "@/lib/format";
@@ -10,16 +10,19 @@ import { HisabInput } from "@/components/hisab/HisabInput";
 import { TransactionDetailSheet } from "@/components/hisab/TransactionDetailSheet";
 import { Sheet } from "@/components/ui/Sheet";
 import { EmptyState } from "@/components/ui/EmptyState";
-import type { Direction } from "@/lib/types";
+import type { Direction, Entity } from "@/lib/types";
+import { buildStatementPdf, statementFilename } from "@/lib/statementPdf";
+import { sendStatementToWhatsApp } from "@/lib/whatsapp";
 
 export function AccountDetailScreen({ entityId }: { entityId: string }) {
-  const { entities, transactions, addSettlement, updateEntity } = useHisab();
+  const { entities, transactions, business, addSettlement, updateEntity } = useHisab();
   const entity = entities.find((e) => e.id === entityId);
 
   const [selectedTxId, setSelectedTxId] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
   const [showSettle, setShowSettle] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [waStatus, setWaStatus] = useState<string | null>(null);
 
   const items = useMemo(
     () => (entity ? entityTransactions(transactions, entity.id) : []),
@@ -56,6 +59,41 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
     a.download = `${entity!.name.replace(/\s+/g, "_")}_statement.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  function buildPdfBlob(): Blob {
+    return buildStatementPdf(entity!, items, balance!, business);
+  }
+
+  function handleDownloadPdf() {
+    const blob = buildPdfBlob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = statementFilename(entity!);
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleWhatsApp() {
+    if (!entity!.phone) return;
+    setWaStatus(null);
+    const blob = buildPdfBlob();
+    const filename = statementFilename(entity!);
+    const file = new File([blob], filename, { type: "application/pdf" });
+    const caption = `Hisab statement for ${entity!.name} — ${balance!.label} ${formatRupees(balance!.displayAmount)}.`;
+
+    const result = await sendStatementToWhatsApp({ phone: entity!.phone, file, caption });
+    if (result === "shared") {
+      setWaStatus("Sent to the WhatsApp share sheet.");
+    } else if (result === "opened-chat") {
+      // Text-only chat links can't carry an attachment, so make sure the
+      // file is on the device to attach manually.
+      handleDownloadPdf();
+      setWaStatus("Opened WhatsApp chat — attach the PDF that just downloaded.");
+    } else {
+      setWaStatus("That phone number doesn't look valid for WhatsApp.");
+    }
   }
 
   return (
@@ -165,19 +203,39 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
       )}
 
       {items.length > 0 && (
-        <div className="mx-5 mb-8 flex gap-3">
-          <button
-            onClick={handleExportCsv}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium text-ink"
-          >
-            <Download size={16} /> Export CSV
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium text-ink"
-          >
-            <Printer size={16} /> Print / PDF
-          </button>
+        <div className="mx-5 mb-8 flex flex-col gap-3">
+          <div className="flex gap-3">
+            <button
+              onClick={handleExportCsv}
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium text-ink"
+            >
+              <Download size={16} /> Export CSV
+            </button>
+            <button
+              onClick={handleDownloadPdf}
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium text-ink"
+            >
+              <Download size={16} /> Download PDF
+            </button>
+          </div>
+
+          {entity.phone && (
+            <button
+              onClick={handleWhatsApp}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-mint-soft py-3 text-sm font-semibold text-mint"
+            >
+              <MessageCircle size={16} /> Send statement on WhatsApp
+            </button>
+          )}
+
+          {waStatus && (
+            <div className="flex items-start justify-between gap-2 rounded-xl bg-primary-soft px-4 py-3 text-xs text-ink">
+              <p>{waStatus}</p>
+              <button onClick={() => setWaStatus(null)} aria-label="Dismiss" className="shrink-0 text-muted">
+                <X size={14} />
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -200,6 +258,7 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
         name={entity.name}
         relationship={entity.relationship ?? ""}
         phone={entity.phone ?? ""}
+        aliases={entity.aliases}
         onSave={(patch) => {
           updateEntity(entity.id, patch);
           setShowEdit(false);
@@ -291,6 +350,7 @@ function EditEntitySheet({
   name,
   relationship,
   phone,
+  aliases,
   onSave,
 }: {
   open: boolean;
@@ -298,11 +358,28 @@ function EditEntitySheet({
   name: string;
   relationship: string;
   phone: string;
-  onSave: (patch: { name: string; relationship: string; phone: string }) => void;
+  aliases: string[];
+  onSave: (patch: Partial<Entity>) => void;
 }) {
   const [n, setN] = useState(name);
   const [r, setR] = useState(relationship);
   const [p, setP] = useState(phone);
+  const [aliasList, setAliasList] = useState<string[]>(aliases);
+  const [aliasInput, setAliasInput] = useState("");
+
+  function addAlias() {
+    const value = aliasInput.trim();
+    if (!value) return;
+    const exists = aliasList.some((a) => a.toLowerCase() === value.toLowerCase());
+    if (!exists && value.toLowerCase() !== n.trim().toLowerCase()) {
+      setAliasList((list) => [...list, value]);
+    }
+    setAliasInput("");
+  }
+
+  function removeAlias(value: string) {
+    setAliasList((list) => list.filter((a) => a !== value));
+  }
 
   return (
     <Sheet open={open} onClose={onClose}>
@@ -310,13 +387,56 @@ function EditEntitySheet({
         <p className="text-base font-semibold text-ink">Edit account</p>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted">Name</span>
+          <span className="text-xs font-medium uppercase tracking-wide text-muted">Official name</span>
           <input
             value={n}
             onChange={(e) => setN(e.target.value)}
             className="rounded-xl border border-border px-4 py-3 text-sm text-ink outline-none focus:border-primary"
           />
         </label>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium uppercase tracking-wide text-muted">Also known as</span>
+          <p className="text-xs text-muted">
+            Add nicknames or short forms — Hisab recognizes these too, so &ldquo;{aliasList[0] ?? "Bhai"} 500&rdquo;
+            still lands on this account.
+          </p>
+          {aliasList.length > 0 && (
+            <div className="flex flex-wrap gap-2 pt-1">
+              {aliasList.map((alias) => (
+                <span
+                  key={alias}
+                  className="flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1.5 text-sm font-medium text-primary"
+                >
+                  {alias}
+                  <button onClick={() => removeAlias(alias)} aria-label={`Remove ${alias}`}>
+                    <X size={13} />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2 pt-1">
+            <input
+              value={aliasInput}
+              onChange={(e) => setAliasInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addAlias();
+                }
+              }}
+              placeholder="e.g. Ramesh bhai"
+              className="min-w-0 flex-1 rounded-xl border border-border px-4 py-3 text-sm text-ink outline-none focus:border-primary"
+            />
+            <button
+              onClick={addAlias}
+              className="rounded-xl border border-border px-4 text-sm font-medium text-ink"
+            >
+              Add
+            </button>
+          </div>
+        </div>
 
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-medium uppercase tracking-wide text-muted">Relationship</span>
@@ -333,12 +453,16 @@ function EditEntitySheet({
           <input
             value={p}
             onChange={(e) => setP(e.target.value)}
+            placeholder="e.g. +91 98765 43210"
             className="rounded-xl border border-border px-4 py-3 text-sm text-ink outline-none focus:border-primary"
           />
+          <span className="text-xs text-muted">Include the country code so &ldquo;Send on WhatsApp&rdquo; can find the right chat.</span>
         </label>
 
         <button
-          onClick={() => onSave({ name: n.trim() || name, relationship: r.trim(), phone: p.trim() })}
+          onClick={() =>
+            onSave({ name: n.trim() || name, relationship: r.trim(), phone: p.trim(), aliases: aliasList })
+          }
           className="rounded-xl bg-primary py-3 text-sm font-semibold text-white"
         >
           Save

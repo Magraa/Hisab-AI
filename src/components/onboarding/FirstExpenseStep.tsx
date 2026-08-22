@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { PenLine } from "lucide-react";
-import { onboarding as theme } from "./theme";
 import { HisabInput } from "@/components/hisab/HisabInput";
 
 export function FirstExpenseStep({ onFinish }: { onFinish: () => void }) {
@@ -11,16 +10,11 @@ export function FirstExpenseStep({ onFinish }: { onFinish: () => void }) {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex flex-col items-center pt-6 text-center">
-        <span
-          className="flex h-16 w-16 items-center justify-center rounded-full"
-          style={{ backgroundColor: theme.primarySoft }}
-        >
-          <PenLine size={26} style={{ color: theme.primary }} />
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-soft">
+          <PenLine size={26} className="text-primary" />
         </span>
-        <h1 className="mt-6 text-[26px] font-bold leading-snug" style={{ color: theme.ink }}>
-          You&rsquo;re ready.
-        </h1>
-        <p className="mt-2 text-sm" style={{ color: theme.muted }}>
+        <h1 className="mt-6 text-[26px] font-bold leading-snug text-ink">You&rsquo;re ready.</h1>
+        <p className="mt-2 text-sm text-muted">
           Try your first expense — type or say something like &ldquo;500 diesel&rdquo;.
         </p>
       </div>
@@ -34,18 +28,12 @@ export function FirstExpenseStep({ onFinish }: { onFinish: () => void }) {
           <button
             type="button"
             onClick={onFinish}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-semibold text-white"
-            style={{ backgroundColor: theme.primary }}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-semibold text-white"
           >
             Continue to Hisab <span aria-hidden>→</span>
           </button>
         ) : (
-          <button
-            type="button"
-            onClick={onFinish}
-            className="w-full py-4 text-center text-sm font-medium"
-            style={{ color: theme.muted }}
-          >
+          <button type="button" onClick={onFinish} className="w-full py-4 text-center text-sm font-medium text-muted">
             Skip for now
           </button>
         )}
