@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Zap, Sparkles, ShieldCheck } from "lucide-react";
 
 const FEATURES = [
@@ -64,7 +65,10 @@ export function WelcomeStep({ onGetStarted }: { onGetStarted: () => void }) {
         </div>
 
         <p className="mt-4 text-center text-sm text-ink">
-          Already have an account? <span className="font-semibold text-primary">Log in</span>
+          Already have an account?{" "}
+          <Link href="/login" className="font-semibold text-primary">
+            Log in
+          </Link>
         </p>
       </div>
     </div>
