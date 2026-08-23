@@ -122,6 +122,7 @@ export type Database = {
           direction: string | null
           entity_id: string | null
           id: string
+          name: string | null
           payment_method: string
           raw_input: string | null
           source: string
@@ -135,6 +136,7 @@ export type Database = {
           direction?: string | null
           entity_id?: string | null
           id?: string
+          name?: string | null
           payment_method?: string
           raw_input?: string | null
           source?: string
@@ -148,6 +150,7 @@ export type Database = {
           direction?: string | null
           entity_id?: string | null
           id?: string
+          name?: string | null
           payment_method?: string
           raw_input?: string | null
           source?: string

@@ -57,7 +57,9 @@ export default function EntriesPage() {
   const filtered = useMemo(() => {
     const now = new Date();
     let result = transactions.filter((tx) => {
-      const label = tx.entityId ? entityLabel(entities, tx.entityId) ?? "" : getCategory(categories, tx.categoryId).label;
+      const label = tx.entityId
+        ? entityLabel(entities, tx.entityId) ?? ""
+        : tx.name || getCategory(categories, tx.categoryId).label;
       if (query && !label.toLowerCase().includes(query.trim().toLowerCase())) return false;
       if (categoryFilter !== "all" && tx.categoryId !== categoryFilter) return false;
       if (paymentFilter !== "all" && tx.paymentMethod !== paymentFilter) return false;

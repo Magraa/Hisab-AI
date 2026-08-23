@@ -4,6 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { getAvatarForName } from "@/lib/avatars";
+import { findMerchant } from "@/lib/merchants";
 
 export function IconBadge({
   icon: Icon,
@@ -76,7 +77,10 @@ export function InitialsBadge({
     .map((w) => w[0]?.toUpperCase())
     .join("");
 
-  const resolvedAvatar = avatarUrl || (showAvatar && cleanName ? getAvatarForName(cleanName).path : null);
+  const merchant = cleanName ? findMerchant(cleanName) : undefined;
+  const resolvedAvatar = avatarUrl || merchant?.logo || (showAvatar && cleanName ? getAvatarForName(cleanName).path : null);
+  const resolvedBg = bg || (merchant ? `${merchant.brandColor}22` : undefined);
+  const resolvedFg = fg || (merchant ? merchant.brandColor : undefined);
 
   if (resolvedAvatar && !imgError) {
     return (
@@ -100,9 +104,9 @@ export function InitialsBadge({
   return (
     <div
       className={`flex shrink-0 items-center justify-center rounded-full font-semibold ${
-        bg || fg ? "" : "bg-primary-soft text-primary"
+        resolvedBg || resolvedFg ? "" : "bg-primary-soft text-primary"
       }`}
-      style={{ width: size, height: size, fontSize: size * 0.38, backgroundColor: bg, color: fg }}
+      style={{ width: size, height: size, fontSize: size * 0.38, backgroundColor: resolvedBg, color: resolvedFg }}
     >
       {initials || "?"}
     </div>

@@ -7,6 +7,7 @@ import { useHisab } from "@/lib/store";
 import { getCategory, getCategoryIcon, getCategoryColors, getCategoryImage } from "@/lib/categories";
 import { formatRupees } from "@/lib/format";
 import { IconBadge, InitialsBadge } from "@/components/ui/IconBadge";
+import { findMerchant } from "@/lib/merchants";
 import type { Direction, PaymentMethod, Transaction } from "@/lib/types";
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -42,18 +43,29 @@ export function TransactionDetailSheet({
   }
   const displayTx = tx ?? lastTxRef.current;
 
-  const entity = displayTx?.entityId ? entities.find((e) => e.id === displayTx.entityId) : undefined;
+  const rawEntity = displayTx?.entityId ? entities.find((e) => e.id === displayTx.entityId) : undefined;
+  const merchant = rawEntity ? findMerchant(rawEntity.name) : displayTx ? findMerchant(displayTx.description) : undefined;
+  const entity = rawEntity
+    ? {
+        ...rawEntity,
+        relationship: rawEntity.relationship || merchant?.relationship,
+        avatar: rawEntity.avatar || merchant?.logo,
+      }
+    : undefined;
+
+  const resolvedCategoryId = displayTx?.categoryId || merchant?.defaultCategoryId;
 
   const [amount, setAmount] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const [txType, setTxType] = useState<"person" | "category">("person");
   const [entityName, setEntityName] = useState("");
+  const [itemName, setItemName] = useState("");
   const [direction, setDirection] = useState<Direction>("outgoing");
 
   if (!displayTx) return null;
 
-  const label = entity ? entity.name : getCategory(categories, displayTx.categoryId).label;
+  const label = entity ? entity.name : displayTx.name || getCategory(categories, resolvedCategoryId).label;
 
   function handleClose() {
     onClose();
@@ -71,10 +83,12 @@ export function TransactionDetailSheet({
       const ent = entities.find((e) => e.id === displayTx.entityId);
       setTxType("person");
       setEntityName(ent?.name ?? displayTx.description ?? "");
+      setItemName("");
       setDirection(displayTx.direction ?? "outgoing");
     } else {
       setTxType("category");
       setEntityName("");
+      setItemName(displayTx.name ?? "");
       setDirection("outgoing");
     }
     setMode("edit");
@@ -112,6 +126,7 @@ export function TransactionDetailSheet({
         direction: undefined,
         categoryId: catId,
         description: getCategory(categories, catId).label,
+        name: itemName.trim() || undefined,
         paymentMethod,
       });
     }
@@ -156,7 +171,10 @@ export function TransactionDetailSheet({
           <div className="flex rounded-xl bg-canvas p-1 border border-border">
             <button
               type="button"
-              onClick={() => setTxType("person")}
+              onClick={() => {
+                setTxType("person");
+                setEntityName((prev) => prev || itemName.trim() || displayTx.description || "");
+              }}
               className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all ${
                 txType === "person"
                   ? "bg-surface text-ink shadow-xs"
@@ -168,7 +186,10 @@ export function TransactionDetailSheet({
             </button>
             <button
               type="button"
-              onClick={() => setTxType("category")}
+              onClick={() => {
+                setTxType("category");
+                setItemName((prev) => prev || entityName.trim() || displayTx.description || "");
+              }}
               className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all ${
                 txType === "category"
                   ? "bg-surface text-ink shadow-xs"
@@ -231,20 +252,32 @@ export function TransactionDetailSheet({
               </div>
             </div>
           ) : (
-            <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium uppercase tracking-wide text-muted">Category</span>
-              <select
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                className="rounded-xl border border-border px-4 py-3 text-sm text-ink outline-none focus:border-primary"
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div className="flex flex-col gap-3">
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted">Category</span>
+                <select
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
+                  className="rounded-xl border border-border px-4 py-3 text-sm text-ink outline-none focus:border-primary"
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted">Item name (optional)</span>
+                <input
+                  type="text"
+                  value={itemName}
+                  onChange={(e) => setItemName(e.target.value)}
+                  placeholder="e.g. Chicken Tikka Masala"
+                  className="rounded-xl border border-border px-4 py-3 text-sm font-medium text-ink outline-none focus:border-primary"
+                />
+              </label>
+            </div>
           )}
 
           {/* Amount */}
@@ -314,10 +347,10 @@ export function TransactionDetailSheet({
               <InitialsBadge name={entity.name} avatarUrl={entity.avatar} size={58} />
             ) : (
               <IconBadge
-                icon={getCategoryIcon(getCategory(categories, displayTx.categoryId).icon)}
-                imageSrc={getCategoryImage(displayTx.categoryId)}
-                bg={getCategoryColors(getCategory(categories, displayTx.categoryId).color).bg}
-                fg={getCategoryColors(getCategory(categories, displayTx.categoryId).color).fg}
+                icon={getCategoryIcon(getCategory(categories, resolvedCategoryId).icon)}
+                imageSrc={getCategoryImage(resolvedCategoryId)}
+                bg={getCategoryColors(getCategory(categories, resolvedCategoryId).color).bg}
+                fg={getCategoryColors(getCategory(categories, resolvedCategoryId).color).fg}
                 size={58}
               />
             )}
@@ -330,7 +363,10 @@ export function TransactionDetailSheet({
           <DetailRow label="Date" value={new Date(displayTx.createdAt).toLocaleString("en-IN", {
             day: "2-digit", month: "long", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true,
           })} />
-          {!entity && <DetailRow label="Category" value={getCategory(categories, displayTx.categoryId).label} />}
+          {!entity && displayTx.name && <DetailRow label="Item" value={displayTx.name} />}
+          {resolvedCategoryId && resolvedCategoryId !== "other" && (
+            <DetailRow label="Category" value={getCategory(categories, resolvedCategoryId).label} />
+          )}
           {entity && <DetailRow label="Account" value={`${entity.name}${entity.relationship ? ` · ${entity.relationship}` : ""}`} />}
           {entity && <DetailRow label="Direction" value={displayTx.direction === "incoming" ? "You got" : "You gave"} />}
           <DetailRow label="Payment" value={PAYMENT_OPTIONS.find((p) => p.value === displayTx.paymentMethod)?.label ?? displayTx.paymentMethod} />

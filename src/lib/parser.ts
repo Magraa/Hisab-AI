@@ -1,14 +1,20 @@
-import type { Category, Direction, Entity } from "./types";
+import type { Category, Direction, Entity, EntityType } from "./types";
 import { findCategoryByKeyword } from "./categories";
+import { findMerchant } from "./merchants";
 
 export interface ParsedInput {
   amount: number | null;
   categoryId?: string;
   entityId?: string;
   entityName?: string;
+  entityType?: EntityType;
+  entityAvatar?: string;
   direction?: Direction;
   description: string;
+  /** Specific item name for a category match, e.g. "Chicken Tikka Masala" — the raw text typed, kept separate from the category's own label. */
+  name?: string;
   confidence: number;
+  isMerchant?: boolean;
 }
 
 // Speech recognition (and quick typing) regularly swaps these words for a
@@ -84,6 +90,34 @@ const FILLER_WORDS = new Set([
 const OUTGOING_WORDS = ["diye", "diya", "de diya", "gave", "give", "paid", "send", "sent"];
 const INCOMING_WORDS = ["mila", "mile", "milaa", "received", "receive", "aaya", "aya", "got"];
 
+const BUSINESS_KEYWORDS = [
+  "store",
+  "shop",
+  "mart",
+  "supermarket",
+  "kirana",
+  "clinic",
+  "hospital",
+  "pharmacy",
+  "restaurant",
+  "hotel",
+  "cafe",
+  "dhaba",
+  "traders",
+  "enterprises",
+  "agency",
+  "services",
+  "ltd",
+  "pvt ltd",
+  "petrol pump",
+  "hardware",
+];
+
+export function isLikelyBusiness(text: string): boolean {
+  const lower = text.toLowerCase();
+  return BUSINESS_KEYWORDS.some((kw) => new RegExp(`\\b${kw}\\b`, "i").test(lower));
+}
+
 function stripAmount(text: string): { amount: number | null; remaining: string } {
   const match = text.match(/₹?\s?([\d,]+(?:\.\d+)?)\s?(k|K)?/);
   if (!match) return { amount: null, remaining: text };
@@ -145,34 +179,57 @@ export function parseInput(raw: string, knownEntities: Entity[], categories: Cat
   if (OUTGOING_WORDS.some((w) => lower.includes(w))) direction = "outgoing";
   else if (INCOMING_WORDS.some((w) => lower.includes(w))) direction = "incoming";
 
+  // 1. Check if input matches a user's existing ledger entity first
   const knownEntity = cleaned ? findKnownEntity(cleaned, knownEntities) : undefined;
-  const category = findCategoryByKeyword(categories, lower);
-
   if (knownEntity) {
     return {
       amount,
       entityId: knownEntity.id,
       entityName: knownEntity.name,
+      entityType: knownEntity.type,
+      entityAvatar: knownEntity.avatar,
       direction: direction ?? "outgoing",
       description: knownEntity.name,
       confidence: amount !== null ? 0.95 : 0.3,
     };
   }
 
+  // 2. Check if input matches a Known Merchant / Company (Top 100+ daily services)
+  const merchant = findMerchant(cleaned) || findMerchant(remaining) || findMerchant(text);
+  if (merchant) {
+    return {
+      amount,
+      entityName: merchant.name,
+      entityType: merchant.entityType,
+      entityAvatar: merchant.logo,
+      categoryId: merchant.defaultCategoryId,
+      direction: direction ?? "outgoing",
+      description: merchant.name,
+      confidence: amount !== null ? 0.95 : 0.4,
+      isMerchant: true,
+    };
+  }
+
+  // 3. Check if input matches an expense category keyword (chai, diesel, rent, etc.)
+  const category = findCategoryByKeyword(categories, lower);
   if (category) {
     return {
       amount,
       categoryId: category.id,
+      name: cleaned.length > 0 ? titleCase(cleaned) : undefined,
       description: category.label,
       confidence: amount !== null ? 0.9 : 0.3,
     };
   }
 
+  // 4. Check if input is a custom name or business
   if (cleaned.length > 0) {
     const guessedName = titleCase(cleaned);
+    const isBusiness = isLikelyBusiness(cleaned);
     return {
       amount,
       entityName: guessedName,
+      entityType: isBusiness ? "vendor" : "person",
       direction: direction ?? "outgoing",
       description: guessedName,
       confidence: amount !== null ? 0.65 : 0.25,

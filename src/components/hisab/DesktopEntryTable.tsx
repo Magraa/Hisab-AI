@@ -10,6 +10,8 @@ import { formatRupees, formatTime } from "@/lib/format";
 import { IconBadge, InitialsBadge } from "@/components/ui/IconBadge";
 import { EmptyState } from "@/components/ui/EmptyState";
 
+import { findMerchant } from "@/lib/merchants";
+
 const PAYMENT_LABELS: Record<string, string> = {
   cash: "Cash",
   upi: "UPI",
@@ -74,9 +76,12 @@ export function DesktopEntryTable({
         <tbody>
           {transactions.map((tx) => {
             const isEntity = Boolean(tx.entityId);
-            const category = getCategory(categories, tx.categoryId);
+            const entity = tx.entityId ? entities.find((e) => e.id === tx.entityId) : undefined;
+            const merchant = isEntity ? findMerchant(entity?.name || tx.description) : undefined;
+            const resolvedCategoryId = tx.categoryId || merchant?.defaultCategoryId;
+            const category = getCategory(categories, resolvedCategoryId);
             const categoryColors = getCategoryColors(category.color);
-            const label = isEntity ? entityLabel(entities, tx.entityId) ?? tx.description : category.label;
+            const label = isEntity ? entityLabel(entities, tx.entityId) ?? tx.description : tx.name || category.label;
             const isIncoming = isEntity && tx.direction === "incoming";
             const PaymentIcon = PAYMENT_ICONS[tx.paymentMethod] ?? Wallet;
 
@@ -92,7 +97,7 @@ export function DesktopEntryTable({
                 <td className="px-5 py-3.5">
                   <div className="flex min-w-0 items-center gap-3">
                     {isEntity ? (
-                      <InitialsBadge name={label} size={34} />
+                      <InitialsBadge name={label} avatarUrl={entity?.avatar} size={34} />
                     ) : (
                       <IconBadge
                         icon={getCategoryIcon(category.icon)}
@@ -112,7 +117,11 @@ export function DesktopEntryTable({
                         isIncoming ? "bg-mint-soft text-mint" : "bg-rose-soft text-rose"
                       }`}
                     >
-                      {isIncoming ? "Received" : "Paid"}
+                      {resolvedCategoryId && resolvedCategoryId !== "other"
+                        ? `${getCategory(categories, resolvedCategoryId).label} · ${isIncoming ? "Received" : "Paid"}`
+                        : isIncoming
+                        ? "Received"
+                        : "Paid"}
                     </span>
                   ) : (
                     <span

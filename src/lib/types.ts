@@ -24,6 +24,8 @@ export interface Transaction {
   amount: number;
   categoryId?: string;
   description: string;
+  /** Specific item/thing name for a category expense, e.g. "Chicken Tikka Masala" for a Refreshments entry. */
+  name?: string;
   entityId?: string;
   direction?: Direction;
   paymentMethod: PaymentMethod;

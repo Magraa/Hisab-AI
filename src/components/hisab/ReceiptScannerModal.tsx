@@ -216,6 +216,7 @@ export function ReceiptScannerModal({
     const inputs: AddTransactionInput[] = selected.map((e) => ({
       amount: e.amount,
       description: e.description || e.personName || "Expense",
+      name: e.personName ? undefined : e.description || undefined,
       entityName: e.personName || undefined,
       categoryId: e.personName ? undefined : e.categoryId || "other",
       direction: e.direction,

@@ -37,7 +37,7 @@ export default function ExportPage() {
       ["Date", "Description", "Category", "Amount", "Payment Method"],
       ...rows.map((t) => [
         new Date(t.createdAt).toLocaleString("en-IN"),
-        t.entityId ? entityLabel(entities, t.entityId) ?? t.description : t.description,
+        t.entityId ? entityLabel(entities, t.entityId) ?? t.description : t.name || t.description,
         t.entityId ? "Account" : getCategory(categories, t.categoryId).label,
         String(t.amount),
         t.paymentMethod,

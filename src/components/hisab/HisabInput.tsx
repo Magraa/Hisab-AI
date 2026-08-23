@@ -95,14 +95,17 @@ export function HisabInput({
     addTransaction({
       amount: result.amount ?? 0,
       description: entityName ?? result.description,
-      categoryId: entityName ? undefined : result.categoryId,
+      categoryId: result.categoryId,
+      name: entityName ? undefined : result.name,
       entityName,
+      entityType: result.entityType,
+      entityAvatar: result.entityAvatar,
       direction: result.direction,
       source,
       rawInput: raw,
     });
 
-    const label = entityName ?? getCategory(categories, result.categoryId).label;
+    const label = entityName ?? result.name ?? getCategory(categories, result.categoryId).label;
     setSuccessLabel(`${formatRupees(result.amount ?? 0)} · ${entityName ? (existing ? label : `${label} (new)`) : label}`);
     setSuccessIncoming(Boolean(entityName) && result.direction === "incoming");
     setStage("success");
@@ -289,14 +292,21 @@ export function HisabInput({
                     <div className="relative flex flex-1 items-center rounded-xl bg-canvas px-3 py-1.5 border border-border/80 focus-within:border-primary focus-within:bg-surface focus-within:ring-2 focus-within:ring-primary/20 transition-all min-w-0">
                       <input
                         type="text"
-                        value={pinnedEntityName ?? pending.entityName ?? pending.description ?? ""}
+                        value={
+                          pinnedEntityName ??
+                          (isEntityEntry ? pending.entityName ?? "" : pending.name ?? pending.description ?? "")
+                        }
                         disabled={Boolean(pinnedEntityName)}
                         onChange={(e) => {
                           const val = e.target.value;
-                          setPending((p) => (p ? { ...p, entityName: val, description: val } : null));
+                          if (isEntityEntry) {
+                            setPending((p) => (p ? { ...p, entityName: val, description: val } : null));
+                          } else {
+                            setPending((p) => (p ? { ...p, name: val } : null));
+                          }
                         }}
                         list="quick-entity-suggestions"
-                        placeholder="Person or category"
+                        placeholder="Person or item name"
                         className="w-full bg-transparent text-sm font-semibold text-ink outline-none placeholder:text-subtle truncate"
                       />
                       <datalist id="quick-entity-suggestions">

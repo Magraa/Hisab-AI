@@ -10,6 +10,8 @@ import { ChevronRight, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
 import { triggerHaptic } from "@/lib/haptics";
 
+import { findMerchant } from "@/lib/merchants";
+
 export function TransactionRow({
   tx,
   entityName,
@@ -19,12 +21,18 @@ export function TransactionRow({
   entityName?: string;
   onClick?: () => void;
 }) {
-  const { categories } = useHisab();
+  const { categories, entities } = useHisab();
   const isEntity = Boolean(tx.entityId);
-  const category = getCategory(categories, tx.categoryId);
+  const entity = tx.entityId ? entities.find((e) => e.id === tx.entityId) : undefined;
+  const merchant = isEntity ? findMerchant(entity?.name || tx.description) : undefined;
+  const resolvedCategoryId = tx.categoryId || merchant?.defaultCategoryId;
+  const category = getCategory(categories, resolvedCategoryId);
   const categoryColors = getCategoryColors(category.color);
-  const label = isEntity ? entityName ?? tx.description : category.label;
+  const label = isEntity ? entityName ?? tx.description : tx.name || category.label;
   const paymentLabel = PAYMENT_LABELS[tx.paymentMethod] ?? tx.paymentMethod;
+  const showCategoryInSubtitle =
+    (!isEntity && Boolean(tx.name)) ||
+    (isEntity && Boolean(resolvedCategoryId) && resolvedCategoryId !== "other");
 
   // Category-only rows are always money leaving the business (an expense).
   // Entity rows carry an explicit direction: "incoming" = money/value coming in.
@@ -46,7 +54,7 @@ export function TransactionRow({
     >
       <div className="relative shrink-0">
         {isEntity ? (
-          <InitialsBadge name={label} />
+          <InitialsBadge name={label} avatarUrl={entity?.avatar} />
         ) : (
           <IconBadge
             icon={getCategoryIcon(category.icon)}
@@ -70,7 +78,8 @@ export function TransactionRow({
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-[15px] font-medium text-ink">{label}</p>
-        <p className="text-xs text-muted">
+        <p className="truncate text-xs text-muted">
+          {showCategoryInSubtitle && `${category.label} · `}
           {formatTime(tx.createdAt)} · {paymentLabel}
         </p>
       </div>

@@ -14,6 +14,7 @@ import type { BusinessProfile, Category, Direction, Entity, EntityType, PaymentM
 import { cloneDefaultCategories } from "./categories";
 import { getRandomCreativeName } from "./creativeNames";
 import { getAvatarForName } from "./avatars";
+import { findMerchant } from "./merchants";
 // Demo-data seeding is disabled below so a fresh signed-out user goes through
 // real onboarding instead of landing on pre-filled demo data (see
 // OnboardingGate). To restore it for testing, uncomment this import and the
@@ -81,7 +82,12 @@ export interface AddTransactionInput {
   amount: number;
   description: string;
   categoryId?: string;
+  /** Specific item name for a category expense, e.g. "Chicken Tikka Masala". Ignored when entityName is set. */
+  name?: string;
   entityName?: string;
+  entityType?: EntityType;
+  entityAvatar?: string;
+  relationship?: string;
   direction?: Direction;
   paymentMethod?: PaymentMethod;
   source?: TxSource;
@@ -153,6 +159,38 @@ export function HisabProvider({ children }: { children: ReactNode }) {
   const localSnapshotRef = useRef<PersistedState | null>(null);
   const loadedLocalOnce = useRef(false);
 
+function enrichStateWithMerchants(s: PersistedState): PersistedState {
+  const updatedEntities = s.entities.map((e) => {
+    const merchant = findMerchant(e.name);
+    if (!merchant) return e;
+    const shouldUpdateAvatar = !e.avatar || e.avatar.startsWith("http") || e.avatar.includes("/avatars/");
+    return {
+      ...e,
+      type: e.type === "person" ? merchant.entityType : e.type,
+      avatar: shouldUpdateAvatar ? merchant.logo : e.avatar,
+      relationship: e.relationship || merchant.relationship,
+    };
+  });
+
+  const updatedTransactions = s.transactions.map((tx) => {
+    if (tx.categoryId && tx.categoryId !== "other") return tx;
+    if (!tx.entityId) return tx;
+    const entity = updatedEntities.find((e) => e.id === tx.entityId);
+    const merchant = findMerchant(entity?.name || tx.description);
+    if (!merchant) return tx;
+    return {
+      ...tx,
+      categoryId: merchant.defaultCategoryId,
+    };
+  });
+
+  return {
+    ...s,
+    entities: updatedEntities,
+    transactions: updatedTransactions,
+  };
+}
+
   useEffect(() => {
     if (loadedLocalOnce.current) return;
     loadedLocalOnce.current = true;
@@ -160,7 +198,7 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       const savedApiKey = window.localStorage.getItem("hisab_gemini_api_key");
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as PersistedState;
+        let parsed = JSON.parse(raw) as PersistedState;
         if (!parsed.business) {
           parsed.business = { name: "", userName: getRandomCreativeName(), type: "", currency: "INR", accountKind: "individual" };
         } else if (!parsed.business.userName) {
@@ -174,6 +212,7 @@ export function HisabProvider({ children }: { children: ReactNode }) {
         if (savedApiKey && !parsed.geminiApiKey) {
           parsed.geminiApiKey = savedApiKey;
         }
+        parsed = enrichStateWithMerchants(parsed);
         localSnapshotRef.current = parsed;
         setState(parsed);
         return;
@@ -257,7 +296,7 @@ export function HisabProvider({ children }: { children: ReactNode }) {
         }
 
         if (cancelled) return;
-        setState(cloud);
+        setState(enrichStateWithMerchants(cloud));
         setCloudError(null);
         setHydrated(true);
       } catch (err) {
@@ -343,17 +382,23 @@ export function HisabProvider({ children }: { children: ReactNode }) {
   );
 
   const getOrCreateEntity = useCallback(
-    (name: string, type: EntityType = "person"): Entity => {
+    (name: string, type?: EntityType, avatar?: string, relationship?: string): Entity => {
       const clean = name.trim();
       const existing = resolveEntityByName(clean);
       if (existing) return existing;
+
+      const merchant = findMerchant(clean);
+      const resolvedType = type ?? (merchant ? merchant.entityType : "person");
+      const resolvedAvatar = avatar ?? (merchant ? merchant.logo : getAvatarForName(clean).path);
+      const resolvedRelationship = relationship ?? (merchant ? merchant.relationship : undefined);
 
       const newEntity: Entity = {
         id: crypto.randomUUID(),
         name: clean,
         aliases: [],
-        type,
-        avatar: getAvatarForName(clean).path,
+        type: resolvedType,
+        avatar: resolvedAvatar,
+        relationship: resolvedRelationship,
         createdAt: new Date().toISOString(),
       };
 
@@ -384,12 +429,18 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       if (existing) {
         entityId = existing.id;
       } else {
+        const merchant = findMerchant(input.entityName);
+        const resolvedType = input.entityType ?? (merchant ? merchant.entityType : "person");
+        const resolvedAvatar = input.entityAvatar ?? (merchant ? merchant.logo : getAvatarForName(input.entityName).path);
+        const resolvedRelationship = input.relationship ?? (merchant ? merchant.relationship : undefined);
+
         newEntity = {
           id: crypto.randomUUID(),
           name: input.entityName,
           aliases: [],
-          type: "person",
-          avatar: getAvatarForName(input.entityName).path,
+          type: resolvedType,
+          avatar: resolvedAvatar,
+          relationship: resolvedRelationship,
           createdAt: new Date().toISOString(),
         };
         entityId = newEntity.id;
@@ -399,8 +450,9 @@ export function HisabProvider({ children }: { children: ReactNode }) {
     const tx: Transaction = {
       id: crypto.randomUUID(),
       amount: input.amount,
-      categoryId: input.entityName ? undefined : input.categoryId ?? "other",
+      categoryId: input.categoryId ?? (input.entityName ? undefined : "other"),
       description: input.description,
+      name: input.entityName ? undefined : input.name,
       entityId,
       direction: input.entityName ? input.direction ?? "outgoing" : undefined,
       paymentMethod: input.paymentMethod ?? "cash",
@@ -451,12 +503,18 @@ export function HisabProvider({ children }: { children: ReactNode }) {
           (e) => e.name.toLowerCase() === lower || e.aliases.some((a) => a.toLowerCase() === lower)
         );
         if (!existing) {
+          const merchant = findMerchant(input.entityName);
+          const resolvedType = input.entityType ?? (merchant ? merchant.entityType : "person");
+          const resolvedAvatar = input.entityAvatar ?? (merchant ? merchant.logo : getAvatarForName(input.entityName).path);
+          const resolvedRelationship = input.relationship ?? (merchant ? merchant.relationship : undefined);
+
           existing = {
             id: crypto.randomUUID(),
             name: input.entityName.trim(),
             aliases: [],
-            type: "person",
-            avatar: getAvatarForName(input.entityName.trim()).path,
+            type: resolvedType,
+            avatar: resolvedAvatar,
+            relationship: resolvedRelationship,
             createdAt: new Date().toISOString(),
           };
           tempEntities.push(existing);
@@ -468,8 +526,9 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       const tx: Transaction = {
         id: crypto.randomUUID(),
         amount: input.amount,
-        categoryId: input.entityName ? undefined : input.categoryId ?? "other",
+        categoryId: input.categoryId ?? (input.entityName ? undefined : "other"),
         description: input.description,
+        name: input.entityName ? undefined : input.name,
         entityId,
         direction: input.entityName ? input.direction ?? "outgoing" : undefined,
         paymentMethod: input.paymentMethod ?? "cash",

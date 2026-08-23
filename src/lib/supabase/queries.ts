@@ -54,6 +54,7 @@ function transactionFromRow(row: TransactionRow): Transaction {
     amount: Number(row.amount),
     categoryId: row.category_id ?? undefined,
     description: row.description,
+    name: row.name ?? undefined,
     entityId: row.entity_id ?? undefined,
     direction: (row.direction as Direction | null) ?? undefined,
     paymentMethod: row.payment_method as PaymentMethod,
@@ -117,6 +118,7 @@ function transactionToInsert(tx: Transaction, userId: string): TablesInsert<"tra
     amount: tx.amount,
     category_id: tx.categoryId ?? null,
     description: tx.description,
+    name: tx.name ?? null,
     entity_id: tx.entityId ?? null,
     direction: tx.direction ?? null,
     payment_method: tx.paymentMethod,
@@ -272,6 +274,7 @@ export async function updateTransactionRow(
   if (patch.amount !== undefined) update.amount = patch.amount;
   if (patch.categoryId !== undefined) update.category_id = patch.categoryId ?? null;
   if (patch.description !== undefined) update.description = patch.description;
+  if (patch.name !== undefined) update.name = patch.name ?? null;
   if (patch.entityId !== undefined) update.entity_id = patch.entityId ?? null;
   if (patch.direction !== undefined) update.direction = patch.direction ?? null;
   if (patch.paymentMethod !== undefined) update.payment_method = patch.paymentMethod;

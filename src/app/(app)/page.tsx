@@ -352,7 +352,7 @@ export default function HomePage() {
                     const isEntity = Boolean(tx.entityId);
                     const label = isEntity
                       ? entityLabel(entities, tx.entityId) ?? tx.description
-                      : getCategory(categories, tx.categoryId).label;
+                      : tx.name || getCategory(categories, tx.categoryId).label;
                     const actionLabel = tx.source === "settlement" ? "Settlement added" : "Expense added";
                     return (
                       <li key={tx.id} className="flex gap-3">

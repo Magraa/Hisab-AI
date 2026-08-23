@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, MoreHorizontal, Download, MessageCircle, ArrowDownLeft, ArrowUpRight, X, Receipt, Tag } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -19,12 +19,13 @@ import { triggerHaptic } from "@/lib/haptics";
 import type { Direction, Entity } from "@/lib/types";
 import { buildStatementPdf, statementFilename } from "@/lib/statementPdf";
 import { sendStatementToWhatsApp } from "@/lib/whatsapp";
+import { findMerchant } from "@/lib/merchants";
 
 export function AccountDetailScreen({ entityId }: { entityId: string }) {
   const { entities, transactions, categories, business, addSettlement, updateEntity } = useHisab();
   const isGeneralExpenses = entityId === "general-expenses" || entityId === "expenses";
 
-  const entity = isGeneralExpenses
+  const rawEntity = isGeneralExpenses
     ? {
         id: "general-expenses",
         name: "General Expenses",
@@ -34,6 +35,15 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
         createdAt: new Date().toISOString(),
       }
     : entities.find((e) => e.id === entityId);
+
+  const merchant = !isGeneralExpenses && rawEntity ? findMerchant(rawEntity.name) : undefined;
+  const entity = rawEntity
+    ? {
+        ...rawEntity,
+        relationship: rawEntity.relationship || merchant?.relationship,
+        avatar: rawEntity.avatar || merchant?.logo,
+      }
+    : undefined;
 
   const [selectedTxId, setSelectedTxId] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -83,7 +93,7 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
           ...items.map((t) => [
             new Date(t.createdAt).toLocaleString("en-IN"),
             getCategory(categories, t.categoryId).label,
-            t.description,
+            t.name || t.description,
             String(t.amount),
             t.paymentMethod,
           ]),
@@ -285,7 +295,7 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
                     </p>
                     <p className="text-[15px] font-medium text-ink truncate">
                       {isGeneralExpenses
-                        ? tx.description || category.label
+                        ? tx.name || tx.description || category.label
                         : isIncoming
                         ? `You got from ${entity.name}`
                         : `You gave to ${entity.name}`}
@@ -487,21 +497,48 @@ function EditEntitySheet({
   const [n, setN] = useState(name);
   const [r, setR] = useState(relationship);
   const [p, setP] = useState(phone);
-  const [aliasList, setAliasList] = useState<string[]>(aliases);
+
+  const merchant = useMemo(() => findMerchant(name), [name]);
+  const builtInAliases = useMemo(() => merchant?.aliases ?? [], [merchant]);
+  const builtInSet = useMemo(() => new Set(builtInAliases.map((a) => a.toLowerCase())), [builtInAliases]);
+
+  const [customAliases, setCustomAliases] = useState<string[]>(() => {
+    return (aliases || []).filter((a) => !builtInSet.has(a.toLowerCase()));
+  });
   const [aliasInput, setAliasInput] = useState("");
+
+  useEffect(() => {
+    setN(name);
+    setR(relationship);
+    setP(phone);
+    setCustomAliases((aliases || []).filter((a) => !builtInSet.has(a.toLowerCase())));
+  }, [name, relationship, phone, aliases, builtInSet]);
 
   function addAlias() {
     const value = aliasInput.trim();
     if (!value) return;
-    const exists = aliasList.some((a) => a.toLowerCase() === value.toLowerCase());
-    if (!exists && value.toLowerCase() !== n.trim().toLowerCase()) {
-      setAliasList((list) => [...list, value]);
+    const lower = value.toLowerCase();
+    const inBuiltIn = builtInSet.has(lower);
+    const inCustom = customAliases.some((a) => a.toLowerCase() === lower);
+    const isSameAsName = lower === n.trim().toLowerCase();
+
+    if (!inBuiltIn && !inCustom && !isSameAsName) {
+      setCustomAliases((list) => [...list, value]);
     }
     setAliasInput("");
   }
 
-  function removeAlias(value: string) {
-    setAliasList((list) => list.filter((a) => a !== value));
+  function removeCustomAlias(value: string) {
+    setCustomAliases((list) => list.filter((a) => a !== value));
+  }
+
+  function handleSave() {
+    onSave({
+      name: n.trim() || name,
+      relationship: r.trim(),
+      phone: p.trim(),
+      aliases: [...builtInAliases, ...customAliases],
+    });
   }
 
   return (
@@ -519,26 +556,52 @@ function EditEntitySheet({
         </label>
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted">Also known as</span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted">Also known as</span>
+            {builtInAliases.length > 0 && (
+              <span className="text-[11px] font-medium text-muted bg-canvas border border-border/70 rounded-full px-2 py-0.5">
+                {builtInAliases.length} built-in
+              </span>
+            )}
+          </div>
           <p className="text-xs text-muted">
-            Add nicknames or short forms — Hisab recognizes these too, so &ldquo;{aliasList[0] ?? "Bhai"} 500&rdquo;
-            still lands on this account.
+            Hisab recognizes these keywords and speech nicknames automatically when adding expenses.
           </p>
-          {aliasList.length > 0 && (
+
+          {(builtInAliases.length > 0 || customAliases.length > 0) && (
             <div className="flex flex-wrap gap-2 pt-1">
-              {aliasList.map((alias) => (
+              {/* Built-in system aliases (hardcoded, protected) */}
+              {builtInAliases.map((alias) => (
                 <span
-                  key={alias}
-                  className="flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1.5 text-sm font-medium text-primary"
+                  key={`builtin-${alias}`}
+                  className="flex items-center gap-1.5 rounded-full border border-border/80 bg-surface px-3 py-1 text-xs font-medium text-muted shadow-2xs"
+                  title="Built-in keyword"
+                >
+                  <span className="text-[10px] opacity-60">🔒</span>
+                  {alias}
+                </span>
+              ))}
+
+              {/* User-defined custom aliases (can be removed) */}
+              {customAliases.map((alias) => (
+                <span
+                  key={`custom-${alias}`}
+                  className="flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-xs font-medium text-primary shadow-2xs"
                 >
                   {alias}
-                  <button onClick={() => removeAlias(alias)} aria-label={`Remove ${alias}`}>
-                    <X size={13} />
+                  <button
+                    type="button"
+                    onClick={() => removeCustomAlias(alias)}
+                    aria-label={`Remove ${alias}`}
+                    className="hover:opacity-75 transition-opacity"
+                  >
+                    <X size={12} />
                   </button>
                 </span>
               ))}
             </div>
           )}
+
           <div className="flex gap-2 pt-1">
             <input
               value={aliasInput}
@@ -549,12 +612,13 @@ function EditEntitySheet({
                   addAlias();
                 }
               }}
-              placeholder="e.g. Ramesh bhai"
+              placeholder="Add custom alias or nickname..."
               className="min-w-0 flex-1 rounded-xl border border-border px-4 py-3 text-sm text-ink outline-none focus:border-primary"
             />
             <button
+              type="button"
               onClick={addAlias}
-              className="rounded-xl border border-border px-4 text-sm font-medium text-ink"
+              className="rounded-xl border border-border px-4 text-sm font-medium text-ink hover:bg-canvas transition-colors"
             >
               Add
             </button>
@@ -562,11 +626,11 @@ function EditEntitySheet({
         </div>
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted">Relationship</span>
+          <span className="text-xs font-medium uppercase tracking-wide text-muted">Relationship / Service</span>
           <input
             value={r}
             onChange={(e) => setR(e.target.value)}
-            placeholder="Supplier, Customer, Employee..."
+            placeholder="Food Delivery, Cab Service, Supplier..."
             className="rounded-xl border border-border px-4 py-3 text-sm text-ink outline-none focus:border-primary"
           />
         </label>
@@ -583,9 +647,7 @@ function EditEntitySheet({
         </label>
 
         <button
-          onClick={() =>
-            onSave({ name: n.trim() || name, relationship: r.trim(), phone: p.trim(), aliases: aliasList })
-          }
+          onClick={handleSave}
           className="rounded-xl bg-primary py-3 text-sm font-semibold text-white"
         >
           Save
