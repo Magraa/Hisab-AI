@@ -1,16 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  Sparkles,
+  CheckCircle2,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
 import { ThemePicker } from "@/components/theme/ThemePicker";
 import { BackupPromoCard } from "@/components/layout/BackupPromoCard";
 import { createClient } from "@/lib/supabase/client";
 import { useHisab } from "@/lib/store";
+import { triggerHaptic } from "@/lib/haptics";
 
 export default function SettingsPage() {
-  const { cloudUser } = useHisab();
+  const { cloudUser, geminiApiKey, setGeminiApiKey, dailyScansRemaining } = useHisab();
   const [notifications, setNotifications] = useState(true);
   const [signingOut, setSigningOut] = useState(false);
+
+  // AI Key state
+  const [inputKey, setInputKey] = useState("");
+  const [showKey, setShowKey] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [showGuide, setShowGuide] = useState(false);
+
+  useEffect(() => {
+    if (geminiApiKey) {
+      setInputKey(geminiApiKey);
+    }
+  }, [geminiApiKey]);
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -19,9 +45,58 @@ export default function SettingsPage() {
     setSigningOut(false);
   }
 
+  async function handleTestAndSaveKey() {
+    if (!inputKey.trim()) {
+      triggerHaptic("warning");
+      setTestResult({ type: "error", message: "Please paste a Gemini API key first." });
+      return;
+    }
+
+    setTesting(true);
+    setTestResult(null);
+    triggerHaptic("medium");
+
+    try {
+      const res = await fetch("/api/scan-receipt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "test_key",
+          apiKey: inputKey.trim(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to validate key.");
+      }
+
+      setGeminiApiKey(inputKey.trim());
+      setTestResult({
+        type: "success",
+        message: "Key verified! Unlimited receipt scanning is now active.",
+      });
+      triggerHaptic("success");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Validation failed";
+      setTestResult({ type: "error", message: msg });
+      triggerHaptic("warning");
+    } finally {
+      setTesting(false);
+    }
+  }
+
+  function handleRemoveKey() {
+    triggerHaptic("light");
+    setGeminiApiKey(null);
+    setInputKey("");
+    setTestResult(null);
+  }
+
   return (
     <div className="pb-8">
-      <SubPageHeader title="Settings" subtitle="Language, notifications, privacy" />
+      <SubPageHeader title="Settings" subtitle="Language, AI scanner, themes & cloud" />
 
       {cloudUser ? (
         <>
@@ -48,6 +123,141 @@ export default function SettingsPage() {
           <BackupPromoCard />
         </div>
       )}
+
+      {/* AI RECEIPT SCANNER SECTION */}
+      <div className="mx-5 mb-6">
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">AI Receipt & Khata Scanner</p>
+          {geminiApiKey ? (
+            <span className="flex items-center gap-1 rounded-full bg-mint-soft px-2 py-0.5 text-[11px] font-semibold text-mint">
+              <span className="h-1.5 w-1.5 rounded-full bg-mint animate-pulse" />
+              Custom Key Active
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 rounded-full bg-primary-soft px-2 py-0.5 text-[11px] font-semibold text-primary">
+              <Zap size={11} /> Free Tier ({dailyScansRemaining} left today)
+            </span>
+          )}
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-border bg-surface p-4 space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
+              <Sparkles size={20} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[15px] font-semibold text-ink">Google Gemini Vision Engine</p>
+              <p className="text-xs text-muted">
+                {geminiApiKey
+                  ? "Powered by your personal Google AI key with 1,500 free daily scans."
+                  : `Free tier includes 3 scans/day. Add your own free key for 1,500 scans/day.`}
+              </p>
+            </div>
+          </div>
+
+          {/* Key Input Field */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted">Gemini API Key</label>
+            <div className="relative flex items-center">
+              <input
+                type={showKey ? "text" : "password"}
+                value={inputKey}
+                onChange={(e) => {
+                  setInputKey(e.target.value);
+                  setTestResult(null);
+                }}
+                placeholder="Paste AI Studio Key (AIzaSy...)"
+                className="w-full rounded-xl border border-border bg-canvas px-3 py-2.5 pr-10 text-xs font-mono text-ink placeholder:text-subtle focus:border-primary focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setShowKey((v) => !v)}
+                aria-label={showKey ? "Hide key" : "Show key"}
+                className="absolute right-2.5 flex h-6 w-6 items-center justify-center text-muted hover:text-ink"
+              >
+                {showKey ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Test / Save Actions */}
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              type="button"
+              onClick={handleTestAndSaveKey}
+              disabled={testing || !inputKey.trim()}
+              className="flex-1 rounded-xl bg-primary py-2.5 text-xs font-semibold text-white shadow-xs disabled:opacity-50 active:scale-98"
+            >
+              {testing ? "Testing key..." : geminiApiKey === inputKey.trim() ? "Key Saved & Active" : "Test & Save Key"}
+            </button>
+
+            {geminiApiKey && (
+              <button
+                type="button"
+                onClick={handleRemoveKey}
+                className="rounded-xl border border-border bg-canvas px-3 py-2.5 text-xs font-semibold text-rose hover:bg-rose-soft/30 active:scale-98"
+              >
+                Remove
+              </button>
+            )}
+          </div>
+
+          {/* Test Status Messages */}
+          {testResult && (
+            <div
+              className={`flex items-start gap-2 rounded-xl p-3 text-xs ${
+                testResult.type === "success" ? "bg-mint-soft text-mint" : "bg-rose-soft text-rose"
+              }`}
+            >
+              {testResult.type === "success" ? (
+                <CheckCircle2 size={16} className="mt-0.5 shrink-0" />
+              ) : (
+                <AlertCircle size={16} className="mt-0.5 shrink-0" />
+              )}
+              <p className="font-medium">{testResult.message}</p>
+            </div>
+          )}
+
+          {/* Free Setup Guide Accordion */}
+          <div className="border-t border-border pt-3">
+            <button
+              type="button"
+              onClick={() => setShowGuide((v) => !v)}
+              className="flex w-full items-center justify-between text-xs font-medium text-primary hover:underline"
+            >
+              <span className="flex items-center gap-1.5">
+                <ShieldCheck size={14} />
+                How to get a 100% free Gemini API key
+              </span>
+              {showGuide ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
+
+            {showGuide && (
+              <div className="mt-2.5 space-y-2 rounded-xl bg-canvas p-3 text-xs text-muted">
+                <ol className="list-decimal pl-4 space-y-1.5">
+                  <li>
+                    Visit{" "}
+                    <a
+                      href="https://aistudio.google.com/app/apikey"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-0.5 font-semibold text-primary underline"
+                    >
+                      Google AI Studio <ExternalLink size={11} />
+                    </a>{" "}
+                    and sign in with any Google account.
+                  </li>
+                  <li>Click <strong>&ldquo;Create API key&rdquo;</strong> (no credit card or billing required).</li>
+                  <li>Copy the key and paste it in the box above, then tap <strong>&ldquo;Test & Save Key&rdquo;</strong>.</li>
+                </ol>
+                <p className="text-[11px] text-subtle pt-1">
+                  ✓ Free tier provides 1,500 scans/day, which is more than enough for daily shop expenses and khata slips.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       <p className="mx-5 mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Theme</p>
       <div className="mx-5 mb-6">
@@ -79,48 +289,10 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      <p className="mx-5 mb-2 text-xs font-semibold uppercase tracking-wide text-muted">AI Receipt Scanner</p>
-      <div className="mx-5 mb-6 overflow-hidden rounded-2xl border border-border bg-surface p-4 space-y-3">
-        <div>
-          <p className="text-[15px] font-medium text-ink">Google Gemini API Key</p>
-          <p className="text-xs text-muted">
-            Used for OCR scanning of bills and handwritten khata slips. Free 1,500 scans/day from{" "}
-            <a
-              href="https://aistudio.google.com/app/apikey"
-              target="_blank"
-              rel="noreferrer"
-              className="text-primary font-semibold underline"
-            >
-              Google AI Studio
-            </a>
-            .
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="password"
-            defaultValue={typeof window !== "undefined" ? localStorage.getItem("hisab_gemini_api_key") || "" : ""}
-            placeholder="Paste your free API Key (AIzaSy...)"
-            onChange={(e) => {
-              try {
-                if (e.target.value.trim()) {
-                  localStorage.setItem("hisab_gemini_api_key", e.target.value.trim());
-                } else {
-                  localStorage.removeItem("hisab_gemini_api_key");
-                }
-              } catch {
-                // ignore
-              }
-            }}
-            className="flex-1 rounded-xl border border-border bg-canvas px-3 py-2 text-xs text-ink placeholder:text-subtle focus:border-primary focus:outline-none"
-          />
-        </div>
-      </div>
-
       <p className="mx-5 mt-4 text-xs text-muted">
         {cloudUser
-          ? "Your data is backed up to the cloud and available wherever you sign in."
-          : "Your data is stored on this device. Sign in above to back it up and access it anywhere."}
+          ? "Your data and settings are backed up to the cloud and available wherever you sign in."
+          : "Your data and settings are stored locally on this device. Sign in above to back them up to the cloud."}
       </p>
     </div>
   );

@@ -4,7 +4,8 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 interface ScanReceiptRequestBody {
-  imageBase64: string; // e.g. "data:image/jpeg;base64,..." or raw base64
+  mode?: "scan" | "test_key";
+  imageBase64?: string; // e.g. "data:image/jpeg;base64,..." or raw base64
   mimeType?: string;
   additionalInfo?: string;
   pinnedEntityName?: string;
@@ -29,18 +30,24 @@ export interface ScanReceiptResponse {
   currency: string;
   entries: ExtractedEntry[];
   rawNotes?: string | null;
+  sourceKeyType?: "custom" | "system";
 }
 
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as ScanReceiptRequestBody;
-    const { imageBase64, mimeType = "image/jpeg", additionalInfo, pinnedEntityName, existingEntities, apiKey: clientApiKey } = body;
-
-    if (!imageBase64) {
-      return NextResponse.json({ error: "Missing image data." }, { status: 400 });
-    }
+    const {
+      mode = "scan",
+      imageBase64,
+      mimeType = "image/jpeg",
+      additionalInfo,
+      pinnedEntityName,
+      existingEntities,
+      apiKey: clientApiKey,
+    } = body;
 
     const apiKey = clientApiKey?.trim() || process.env.GEMINI_API_KEY?.trim();
+    const sourceKeyType = clientApiKey?.trim() ? "custom" : "system";
 
     if (!apiKey) {
       return NextResponse.json(
@@ -50,6 +57,42 @@ export async function POST(req: Request) {
         },
         { status: 400 }
       );
+    }
+
+    // MODE: TEST KEY VALIDATION
+    if (mode === "test_key") {
+      const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+      const testRes = await fetch(testUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: "Respond with the word 'PONG'." }] }],
+        }),
+      });
+
+      if (!testRes.ok) {
+        const errText = await testRes.text();
+        if (testRes.status === 400 || testRes.status === 403) {
+          return NextResponse.json(
+            { error: "INVALID_API_KEY", message: "The API key provided is invalid or has expired." },
+            { status: 400 }
+          );
+        }
+        return NextResponse.json(
+          { error: "API_ERROR", message: `Gemini test failed (${testRes.status}): ${errText}` },
+          { status: 400 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Gemini API key is valid and connected successfully.",
+      });
+    }
+
+    // MODE: SCAN RECEIPT
+    if (!imageBase64) {
+      return NextResponse.json({ error: "Missing image data." }, { status: 400 });
     }
 
     // Extract clean base64 data and mime type
@@ -112,8 +155,8 @@ Return ONLY a valid JSON object strictly matching this structure:
   "rawNotes": "Any extra detected handwritten notes or null"
 }`;
 
-    // Use Gemini 2.0 Flash (with automatic fallback to gemini-1.5-flash if needed)
-    const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
+    // Use Gemini Flash models (with automatic fallback)
+    const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
     let lastError: Error | null = null;
     let resultJson: ScanReceiptResponse | null = null;
 
@@ -146,6 +189,9 @@ Return ONLY a valid JSON object strictly matching this structure:
 
         if (!response.ok) {
           const errBody = await response.text();
+          if (response.status === 400 || response.status === 403) {
+            throw new Error("INVALID_API_KEY: The provided Gemini API key is invalid or lacks permissions.");
+          }
           throw new Error(`Gemini API error (${response.status}): ${errBody}`);
         }
 
@@ -164,12 +210,15 @@ Return ONLY a valid JSON object strictly matching this structure:
     }
 
     if (!resultJson) {
+      const isInvalidKey = lastError?.message.includes("INVALID_API_KEY");
       return NextResponse.json(
         {
-          error: "OCR_FAILED",
-          message: lastError?.message || "Failed to process receipt image with AI.",
+          error: isInvalidKey ? "INVALID_API_KEY" : "OCR_FAILED",
+          message: isInvalidKey
+            ? "Your Gemini API key appears to be invalid. Please check your key in Settings."
+            : lastError?.message || "Failed to process receipt image with AI.",
         },
-        { status: 500 }
+        { status: isInvalidKey ? 400 : 500 }
       );
     }
 
@@ -182,6 +231,8 @@ Return ONLY a valid JSON object strictly matching this structure:
     if (typeof resultJson.totalAmount !== "number" || isNaN(resultJson.totalAmount)) {
       resultJson.totalAmount = resultJson.entries.reduce((acc, curr) => acc + (curr.amount || 0), 0);
     }
+
+    resultJson.sourceKeyType = sourceKeyType;
 
     return NextResponse.json(resultJson);
   } catch (error: unknown) {

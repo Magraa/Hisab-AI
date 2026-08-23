@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
   Camera,
   Upload,
@@ -12,9 +13,9 @@ import {
   Trash2,
   Check,
   AlertCircle,
-  Key,
   RotateCcw,
-  Info,
+  Zap,
+  Settings,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useHisab, type AddTransactionInput } from "@/lib/store";
@@ -35,8 +36,6 @@ const QUICK_CHIPS = [
   "Multiple items",
 ];
 
-const LOCAL_KEY_STORAGE = "hisab_gemini_api_key";
-
 export function ReceiptScannerModal({
   open,
   onClose,
@@ -46,32 +45,28 @@ export function ReceiptScannerModal({
   onClose: () => void;
   pinnedEntityName?: string;
 }) {
-  const { entities, categories, addTransactionsBulk } = useHisab();
+  const {
+    entities,
+    categories,
+    addTransactionsBulk,
+    geminiApiKey,
+    dailyScansRemaining,
+    recordScanUsage,
+  } = useHisab();
 
   // State
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageMime, setImageMime] = useState<string>("image/jpeg");
   const [additionalInfo, setAdditionalInfo] = useState<string>("");
-  const [apiKey, setApiKey] = useState<string>("");
-  const [showKeyInput, setShowKeyInput] = useState<boolean>(false);
   const [step, setStep] = useState<"capture" | "processing" | "review">("capture");
   const [processingMessageIndex, setProcessingMessageIndex] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [quotaBlocked, setQuotaBlocked] = useState<boolean>(false);
   const [extractedEntries, setExtractedEntries] = useState<EditableEntry[]>([]);
   const [scanSummary, setScanSummary] = useState<string>("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
-
-  // Load API key from local storage on mount
-  useEffect(() => {
-    try {
-      const savedKey = localStorage.getItem(LOCAL_KEY_STORAGE);
-      if (savedKey) setApiKey(savedKey);
-    } catch {
-      // ignore
-    }
-  }, []);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -93,6 +88,7 @@ export function ReceiptScannerModal({
       setAdditionalInfo("");
       setStep("capture");
       setErrorMsg(null);
+      setQuotaBlocked(false);
       setExtractedEntries([]);
     }, 300);
   }
@@ -128,18 +124,19 @@ export function ReceiptScannerModal({
   // Trigger AI OCR
   async function runScan() {
     if (!imagePreview) return;
+
+    // Check daily quota if no custom API key is present
+    if (!geminiApiKey && dailyScansRemaining <= 0) {
+      setQuotaBlocked(true);
+      setErrorMsg("You've used all 3 free scans for today. Add your free Gemini API key in Settings to scan unlimited bills.");
+      triggerHaptic("warning");
+      return;
+    }
+
     triggerHaptic("medium");
     setStep("processing");
     setErrorMsg(null);
-
-    // Save key if changed
-    if (apiKey.trim()) {
-      try {
-        localStorage.setItem(LOCAL_KEY_STORAGE, apiKey.trim());
-      } catch {
-        // ignore
-      }
-    }
+    setQuotaBlocked(false);
 
     try {
       const existingEntityNames = entities.map((e) => e.name);
@@ -152,16 +149,18 @@ export function ReceiptScannerModal({
           additionalInfo: additionalInfo.trim() || undefined,
           pinnedEntityName: pinnedEntityName || undefined,
           existingEntities: existingEntityNames,
-          apiKey: apiKey.trim() || undefined,
+          apiKey: geminiApiKey || undefined,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.error === "INVALID_API_KEY") {
+          throw new Error("Your custom Gemini API key is invalid. Please update it in Settings.");
+        }
         if (data.error === "NO_API_KEY") {
-          setShowKeyInput(true);
-          throw new Error("Please enter your free Google Gemini API key below to scan receipts.");
+          throw new Error("No API key configured. Please add your free Google Gemini API key in Settings.");
         }
         throw new Error(data.message || "Failed to scan receipt.");
       }
@@ -192,6 +191,9 @@ export function ReceiptScannerModal({
           selected: true,
         });
       }
+
+      // Record scan usage count for free tier
+      recordScanUsage();
 
       setExtractedEntries(entries);
       setStep("review");
@@ -297,13 +299,21 @@ export function ReceiptScannerModal({
                 <h3 className="text-base font-semibold text-ink">
                   {step === "review" ? "Review Extracted Entries" : "Scan Receipt & Khata"}
                 </h3>
-                <p className="text-xs text-muted">
-                  {step === "review"
-                    ? scanSummary
-                    : pinnedEntityName
-                    ? `Recording for ${pinnedEntityName}`
-                    : "Bills, slips, or handwritten pages"}
-                </p>
+                <div className="flex items-center gap-1.5 text-xs text-muted">
+                  {step === "review" ? (
+                    <span>{scanSummary}</span>
+                  ) : pinnedEntityName ? (
+                    <span>Recording for {pinnedEntityName}</span>
+                  ) : geminiApiKey ? (
+                    <span className="flex items-center gap-1 text-mint font-medium">
+                      <span className="h-1.5 w-1.5 rounded-full bg-mint" /> Unlimited scans active
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 text-muted">
+                      <Zap size={11} className="text-primary" /> {dailyScansRemaining} of 3 free scans left today
+                    </span>
+                  )}
+                </div>
               </div>
               <button
                 type="button"
@@ -316,13 +326,25 @@ export function ReceiptScannerModal({
 
             {/* Scrollable Body */}
             <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-              {/* ERROR NOTICE */}
+              {/* QUOTA LIMIT / ERROR NOTICE */}
               {errorMsg && (
-                <div className="flex items-start gap-2.5 rounded-xl bg-rose-soft/80 p-3 text-xs text-rose">
-                  <AlertCircle size={16} className="mt-0.5 shrink-0" />
-                  <div className="flex-1">
-                    <p className="font-semibold">Notice</p>
-                    <p>{errorMsg}</p>
+                <div className="flex items-start gap-2.5 rounded-2xl bg-rose-soft/80 p-3.5 text-xs text-rose">
+                  <AlertCircle size={17} className="mt-0.5 shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div>
+                      <p className="font-semibold">{quotaBlocked ? "Daily Free Limit Reached" : "Notice"}</p>
+                      <p className="mt-0.5 text-ink/80">{errorMsg}</p>
+                    </div>
+                    {quotaBlocked && (
+                      <Link
+                        href="/more/settings"
+                        onClick={handleClose}
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 font-semibold text-white shadow-2xs active:scale-95"
+                      >
+                        <Settings size={13} />
+                        Add Free Key in Settings →
+                      </Link>
+                    )}
                   </div>
                 </div>
               )}
@@ -428,45 +450,6 @@ export function ReceiptScannerModal({
                       ))}
                     </div>
                   </div>
-
-                  {/* API Key section (if needed or requested) */}
-                  <div className="border-t border-border pt-3">
-                    <button
-                      type="button"
-                      onClick={() => setShowKeyInput((v) => !v)}
-                      className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
-                    >
-                      <Key size={13} />
-                      {showKeyInput ? "Hide Gemini API Key" : "Free Gemini API Key Settings"}
-                    </button>
-
-                    {showKeyInput && (
-                      <div className="mt-2 rounded-xl bg-canvas p-3 text-xs space-y-2 border border-border">
-                        <div className="flex items-start gap-2 text-muted">
-                          <Info size={14} className="mt-0.5 shrink-0 text-primary" />
-                          <p>
-                            Get a 100% free API key from{" "}
-                            <a
-                              href="https://aistudio.google.com/app/apikey"
-                              target="_blank"
-                              rel="noreferrer"
-                              className="font-semibold text-primary underline"
-                            >
-                              Google AI Studio
-                            </a>{" "}
-                            (1,500 free scans/day).
-                          </p>
-                        </div>
-                        <input
-                          type="password"
-                          value={apiKey}
-                          onChange={(e) => setApiKey(e.target.value)}
-                          placeholder="Paste AI Studio API Key (AIzaSy...)"
-                          className="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs text-ink placeholder:text-subtle focus:border-primary focus:outline-none"
-                        />
-                      </div>
-                    )}
-                  </div>
                 </div>
               )}
 
@@ -485,7 +468,7 @@ export function ReceiptScannerModal({
                   </div>
 
                   <div>
-                    <h4 className="text-base font-semibold text-ink">Analyzing Image</h4>
+                    <h4 className="text-base font-semibold text-ink">Analyzing Document</h4>
                     <p className="mt-1 text-xs text-muted">
                       {processingMessages[processingMessageIndex]}
                     </p>

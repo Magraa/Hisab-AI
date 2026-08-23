@@ -42,6 +42,8 @@ interface PersistedState {
   business: BusinessProfile;
   enabledPaymentMethods: PaymentMethod[];
   hasOnboarded: boolean;
+  geminiApiKey?: string | null;
+  scanUsage?: { date: string; count: number };
 }
 
 function defaultState(): PersistedState {
@@ -52,6 +54,8 @@ function defaultState(): PersistedState {
     business: { name: "", type: "", currency: "INR", accountKind: "individual" }, // seedBusiness(),
     enabledPaymentMethods: ["cash", "upi", "bank", "card", "credit"],
     hasOnboarded: false,
+    geminiApiKey: null,
+    scanUsage: undefined,
   };
 }
 
@@ -66,6 +70,8 @@ function emptyCloudState(): PersistedState {
     business: { name: "", type: "", currency: "INR", accountKind: "individual" },
     enabledPaymentMethods: ["cash", "upi", "bank", "card", "credit"],
     hasOnboarded: false,
+    geminiApiKey: null,
+    scanUsage: undefined,
   };
 }
 
@@ -103,6 +109,10 @@ interface HisabContextValue {
   cloudUser: CloudUser | null;
   cloudError: string | null;
   dismissCloudError: () => void;
+  geminiApiKey: string | null;
+  setGeminiApiKey: (key: string | null) => void;
+  dailyScansRemaining: number;
+  recordScanUsage: () => void;
   addTransaction: (input: AddTransactionInput) => Transaction;
   addTransactionsBulk: (inputs: AddTransactionInput[]) => Transaction[];
   addSettlement: (entityId: string, amount: number, direction: Direction) => void;
@@ -144,6 +154,7 @@ export function HisabProvider({ children }: { children: ReactNode }) {
     if (loadedLocalOnce.current) return;
     loadedLocalOnce.current = true;
     try {
+      const savedApiKey = window.localStorage.getItem("hisab_gemini_api_key");
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as PersistedState;
@@ -152,8 +163,17 @@ export function HisabProvider({ children }: { children: ReactNode }) {
         if (!parsed.categories || parsed.categories.length === 0) {
           parsed.categories = cloneDefaultCategories();
         }
+        if (savedApiKey && !parsed.geminiApiKey) {
+          parsed.geminiApiKey = savedApiKey;
+        }
         localSnapshotRef.current = parsed;
         setState(parsed);
+        return;
+      } else if (savedApiKey) {
+        const base = defaultState();
+        base.geminiApiKey = savedApiKey;
+        localSnapshotRef.current = base;
+        setState(base);
         return;
       }
     } catch {
@@ -246,6 +266,41 @@ export function HisabProvider({ children }: { children: ReactNode }) {
   }, [state, hydrated, cloudUser]);
 
   const dismissCloudError = useCallback(() => setCloudError(null), []);
+
+  const setGeminiApiKey = useCallback((key: string | null) => {
+    const cleanKey = key?.trim() || null;
+    setState((s) => ({ ...s, geminiApiKey: cleanKey }));
+    try {
+      if (cleanKey) {
+        window.localStorage.setItem("hisab_gemini_api_key", cleanKey);
+      } else {
+        window.localStorage.removeItem("hisab_gemini_api_key");
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const dailyScansRemaining = useMemo(() => {
+    if (state.geminiApiKey) return 1500;
+    const today = new Date().toISOString().slice(0, 10);
+    const count = state.scanUsage?.date === today ? state.scanUsage.count : 0;
+    return Math.max(0, 3 - count);
+  }, [state.geminiApiKey, state.scanUsage]);
+
+  const recordScanUsage = useCallback(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    setState((s) => {
+      const currentCount = s.scanUsage?.date === today ? s.scanUsage.count : 0;
+      return {
+        ...s,
+        scanUsage: {
+          date: today,
+          count: currentCount + 1,
+        },
+      };
+    });
+  }, []);
 
   function runCloudWrite(promise: Promise<void>, rollback: () => void) {
     promise.catch((err) => {
@@ -601,6 +656,10 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       cloudUser,
       cloudError,
       dismissCloudError,
+      geminiApiKey: state.geminiApiKey ?? null,
+      setGeminiApiKey,
+      dailyScansRemaining,
+      recordScanUsage,
       addTransaction,
       addTransactionsBulk,
       addSettlement,
@@ -622,6 +681,9 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       cloudUser,
       cloudError,
       dismissCloudError,
+      setGeminiApiKey,
+      dailyScansRemaining,
+      recordScanUsage,
       addTransaction,
       addTransactionsBulk,
       addSettlement,
