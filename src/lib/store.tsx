@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { BusinessProfile, Category, Direction, Entity, PaymentMethod, Transaction, TxSource } from "./types";
+import type { BusinessProfile, Category, Direction, Entity, EntityType, PaymentMethod, Transaction, TxSource } from "./types";
 import { cloneDefaultCategories } from "./categories";
 // Demo-data seeding is disabled below so a fresh signed-out user goes through
 // real onboarding instead of landing on pre-filled demo data (see
@@ -122,6 +122,7 @@ interface HisabContextValue {
   updateBusiness: (patch: Partial<BusinessProfile>) => void;
   togglePaymentMethod: (method: PaymentMethod) => void;
   resolveEntityByName: (name: string) => Entity | undefined;
+  getOrCreateEntity: (name: string, type?: EntityType) => Entity;
   completeOnboarding: (profile: Partial<BusinessProfile>) => void;
   resetOnboarding: () => void;
   addCategory: (input: AddCategoryInput) => Category;
@@ -318,6 +319,38 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       );
     },
     [state.entities]
+  );
+
+  const getOrCreateEntity = useCallback(
+    (name: string, type: EntityType = "person"): Entity => {
+      const clean = name.trim();
+      const existing = resolveEntityByName(clean);
+      if (existing) return existing;
+
+      const newEntity: Entity = {
+        id: crypto.randomUUID(),
+        name: clean,
+        aliases: [],
+        type,
+        createdAt: new Date().toISOString(),
+      };
+
+      setState((s) => ({
+        ...s,
+        entities: [...s.entities, newEntity],
+      }));
+
+      if (cloudUser) {
+        const uid = cloudUser.id;
+        runCloudWrite(
+          insertEntity(supabase, uid, newEntity),
+          () => setState((s) => ({ ...s, entities: s.entities.filter((e) => e.id !== newEntity.id) }))
+        );
+      }
+
+      return newEntity;
+    },
+    [resolveEntityByName, cloudUser, supabase]
   );
 
   const addTransaction = useCallback((input: AddTransactionInput): Transaction => {
@@ -669,6 +702,7 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       updateBusiness,
       togglePaymentMethod,
       resolveEntityByName,
+      getOrCreateEntity,
       completeOnboarding,
       resetOnboarding,
       addCategory,
@@ -693,6 +727,7 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       updateBusiness,
       togglePaymentMethod,
       resolveEntityByName,
+      getOrCreateEntity,
       completeOnboarding,
       resetOnboarding,
       addCategory,

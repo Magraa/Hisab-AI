@@ -25,6 +25,10 @@
 *.pem
 session_handoff.md
 *session_handoff*
+CLAUDE.md
+claude.md
+AGENTS.md
+agents.md
 
 # debug
 npm-debug.log*

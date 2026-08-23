@@ -210,7 +210,27 @@ export function HisabInput({
             className="flex flex-col gap-3 py-1.5"
           >
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted">I think this is:</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium text-muted">I think this is:</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic("light");
+                    const currentDir = pending.direction ?? "outgoing";
+                    const nextDir = currentDir === "incoming" ? "outgoing" : "incoming";
+                    setPending((p) => (p ? { ...p, direction: nextDir } : null));
+                  }}
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold border transition-all cursor-pointer ${
+                    (pending.direction ?? "outgoing") === "incoming"
+                      ? "bg-mint-soft text-mint border-mint/40 hover:bg-mint-soft/80"
+                      : "bg-rose-soft text-rose border-rose/40 hover:bg-rose-soft/80"
+                  }`}
+                  title="Click to switch Diya / Liya"
+                >
+                  {(pending.direction ?? "outgoing") === "incoming" ? "Liya (Got)" : "Diya (Gave)"}
+                  <span className="text-[11px] opacity-70">⇄</span>
+                </button>
+              </div>
               <motion.button
                 whileTap={{ scale: 0.85 }}
                 type="button"
@@ -223,31 +243,76 @@ export function HisabInput({
             </div>
             {(() => {
               const isEntityEntry = Boolean(pinnedEntityName ?? pending.entityName);
-              const isIncoming = isEntityEntry && pending.direction === "incoming";
+              const direction = pending.direction ?? "outgoing";
+              const isIncoming = direction === "incoming";
               return (
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
-                      isIncoming ? "bg-mint-soft" : "bg-rose-soft"
+                <div className="flex items-center gap-2.5">
+                  <motion.button
+                    whileTap={{ scale: 0.88 }}
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic("light");
+                      const nextDir = isIncoming ? "outgoing" : "incoming";
+                      setPending((p) => (p ? { ...p, direction: nextDir } : null));
+                    }}
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-all cursor-pointer ${
+                      isIncoming
+                        ? "bg-mint-soft border-mint/40 text-mint hover:scale-105 active:scale-95 shadow-xs"
+                        : "bg-rose-soft border-rose/40 text-rose hover:scale-105 active:scale-95 shadow-xs"
                     }`}
-                    aria-label={isIncoming ? "Money in" : "Money out"}
+                    title={`Click to switch to ${isIncoming ? "Diya (You gave)" : "Liya (You got)"}`}
+                    aria-label={`Direction: ${isIncoming ? "Liya (Money in)" : "Diya (Money out)"}. Click to switch.`}
                   >
                     {isIncoming ? (
-                      <ArrowDownLeft size={17} strokeWidth={2.5} className="text-mint" />
+                      <ArrowDownLeft size={19} strokeWidth={2.5} />
                     ) : (
-                      <ArrowUpRight size={17} strokeWidth={2.5} className="text-rose" />
+                      <ArrowUpRight size={19} strokeWidth={2.5} />
                     )}
-                  </span>
-                  <p className="flex items-baseline gap-2 text-xl font-semibold text-ink">
-                    <span>{formatRupees(pending.amount ?? 0)}</span>
-                    <span className="text-base font-medium text-muted">
-                      {pinnedEntityName ?? pending.entityName ?? getCategory(categories, pending.categoryId).label}
-                    </span>
-                  </p>
+                  </motion.button>
+
+                  <div className="flex flex-1 items-center gap-2 min-w-0">
+                    <div className="relative flex items-center rounded-xl bg-canvas px-2.5 py-1.5 border border-border/80 focus-within:border-primary focus-within:bg-surface focus-within:ring-2 focus-within:ring-primary/20 transition-all shrink-0">
+                      <span className="text-base font-semibold text-muted mr-1">₹</span>
+                      <input
+                        type="number"
+                        inputMode="decimal"
+                        value={pending.amount ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value === "" ? null : parseFloat(e.target.value);
+                          setPending((p) => (p ? { ...p, amount: val } : null));
+                        }}
+                        placeholder="0"
+                        className="w-20 bg-transparent text-lg font-bold text-ink outline-none"
+                      />
+                    </div>
+
+                    <div className="relative flex flex-1 items-center rounded-xl bg-canvas px-3 py-1.5 border border-border/80 focus-within:border-primary focus-within:bg-surface focus-within:ring-2 focus-within:ring-primary/20 transition-all min-w-0">
+                      <input
+                        type="text"
+                        value={pinnedEntityName ?? pending.entityName ?? pending.description ?? ""}
+                        disabled={Boolean(pinnedEntityName)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setPending((p) => (p ? { ...p, entityName: val, description: val } : null));
+                        }}
+                        list="quick-entity-suggestions"
+                        placeholder="Person or category"
+                        className="w-full bg-transparent text-sm font-semibold text-ink outline-none placeholder:text-subtle truncate"
+                      />
+                      <datalist id="quick-entity-suggestions">
+                        {entities.map((e) => (
+                          <option key={e.id} value={e.name} />
+                        ))}
+                        {categories.map((c) => (
+                          <option key={c.id} value={c.label} />
+                        ))}
+                      </datalist>
+                    </div>
+                  </div>
                 </div>
               );
             })()}
-            <div className="flex gap-2">
+            <div className="flex gap-2 pt-1">
               <motion.button
                 whileTap={{ scale: 0.97 }}
                 onClick={() => {
@@ -256,7 +321,7 @@ export function HisabInput({
                 }}
                 className="flex-1 rounded-xl border border-border py-2.5 text-sm font-medium text-ink active:bg-canvas"
               >
-                Edit
+                Re-type
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.97 }}

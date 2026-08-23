@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { ArrowDownLeft, ArrowUpRight, User, Tag } from "lucide-react";
 import { Sheet } from "@/components/ui/Sheet";
 import { useHisab } from "@/lib/store";
 import { getCategory } from "@/lib/categories";
 import { formatRupees } from "@/lib/format";
-import type { PaymentMethod } from "@/lib/types";
+import type { Direction, PaymentMethod, Transaction } from "@/lib/types";
 
 const SOURCE_LABELS: Record<string, string> = {
   local_text: "Typed",
@@ -30,54 +31,106 @@ export function TransactionDetailSheet({
   txId: string | null;
   onClose: () => void;
 }) {
-  const { transactions, entities, categories, updateTransaction, deleteTransaction } = useHisab();
+  const { transactions, entities, categories, updateTransaction, deleteTransaction, getOrCreateEntity } = useHisab();
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
 
   const tx = useMemo(() => transactions.find((t) => t.id === txId) ?? null, [transactions, txId]);
-  const entity = tx?.entityId ? entities.find((e) => e.id === tx.entityId) : undefined;
+  const lastTxRef = useRef<Transaction | null>(null);
+  if (tx) {
+    lastTxRef.current = tx;
+  }
+  const displayTx = tx ?? lastTxRef.current;
+
+  const entity = displayTx?.entityId ? entities.find((e) => e.id === displayTx.entityId) : undefined;
 
   const [amount, setAmount] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
+  const [txType, setTxType] = useState<"person" | "category">("person");
+  const [entityName, setEntityName] = useState("");
+  const [direction, setDirection] = useState<Direction>("outgoing");
 
-  if (!tx) return null;
+  if (!displayTx) return null;
 
-  const label = entity ? entity.name : getCategory(categories, tx.categoryId).label;
+  const label = entity ? entity.name : getCategory(categories, displayTx.categoryId).label;
+
+  function handleClose() {
+    onClose();
+    setTimeout(() => {
+      setMode("view");
+    }, 300);
+  }
 
   function startEdit() {
-    if (!tx) return;
-    setAmount(String(tx.amount));
-    setCategoryId(tx.categoryId ?? "other");
-    setPaymentMethod(tx.paymentMethod);
+    if (!displayTx) return;
+    setAmount(String(displayTx.amount));
+    setCategoryId(displayTx.categoryId ?? categories[0]?.id ?? "other");
+    setPaymentMethod(displayTx.paymentMethod);
+    if (displayTx.entityId) {
+      const ent = entities.find((e) => e.id === displayTx.entityId);
+      setTxType("person");
+      setEntityName(ent?.name ?? displayTx.description ?? "");
+      setDirection(displayTx.direction ?? "outgoing");
+    } else {
+      setTxType("category");
+      setEntityName("");
+      setDirection("outgoing");
+    }
     setMode("edit");
   }
 
   function saveEdit() {
-    if (!tx) return;
+    if (!displayTx) return;
     const parsed = parseFloat(amount);
-    updateTransaction(tx.id, {
-      amount: Number.isNaN(parsed) ? tx.amount : parsed,
-      categoryId: entity ? tx.categoryId : categoryId,
-      paymentMethod,
-    });
+    const validAmount = Number.isNaN(parsed) || parsed < 0 ? displayTx.amount : parsed;
+
+    if (txType === "person") {
+      const cleanName = entityName.trim();
+      if (cleanName) {
+        const ent = getOrCreateEntity(cleanName);
+        updateTransaction(displayTx.id, {
+          amount: validAmount,
+          entityId: ent.id,
+          direction,
+          description: ent.name,
+          categoryId: undefined,
+          paymentMethod,
+        });
+      } else {
+        updateTransaction(displayTx.id, {
+          amount: validAmount,
+          direction,
+          paymentMethod,
+        });
+      }
+    } else {
+      const catId = categoryId || "other";
+      updateTransaction(displayTx.id, {
+        amount: validAmount,
+        entityId: undefined,
+        direction: undefined,
+        categoryId: catId,
+        description: getCategory(categories, catId).label,
+        paymentMethod,
+      });
+    }
     setMode("view");
   }
 
   function confirmDelete() {
-    if (!tx) return;
-    deleteTransaction(tx.id);
-    onClose();
-    setMode("view");
+    if (!displayTx) return;
+    deleteTransaction(displayTx.id);
+    handleClose();
   }
 
   return (
-    <Sheet open={Boolean(txId)} onClose={() => { setMode("view"); onClose(); }}>
+    <Sheet open={Boolean(txId && tx)} onClose={handleClose}>
       {mode === "delete" ? (
         <div className="flex flex-col gap-4 pt-2">
           <div>
             <p className="text-base font-semibold text-ink">Delete this expense?</p>
             <p className="mt-1 text-sm text-muted">
-              {formatRupees(tx.amount)} · {label}
+              {formatRupees(displayTx.amount)} · {label}
             </p>
             <p className="mt-2 text-sm text-muted">This will be removed from your Hisab.</p>
           </div>
@@ -96,19 +149,87 @@ export function TransactionDetailSheet({
         </div>
       ) : mode === "edit" ? (
         <div className="flex flex-col gap-4 pt-2">
-          <p className="text-base font-semibold text-ink">Edit expense</p>
+          <p className="text-base font-semibold text-ink">Edit transaction</p>
 
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted">Amount</span>
-            <input
-              inputMode="decimal"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="rounded-xl border border-border px-4 py-3 text-lg font-semibold text-ink outline-none focus:border-primary"
-            />
-          </label>
+          {/* Type Switcher: Person vs Category */}
+          <div className="flex rounded-xl bg-canvas p-1 border border-border">
+            <button
+              type="button"
+              onClick={() => setTxType("person")}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all ${
+                txType === "person"
+                  ? "bg-surface text-ink shadow-xs"
+                  : "text-muted hover:text-ink"
+              }`}
+            >
+              <User size={14} />
+              Person / Account
+            </button>
+            <button
+              type="button"
+              onClick={() => setTxType("category")}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all ${
+                txType === "category"
+                  ? "bg-surface text-ink shadow-xs"
+                  : "text-muted hover:text-ink"
+              }`}
+            >
+              <Tag size={14} />
+              General Expense
+            </button>
+          </div>
 
-          {!entity && (
+          {/* Entity (Person) and Direction if txType === "person" */}
+          {txType === "person" ? (
+            <div className="flex flex-col gap-3">
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted">Person / Entity</span>
+                <input
+                  type="text"
+                  value={entityName}
+                  onChange={(e) => setEntityName(e.target.value)}
+                  list="edit-entity-options"
+                  placeholder="e.g. Ramesh, Ayush, Vendor..."
+                  className="rounded-xl border border-border px-4 py-3 text-sm font-medium text-ink outline-none focus:border-primary"
+                />
+                <datalist id="edit-entity-options">
+                  {entities.map((e) => (
+                    <option key={e.id} value={e.name} />
+                  ))}
+                </datalist>
+              </label>
+
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted">Direction (Len-Den)</span>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setDirection("outgoing")}
+                    className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 px-3 text-sm font-semibold transition-all ${
+                      direction === "outgoing"
+                        ? "border-rose bg-rose-soft/50 text-rose shadow-xs ring-2 ring-rose/20"
+                        : "border-border bg-surface text-muted hover:bg-canvas"
+                    }`}
+                  >
+                    <ArrowUpRight size={17} strokeWidth={2.5} />
+                    Diya (You gave)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDirection("incoming")}
+                    className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 px-3 text-sm font-semibold transition-all ${
+                      direction === "incoming"
+                        ? "border-mint bg-mint-soft/50 text-mint shadow-xs ring-2 ring-mint/20"
+                        : "border-border bg-surface text-muted hover:bg-canvas"
+                    }`}
+                  >
+                    <ArrowDownLeft size={17} strokeWidth={2.5} />
+                    Liya (You got)
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-medium uppercase tracking-wide text-muted">Category</span>
               <select
@@ -125,20 +246,50 @@ export function TransactionDetailSheet({
             </label>
           )}
 
+          {/* Amount */}
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted">Payment method</span>
-            <select
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
-              className="rounded-xl border border-border px-4 py-3 text-sm text-ink outline-none focus:border-primary"
-            >
-              {PAYMENT_OPTIONS.map((p) => (
-                <option key={p.value} value={p.value}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
+            <span className="text-xs font-medium uppercase tracking-wide text-muted">Amount</span>
+            <div className="relative flex items-center">
+              <span className="absolute left-4 text-base font-semibold text-muted">₹</span>
+              <input
+                inputMode="decimal"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="w-full rounded-xl border border-border pl-8 pr-4 py-3 text-lg font-semibold text-ink outline-none focus:border-primary"
+              />
+            </div>
           </label>
+
+          {/* Payment Method */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted">Payment method</span>
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { value: "cash", label: "Cash" },
+                { value: "upi", label: "UPI" },
+                { value: "bank", label: "Bank" },
+                { value: "other", label: "Others" },
+              ].map((p) => {
+                const isSelected =
+                  paymentMethod === p.value ||
+                  (p.value === "other" && !["cash", "upi", "bank"].includes(paymentMethod));
+                return (
+                  <button
+                    key={p.value}
+                    type="button"
+                    onClick={() => setPaymentMethod(p.value as PaymentMethod)}
+                    className={`rounded-xl border py-2.5 px-2 text-center text-sm font-semibold transition-all cursor-pointer ${
+                      isSelected
+                        ? "border-primary bg-primary-soft text-primary ring-2 ring-primary/20 shadow-xs"
+                        : "border-border bg-surface text-muted hover:bg-canvas hover:text-ink"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           <div className="mt-2 flex gap-3">
             <button
@@ -157,24 +308,24 @@ export function TransactionDetailSheet({
         </div>
       ) : (
         <div className="flex flex-col gap-1 pt-2">
-          <p className="text-center text-3xl font-semibold text-ink">{formatRupees(tx.amount)}</p>
+          <p className="text-center text-3xl font-semibold text-ink">{formatRupees(displayTx.amount)}</p>
           <p className="text-center text-sm text-muted">{label}</p>
 
           <div className="my-5 h-px bg-border" />
 
-          <DetailRow label="Date" value={new Date(tx.createdAt).toLocaleString("en-IN", {
+          <DetailRow label="Date" value={new Date(displayTx.createdAt).toLocaleString("en-IN", {
             day: "2-digit", month: "long", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true,
           })} />
-          {!entity && <DetailRow label="Category" value={getCategory(categories, tx.categoryId).label} />}
+          {!entity && <DetailRow label="Category" value={getCategory(categories, displayTx.categoryId).label} />}
           {entity && <DetailRow label="Account" value={`${entity.name}${entity.relationship ? ` · ${entity.relationship}` : ""}`} />}
-          {entity && <DetailRow label="Direction" value={tx.direction === "incoming" ? "You got" : "You gave"} />}
-          <DetailRow label="Payment" value={PAYMENT_OPTIONS.find((p) => p.value === tx.paymentMethod)?.label ?? tx.paymentMethod} />
-          <DetailRow label="Added via" value={SOURCE_LABELS[tx.source] ?? "Typed"} />
+          {entity && <DetailRow label="Direction" value={displayTx.direction === "incoming" ? "You got" : "You gave"} />}
+          <DetailRow label="Payment" value={PAYMENT_OPTIONS.find((p) => p.value === displayTx.paymentMethod)?.label ?? displayTx.paymentMethod} />
+          <DetailRow label="Added via" value={SOURCE_LABELS[displayTx.source] ?? "Typed"} />
 
-          {tx.rawInput && (
+          {displayTx.rawInput && (
             <div className="mt-3">
               <p className="text-xs font-medium uppercase tracking-wide text-muted">Original entry</p>
-              <p className="mt-1 rounded-xl bg-canvas px-4 py-3 text-sm italic text-ink">&ldquo;{tx.rawInput}&rdquo;</p>
+              <p className="mt-1 rounded-xl bg-canvas px-4 py-3 text-sm italic text-ink">&ldquo;{displayTx.rawInput}&rdquo;</p>
             </div>
           )}
 

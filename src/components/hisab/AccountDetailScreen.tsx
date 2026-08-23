@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, MoreHorizontal, Download, MessageCircle, ArrowDownLeft, ArrowUpRight, X } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, Download, MessageCircle, ArrowDownLeft, ArrowUpRight, X, Receipt, Tag } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
 import { computeBalance, entityTransactions } from "@/lib/selectors";
+import { getCategory } from "@/lib/categories";
 import { formatRupees, formatDayLabel } from "@/lib/format";
 import { HisabInput } from "@/components/hisab/HisabInput";
 import { TransactionDetailSheet } from "@/components/hisab/TransactionDetailSheet";
@@ -19,8 +20,19 @@ import { buildStatementPdf, statementFilename } from "@/lib/statementPdf";
 import { sendStatementToWhatsApp } from "@/lib/whatsapp";
 
 export function AccountDetailScreen({ entityId }: { entityId: string }) {
-  const { entities, transactions, business, addSettlement, updateEntity } = useHisab();
-  const entity = entities.find((e) => e.id === entityId);
+  const { entities, transactions, categories, business, addSettlement, updateEntity } = useHisab();
+  const isGeneralExpenses = entityId === "general-expenses" || entityId === "expenses";
+
+  const entity = isGeneralExpenses
+    ? {
+        id: "general-expenses",
+        name: "General Expenses",
+        aliases: [],
+        type: "group" as const,
+        relationship: "Daily expenses & bills",
+        createdAt: new Date().toISOString(),
+      }
+    : entities.find((e) => e.id === entityId);
 
   const [selectedTxId, setSelectedTxId] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -28,14 +40,32 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
   const [showEdit, setShowEdit] = useState(false);
   const [waStatus, setWaStatus] = useState<string | null>(null);
 
-  const items = useMemo(
-    () => (entity ? entityTransactions(transactions, entity.id) : []),
-    [transactions, entity]
+  const items = useMemo(() => {
+    if (isGeneralExpenses) {
+      return transactions
+        .filter((t) => !t.entityId)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+    return entity ? entityTransactions(transactions, entity.id) : [];
+  }, [transactions, entity, isGeneralExpenses]);
+
+  const totalSpent = useMemo(
+    () => items.reduce((sum, t) => sum + (t.amount || 0), 0),
+    [items]
   );
-  const balance = useMemo(
-    () => (entity ? computeBalance(transactions, entity.id) : null),
-    [transactions, entity]
-  );
+
+  const balance = useMemo(() => {
+    if (isGeneralExpenses) {
+      return {
+        label: `${items.length} ${items.length === 1 ? "expense" : "expenses"} recorded`,
+        displayAmount: totalSpent,
+        net: -totalSpent,
+        totalGiven: totalSpent,
+        totalGot: 0,
+      };
+    }
+    return entity ? computeBalance(transactions, entity.id) : null;
+  }, [transactions, entity, isGeneralExpenses, items.length, totalSpent]);
 
   if (!entity || !balance) {
     return (
@@ -46,27 +76,41 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
   }
 
   function handleExportCsv() {
-    const rows = [
-      ["Date", "Direction", "Amount", "Payment Method"],
-      ...items.map((t) => [
-        new Date(t.createdAt).toLocaleString("en-IN"),
-        t.direction === "incoming" ? "Received" : "Paid",
-        String(t.amount),
-        t.paymentMethod,
-      ]),
-    ];
+    const rows = isGeneralExpenses
+      ? [
+          ["Date", "Category", "Description", "Amount", "Payment Method"],
+          ...items.map((t) => [
+            new Date(t.createdAt).toLocaleString("en-IN"),
+            getCategory(categories, t.categoryId).label,
+            t.description,
+            String(t.amount),
+            t.paymentMethod,
+          ]),
+        ]
+      : [
+          ["Date", "Direction", "Amount", "Payment Method"],
+          ...items.map((t) => [
+            new Date(t.createdAt).toLocaleString("en-IN"),
+            t.direction === "incoming" ? "Received" : "Paid",
+            String(t.amount),
+            t.paymentMethod,
+          ]),
+        ];
     const csv = rows.map((r) => r.map((cell) => `"${cell}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${entity!.name.replace(/\s+/g, "_")}_statement.csv`;
+    a.download = isGeneralExpenses
+      ? "General_Expenses_statement.csv"
+      : `${entity!.name.replace(/\s+/g, "_")}_statement.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
 
   function buildPdfBlob(): Blob {
-    return buildStatementPdf(entity!, items, balance!, business);
+    const entBalance = computeBalance(transactions, entity!.id);
+    return buildStatementPdf(entity!, items, entBalance, business);
   }
 
   function handleDownloadPdf() {
@@ -109,23 +153,30 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
         >
           <ArrowLeft size={18} />
         </Link>
-        <button
-          onClick={() => {
-            triggerHaptic("light");
-            setShowEdit(true);
-          }}
-          aria-label="Edit account"
-          className="tap-active flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted transition-colors active:bg-primary-soft/40"
-        >
-          <MoreHorizontal size={18} />
-        </button>
+        {!isGeneralExpenses && (
+          <button
+            onClick={() => {
+              triggerHaptic("light");
+              setShowEdit(true);
+            }}
+            aria-label="Edit account"
+            className="tap-active flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted transition-colors active:bg-primary-soft/40"
+          >
+            <MoreHorizontal size={18} />
+          </button>
+        )}
       </div>
 
       <div className="mt-2 flex flex-col items-center px-5 text-center">
+        {isGeneralExpenses && (
+          <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-amber-soft text-amber shadow-2xs">
+            <Receipt size={28} strokeWidth={2.2} />
+          </div>
+        )}
         <h1 className="text-2xl font-semibold text-ink">{entity.name}</h1>
         {entity.relationship && <p className="text-sm text-muted">{entity.relationship}</p>}
 
-        <p className="mt-5 text-sm text-muted">Balance</p>
+        <p className="mt-5 text-sm text-muted">{isGeneralExpenses ? "Total Spent" : "Balance"}</p>
         <p className="text-4xl font-semibold text-ink">
           <AnimatedNumber value={balance.displayAmount} />
         </p>
@@ -141,20 +192,24 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
             triggerHaptic("light");
             setShowAdd((s) => !s);
           }}
-          className="flex-1 rounded-xl bg-primary py-3 text-sm font-semibold text-white shadow-xs"
+          className={`flex-1 rounded-xl bg-primary py-3 text-sm font-semibold text-white shadow-xs ${
+            isGeneralExpenses ? "w-full" : ""
+          }`}
         >
           + Add expense
         </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={() => {
-            triggerHaptic("light");
-            setShowSettle(true);
-          }}
-          className="flex-1 rounded-xl border border-border bg-surface py-3 text-sm font-semibold text-ink shadow-2xs"
-        >
-          Settle up
-        </motion.button>
+        {!isGeneralExpenses && (
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={() => {
+              triggerHaptic("light");
+              setShowSettle(true);
+            }}
+            className="flex-1 rounded-xl border border-border bg-surface py-3 text-sm font-semibold text-ink shadow-2xs"
+          >
+            Settle up
+          </motion.button>
+        )}
       </div>
 
       <AnimatePresence>
@@ -166,8 +221,12 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
             className="mx-5 mt-3 overflow-hidden"
           >
             <HisabInput
-              pinnedEntityName={entity.name}
-              placeholder={`What did you spend on ${entity.name}?`}
+              pinnedEntityName={isGeneralExpenses ? undefined : entity.name}
+              placeholder={
+                isGeneralExpenses
+                  ? "What did you spend? (e.g. Chai 40, Petrol 500)"
+                  : `What did you spend on ${entity.name}?`
+              }
               onAdded={() => setShowAdd(false)}
             />
           </motion.div>
@@ -178,37 +237,61 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
 
       <div className="px-5 pb-4">
         {items.length === 0 ? (
-          <EmptyState title="No transactions yet" subtitle={`Record your first entry with ${entity.name}.`} />
+          <EmptyState
+            title="No transactions yet"
+            subtitle={
+              isGeneralExpenses
+                ? "Record daily expenses like chai, fuel, groceries, or supplies."
+                : `Record your first entry with ${entity.name}.`
+            }
+          />
         ) : (
           <div className="flex flex-col">
             {items.map((tx) => {
               const isIncoming = tx.direction === "incoming";
+              const category = getCategory(categories, tx.categoryId);
               return (
                 <button
                   key={tx.id}
                   onClick={() => setSelectedTxId(tx.id)}
-                  className="flex items-center gap-3 border-b border-border py-3 text-left last:border-b-0"
+                  className="flex items-center gap-3 border-b border-border py-3 text-left last:border-b-0 w-full transition-colors active:bg-primary-soft/20"
                 >
                   <span
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-                      isIncoming ? "bg-mint-soft" : "bg-rose-soft"
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
+                      isGeneralExpenses
+                        ? "bg-amber-soft text-amber"
+                        : isIncoming
+                        ? "bg-mint-soft text-mint"
+                        : "bg-rose-soft text-rose"
                     }`}
-                    aria-label={isIncoming ? "Money in" : "Money out"}
+                    aria-label={isGeneralExpenses ? "Expense" : isIncoming ? "Money in" : "Money out"}
                   >
-                    {isIncoming ? (
-                      <ArrowDownLeft size={15} strokeWidth={2.5} className="text-mint" />
+                    {isGeneralExpenses ? (
+                      <Tag size={16} strokeWidth={2.2} />
+                    ) : isIncoming ? (
+                      <ArrowDownLeft size={16} strokeWidth={2.5} />
                     ) : (
-                      <ArrowUpRight size={15} strokeWidth={2.5} className="text-rose" />
+                      <ArrowUpRight size={16} strokeWidth={2.5} />
                     )}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm text-muted">{formatDayLabel(tx.createdAt)}</p>
-                    <p className="text-[15px] font-medium text-ink">
-                      {isIncoming ? `You got from ${entity.name}` : `You gave to ${entity.name}`}
+                    <p className="text-xs text-muted">
+                      {formatDayLabel(tx.createdAt)} · {tx.paymentMethod.toUpperCase()}
+                    </p>
+                    <p className="text-[15px] font-medium text-ink truncate">
+                      {isGeneralExpenses
+                        ? tx.description || category.label
+                        : isIncoming
+                        ? `You got from ${entity.name}`
+                        : `You gave to ${entity.name}`}
                     </p>
                   </div>
-                  <span className={`text-[15px] font-semibold ${isIncoming ? "text-mint" : "text-ink"}`}>
-                    {isIncoming ? "+" : "-"}
+                  <span
+                    className={`text-[15px] font-semibold ${
+                      isGeneralExpenses ? "text-ink" : isIncoming ? "text-mint" : "text-ink"
+                    }`}
+                  >
+                    {isGeneralExpenses ? "-" : isIncoming ? "+" : "-"}
                     {formatRupees(tx.amount)}
                   </span>
                 </button>
@@ -218,13 +301,15 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
         )}
       </div>
 
-      {items.length > 0 && (
+      {items.length > 0 && !isGeneralExpenses && (
         <div className="mx-5 mb-5 rounded-2xl border border-border bg-surface px-5 py-4">
           <TotalRow label="You gave" value={balance.totalGiven} />
           <TotalRow label="You got" value={balance.totalGot} />
           <div className="mt-2 flex items-center justify-between border-t border-border pt-2">
             <span className="text-sm font-semibold text-ink">Net</span>
-            <span className="text-sm font-semibold text-ink">{formatRupees(balance.net < 0 ? -balance.net : balance.net)}</span>
+            <span className="text-sm font-semibold text-ink">
+              {formatRupees(balance.net < 0 ? -balance.net : balance.net)}
+            </span>
           </div>
         </div>
       )}
@@ -238,15 +323,17 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
             >
               <Download size={16} /> Export CSV
             </button>
-            <button
-              onClick={handleDownloadPdf}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium text-ink"
-            >
-              <Download size={16} /> Download PDF
-            </button>
+            {!isGeneralExpenses && (
+              <button
+                onClick={handleDownloadPdf}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium text-ink"
+              >
+                <Download size={16} /> Download PDF
+              </button>
+            )}
           </div>
 
-          {entity.phone && (
+          {!isGeneralExpenses && entity.phone && (
             <button
               onClick={handleWhatsApp}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-mint-soft py-3 text-sm font-semibold text-mint"
@@ -268,29 +355,33 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
 
       <TransactionDetailSheet txId={selectedTxId} onClose={() => setSelectedTxId(null)} />
 
-      <SettleUpSheet
-        open={showSettle}
-        onClose={() => setShowSettle(false)}
-        entityName={entity.name}
-        balance={balance}
-        onSettle={(amount, direction) => {
-          addSettlement(entity.id, amount, direction);
-          setShowSettle(false);
-        }}
-      />
+      {!isGeneralExpenses && (
+        <>
+          <SettleUpSheet
+            open={showSettle}
+            onClose={() => setShowSettle(false)}
+            entityName={entity.name}
+            balance={balance}
+            onSettle={(amount, direction) => {
+              addSettlement(entity.id, amount, direction);
+              setShowSettle(false);
+            }}
+          />
 
-      <EditEntitySheet
-        open={showEdit}
-        onClose={() => setShowEdit(false)}
-        name={entity.name}
-        relationship={entity.relationship ?? ""}
-        phone={entity.phone ?? ""}
-        aliases={entity.aliases}
-        onSave={(patch) => {
-          updateEntity(entity.id, patch);
-          setShowEdit(false);
-        }}
-      />
+          <EditEntitySheet
+            open={showEdit}
+            onClose={() => setShowEdit(false)}
+            name={entity.name}
+            relationship={entity.relationship ?? ""}
+            phone={entity.phone ?? ""}
+            aliases={entity.aliases}
+            onSave={(patch) => {
+              updateEntity(entity.id, patch);
+              setShowEdit(false);
+            }}
+          />
+        </>
+      )}
     </PageTransition>
   );
 }
