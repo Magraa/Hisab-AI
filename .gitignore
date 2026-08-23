@@ -54,6 +54,8 @@ public/Assets/*.png
 !public/Assets/logo-name-only.png
 !public/Assets/logo.png
 !public/Assets/Logo.png
+/public/Assets/Home/*.png
+public/Assets/Home/*.png
 /public/Assets/categories/*.png
 public/Assets/categories/*.png
 /public/Assets/onboarding/*.png

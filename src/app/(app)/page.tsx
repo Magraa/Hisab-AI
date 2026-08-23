@@ -2,9 +2,9 @@
 
 import { useMemo, useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   MoreHorizontal,
-  Wallet,
   Bell,
   Plus,
   Lightbulb,
@@ -350,11 +350,18 @@ export default function HomePage() {
             <p className="text-sm text-muted">spent so far</p>
           </div>
           <motion.div
-            animate={{ scale: [1, 1.05, 1] }}
+            animate={{ scale: [1, 1.04, 1], y: [0, -3, 0] }}
             transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-surface shadow-xs"
+            className="relative flex h-24 w-24 shrink-0 items-center justify-center -my-2"
           >
-            <Wallet size={26} className="text-mint" />
+            <Image
+              src="/Assets/Home/teal-wallet-chart.webp"
+              alt="Today's spend"
+              width={100}
+              height={100}
+              className="h-full w-full object-contain select-none pointer-events-none opacity-75"
+              priority
+            />
           </motion.div>
         </motion.div>
 
