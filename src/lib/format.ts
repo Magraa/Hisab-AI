@@ -69,9 +69,25 @@ export function dateKey(iso: string): string {
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 }
 
+const MORNING_GREETINGS = ["Good morning", "Morning", "Rise and shine", "Hope you slept well"];
+const AFTERNOON_GREETINGS = ["Good afternoon", "Afternoon", "Hope your day's going well", "Halfway through the day"];
+const EVENING_GREETINGS = ["Good evening", "Evening", "Hope you had a good day", "Winding down?"];
+const NIGHT_GREETINGS = ["Good night", "Burning the midnight oil?", "Still up?", "Late night hisab?"];
+
 export function greeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
+  const now = new Date();
+  const hour = now.getHours();
+
+  // 12am-4am is late night, not "morning" — hour alone (0-11) can't tell
+  // those apart, so night is checked explicitly before morning, not just after evening.
+  let options: string[];
+  if (hour < 5) options = NIGHT_GREETINGS;
+  else if (hour < 12) options = MORNING_GREETINGS;
+  else if (hour < 17) options = AFTERNOON_GREETINGS;
+  else if (hour < 21) options = EVENING_GREETINGS;
+  else options = NIGHT_GREETINGS;
+
+  // Deterministic per calendar day (not per render) so server/client
+  // hydration always agree and the greeting doesn't flip on every re-render.
+  return options[now.getDate() % options.length];
 }

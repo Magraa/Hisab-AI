@@ -85,10 +85,21 @@ const FILLER_WORDS = new Set([
   "kal",
   "today",
   "yesterday",
+  "bheja",
+  "bheji",
+  "transferred",
+  "transfer",
+  "debited",
+  "kharch",
+  "kharcha",
+  "credited",
+  "refund",
+  "jama",
+  "vasool",
 ]);
 
-const OUTGOING_WORDS = ["diye", "diya", "de diya", "gave", "give", "paid", "send", "sent"];
-const INCOMING_WORDS = ["mila", "mile", "milaa", "received", "receive", "aaya", "aya", "got"];
+const OUTGOING_WORDS = ["diye", "diya", "de diya", "gave", "give", "paid", "send", "sent", "bheja", "bheji", "transferred", "debited", "kharch", "kharcha"];
+const INCOMING_WORDS = ["mila", "mile", "milaa", "received", "receive", "aaya", "aya", "got", "credited", "refund", "jama", "vasool"];
 
 const BUSINESS_KEYWORDS = [
   "store",
@@ -242,4 +253,38 @@ export function parseInput(raw: string, knownEntities: Entity[], categories: Cat
     description: "Expense",
     confidence: amount !== null ? 0.5 : 0,
   };
+}
+
+// Splits on "and"/"aur"/"&"/";"/newline — deliberately NOT on a bare comma,
+// since stripAmount() treats a comma as a thousands separator ("1,000
+// diesel") and splitting on it first would mangle that number.
+const MULTI_ENTRY_SPLIT = /\s*(?:;|\n|&|\band\b|\baur\b)\s*/gi;
+
+/**
+ * Splits one typed/spoken line into multiple transactions when it clearly
+ * describes more than one, e.g. "Prashant ko 200 diye and Anjali ko 600 diye".
+ * Falls back to a single parseInput() result for everything else, including
+ * a phrase that merely contains the word "and" as part of an item name
+ * (e.g. "fish and chips 200") — guarded by requiring at least two of the
+ * split segments to carry their own amount before treating this as multiple
+ * entries at all.
+ */
+export function parseMultipleInputs(raw: string, knownEntities: Entity[], categories: Category[]): ParsedInput[] {
+  const segments = raw
+    .split(MULTI_ENTRY_SPLIT)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (segments.length < 2) {
+    return [parseInput(raw, knownEntities, categories)];
+  }
+
+  const parsed = segments.map((seg) => parseInput(seg, knownEntities, categories));
+  const withAmount = parsed.filter((p) => p.amount !== null).length;
+
+  if (withAmount < 2) {
+    return [parseInput(raw, knownEntities, categories)];
+  }
+
+  return parsed;
 }

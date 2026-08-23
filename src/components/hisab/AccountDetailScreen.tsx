@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, MoreHorizontal, Download, MessageCircle, ArrowDownLeft, ArrowUpRight, X, Receipt, Tag } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, MoreHorizontal, Download, MessageCircle, ArrowDownLeft, ArrowUpRight, X, Receipt, Tag, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
 import { computeBalance, entityTransactions } from "@/lib/selectors";
@@ -22,7 +23,8 @@ import { sendStatementToWhatsApp } from "@/lib/whatsapp";
 import { findMerchant } from "@/lib/merchants";
 
 export function AccountDetailScreen({ entityId }: { entityId: string }) {
-  const { entities, transactions, categories, business, addSettlement, updateEntity } = useHisab();
+  const router = useRouter();
+  const { entities, transactions, categories, business, addSettlement, updateEntity, deleteEntity } = useHisab();
   const isGeneralExpenses = entityId === "general-expenses" || entityId === "expenses";
 
   const rawEntity = isGeneralExpenses
@@ -394,6 +396,11 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
               updateEntity(entity.id, patch);
               setShowEdit(false);
             }}
+            onDelete={() => {
+              deleteEntity(entity.id);
+              setShowEdit(false);
+              router.push("/accounts");
+            }}
           />
         </>
       )}
@@ -485,6 +492,7 @@ function EditEntitySheet({
   phone,
   aliases,
   onSave,
+  onDelete,
 }: {
   open: boolean;
   onClose: () => void;
@@ -493,7 +501,9 @@ function EditEntitySheet({
   phone: string;
   aliases: string[];
   onSave: (patch: Partial<Entity>) => void;
+  onDelete: () => void;
 }) {
+  const [mode, setMode] = useState<"edit" | "delete">("edit");
   const [n, setN] = useState(name);
   const [r, setR] = useState(relationship);
   const [p, setP] = useState(phone);
@@ -541,8 +551,40 @@ function EditEntitySheet({
     });
   }
 
+  function handleClose() {
+    onClose();
+    setTimeout(() => setMode("edit"), 300);
+  }
+
+  if (mode === "delete") {
+    return (
+      <Sheet open={open} onClose={handleClose}>
+        <div className="flex flex-col gap-4 pt-2">
+          <div>
+            <p className="text-base font-semibold text-ink">Delete {name}?</p>
+            <p className="mt-1 text-sm text-muted">
+              This permanently removes this account and every transaction linked to it. This can&rsquo;t be undone.
+            </p>
+          </div>
+          <button
+            onClick={() => setMode("edit")}
+            className="rounded-xl border border-border py-3 text-sm font-medium text-ink"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onDelete}
+            className="rounded-xl bg-rose py-3 text-sm font-semibold text-white"
+          >
+            Delete account
+          </button>
+        </div>
+      </Sheet>
+    );
+  }
+
   return (
-    <Sheet open={open} onClose={onClose}>
+    <Sheet open={open} onClose={handleClose}>
       <div className="flex flex-col gap-4 pt-2">
         <p className="text-base font-semibold text-ink">Edit account</p>
 
@@ -651,6 +693,13 @@ function EditEntitySheet({
           className="rounded-xl bg-primary py-3 text-sm font-semibold text-white"
         >
           Save
+        </button>
+
+        <button
+          onClick={() => setMode("delete")}
+          className="flex items-center justify-center gap-2 rounded-xl border border-rose/30 py-3 text-sm font-medium text-rose"
+        >
+          <Trash2 size={15} /> Delete account
         </button>
       </div>
     </Sheet>

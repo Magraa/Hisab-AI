@@ -11,7 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import type { BusinessProfile, Category, Direction, Entity, EntityType, ParsingMode, PaymentMethod, Transaction, TxSource } from "./types";
-import { cloneDefaultCategories } from "./categories";
+import { cloneDefaultCategories, missingDefaultCategories } from "./categories";
 import { getRandomCreativeName } from "./creativeNames";
 import { getAvatarForName } from "./avatars";
 import { findMerchant } from "./merchants";
@@ -23,6 +23,7 @@ import { findMerchant } from "./merchants";
 import { createClient } from "./supabase/client";
 import {
   deleteCategoryRow,
+  deleteEntityRow,
   deleteTransactionRow,
   fetchCloudState,
   importLocalData,
@@ -139,6 +140,7 @@ interface HisabContextValue {
   updateTransaction: (id: string, patch: Partial<Transaction>) => void;
   deleteTransaction: (id: string) => void;
   updateEntity: (id: string, patch: Partial<Entity>) => void;
+  deleteEntity: (id: string) => void;
   updateBusiness: (patch: Partial<BusinessProfile>) => void;
   togglePaymentMethod: (method: PaymentMethod) => void;
   resolveEntityByName: (name: string) => Entity | undefined;
@@ -220,6 +222,15 @@ function enrichStateWithMerchants(s: PersistedState): PersistedState {
         // have this field — backfill the defaults rather than starting empty.
         if (!parsed.categories || parsed.categories.length === 0) {
           parsed.categories = cloneDefaultCategories();
+        } else {
+          // Categories added to the built-in default list after this
+          // snapshot was saved (e.g. Entertainment, Groceries) won't
+          // otherwise appear — add just the missing ones, untouched
+          // customizations stay untouched.
+          const missing = missingDefaultCategories(parsed.categories);
+          if (missing.length > 0) {
+            parsed.categories = [...parsed.categories, ...missing];
+          }
         }
         if (savedApiKey && !parsed.geminiApiKey) {
           parsed.geminiApiKey = savedApiKey;
@@ -305,6 +316,15 @@ function enrichStateWithMerchants(s: PersistedState): PersistedState {
         if (cloud.categories.length === 0) {
           await seedDefaultCategories(supabase, cloudUser.id);
           cloud = await fetchCloudState(supabase, cloudUser.id);
+        } else {
+          // Categories added to the built-in default list after this
+          // account first synced (e.g. Entertainment, Groceries) won't
+          // otherwise appear — add just the missing ones.
+          const missing = missingDefaultCategories(cloud.categories);
+          if (missing.length > 0) {
+            await Promise.all(missing.map((c) => insertCategory(supabase, cloudUser.id, c)));
+            cloud = await fetchCloudState(supabase, cloudUser.id);
+          }
         }
 
         if (cancelled) return;
@@ -685,6 +705,33 @@ function enrichStateWithMerchants(s: PersistedState): PersistedState {
     }
   }, [cloudUser, supabase]);
 
+  // Deletes an entity (a person/vendor ledger account) along with every
+  // transaction linked to it — there's no "unassigned" entity fallback like
+  // categories have "other", so this is a full cascade delete, not a
+  // reassignment.
+  const deleteEntity = useCallback((id: string) => {
+    const previousEntities = stateRef.current.entities;
+    const removedTransactions = stateRef.current.transactions.filter((t) => t.entityId === id);
+    setState((s) => ({
+      ...s,
+      entities: s.entities.filter((e) => e.id !== id),
+      transactions: s.transactions.filter((t) => t.entityId !== id),
+    }));
+
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        deleteEntityRow(supabase, uid, id),
+        () =>
+          setState((s) => ({
+            ...s,
+            entities: previousEntities,
+            transactions: [...removedTransactions, ...s.transactions],
+          }))
+      );
+    }
+  }, [cloudUser, supabase]);
+
   const updateBusiness = useCallback((patch: Partial<BusinessProfile>) => {
     const previous = stateRef.current.business;
     setState((s) => ({ ...s, business: { ...s.business, ...patch } }));
@@ -846,6 +893,7 @@ function enrichStateWithMerchants(s: PersistedState): PersistedState {
       updateTransaction,
       deleteTransaction,
       updateEntity,
+      deleteEntity,
       updateBusiness,
       togglePaymentMethod,
       resolveEntityByName,
@@ -874,6 +922,7 @@ function enrichStateWithMerchants(s: PersistedState): PersistedState {
       updateTransaction,
       deleteTransaction,
       updateEntity,
+      deleteEntity,
       updateBusiness,
       togglePaymentMethod,
       resolveEntityByName,

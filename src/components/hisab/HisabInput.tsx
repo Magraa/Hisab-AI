@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Mic, Camera, Square, ArrowDownLeft, ArrowUpRight, X, Plus, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useHisab } from "@/lib/store";
-import { parseInput } from "@/lib/parser";
-import { parseInputWithAI } from "@/lib/aiParser";
+import { useHisab, type AddTransactionInput } from "@/lib/store";
+import { parseInput, parseMultipleInputs } from "@/lib/parser";
+import { parseInputsWithAI } from "@/lib/aiParser";
 import { getCategory } from "@/lib/categories";
 import { formatRupees } from "@/lib/format";
 import { triggerHaptic } from "@/lib/haptics";
 import { ReceiptScannerModal } from "./ReceiptScannerModal";
+import { MultiEntryConfirmSheet, type MultiEntryRow } from "./MultiEntryConfirmSheet";
 
 interface SpeechRecognitionAlternativeLike {
   transcript: string;
@@ -51,6 +52,7 @@ export function HisabInput({
     entities,
     categories,
     addTransaction,
+    addTransactionsBulk,
     resolveEntityByName,
     parsingMode,
     geminiApiKey,
@@ -66,6 +68,10 @@ export function HisabInput({
   const [successLabel, setSuccessLabel] = useState("");
   const [successIncoming, setSuccessIncoming] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [multiOpen, setMultiOpen] = useState(false);
+  const [multiRows, setMultiRows] = useState<MultiEntryRow[]>([]);
+  const [multiFromAI, setMultiFromAI] = useState(false);
+  const [multiSource, setMultiSource] = useState<"manual" | "voice">("manual");
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const aiControllerRef = useRef<AbortController | null>(null);
 
@@ -81,7 +87,11 @@ export function HisabInput({
   async function runParse(raw: string, source: "manual" | "voice") {
     if (!raw.trim()) return;
     const effectiveText = pinnedEntityName ? `${pinnedEntityName} ${raw}` : raw;
-    const localResult = parseInput(effectiveText, entities, categories);
+    // One typed/spoken line can describe more than one transaction, e.g.
+    // "Prashant ko 200 diye and Anjali ko 600 diye" — this splits it into
+    // per-entry ParsedInput results; a normal single-transaction line just
+    // comes back as a one-element array.
+    const localResults = parseMultipleInputs(effectiveText, entities, categories);
 
     // Pinned-entity quick-add rows (e.g. an account's ledger) have nothing
     // ambiguous to classify — the entity is already fixed — so AI adds no
@@ -90,10 +100,10 @@ export function HisabInput({
       parsingMode !== "local" &&
       !pinnedEntityName &&
       (Boolean(geminiApiKey) || dailyTextParsesRemaining > 0) &&
-      (parsingMode === "ai" || (localResult.amount !== null && localResult.confidence < 0.85));
+      (parsingMode === "ai" || localResults.some((r) => r.amount !== null && r.confidence < 0.85));
 
     if (!eligibleForAI) {
-      finalize(localResult, raw, source, false);
+      finalize(localResults, raw, source, false);
       return;
     }
 
@@ -101,17 +111,25 @@ export function HisabInput({
     triggerHaptic("light");
     const controller = new AbortController();
     aiControllerRef.current = controller;
-    const aiResult = await parseInputWithAI(raw, entities, categories, {
+    const aiResults = await parseInputsWithAI(raw, entities, categories, {
       apiKey: geminiApiKey,
       pinnedEntityName,
       signal: controller.signal,
     });
     aiControllerRef.current = null;
-    if (aiResult) recordTextParseUsage();
-    finalize(aiResult ?? localResult, raw, source, Boolean(aiResult));
+    const usedAI = aiResults !== null && aiResults.length > 0;
+    if (usedAI) recordTextParseUsage();
+    finalize(usedAI ? aiResults : localResults, raw, source, usedAI);
   }
 
-  function finalize(result: PendingParse, raw: string, source: "manual" | "voice", fromAI: boolean) {
+  function finalize(results: PendingParse[], raw: string, source: "manual" | "voice", fromAI: boolean) {
+    if (results.length > 1) {
+      openMultiConfirm(results, source, fromAI);
+      return;
+    }
+
+    const result = results[0];
+
     if (result.amount === null) {
       setPending(result);
       setPendingFromAI(fromAI);
@@ -134,6 +152,55 @@ export function HisabInput({
   function cancelThinking() {
     triggerHaptic("light");
     aiControllerRef.current?.abort();
+  }
+
+  function openMultiConfirm(results: PendingParse[], source: "manual" | "voice", fromAI: boolean) {
+    const rows: MultiEntryRow[] = results.map((r, i) => ({
+      id: `row-${Date.now()}-${i}`,
+      amount: r.amount,
+      name: r.entityName ?? r.name ?? r.description,
+      categoryId: r.entityName ? undefined : r.categoryId ?? "other",
+      entityName: r.entityName,
+      entityType: r.entityType,
+      entityAvatar: r.entityAvatar,
+      direction: r.direction ?? "outgoing",
+    }));
+    setMultiRows(rows);
+    setMultiFromAI(fromAI);
+    setMultiSource(source);
+    setMultiOpen(true);
+    setStage("idle");
+    setText("");
+    triggerHaptic("medium");
+  }
+
+  function closeMultiConfirm() {
+    triggerHaptic("light");
+    setMultiOpen(false);
+    setMultiRows([]);
+  }
+
+  function commitMulti() {
+    const validRows = multiRows.filter((r) => r.amount !== null && r.amount > 0);
+    if (validRows.length === 0) return;
+
+    const inputs: AddTransactionInput[] = validRows.map((r) => ({
+      amount: r.amount ?? 0,
+      description: r.entityName ? r.entityName : getCategory(categories, r.categoryId).label,
+      categoryId: r.entityName ? undefined : r.categoryId,
+      name: r.entityName ? undefined : r.name,
+      entityName: r.entityName,
+      entityType: r.entityType,
+      entityAvatar: r.entityAvatar,
+      direction: r.direction,
+      source: multiFromAI ? "ai_text" : multiSource,
+    }));
+
+    addTransactionsBulk(inputs);
+    triggerHaptic("success");
+    setMultiOpen(false);
+    setMultiRows([]);
+    onAdded?.();
   }
 
   function commit(result: PendingParse, raw: string, source: "manual" | "voice", fromAI: boolean) {
@@ -221,6 +288,7 @@ export function HisabInput({
   }
 
   return (
+    <>
     <motion.div
       layout
       transition={{ type: "spring", stiffness: 450, damping: 32 }}
@@ -524,12 +592,21 @@ export function HisabInput({
           </motion.div>
         )}
       </AnimatePresence>
+    </motion.div>
 
       <ReceiptScannerModal
         open={scannerOpen}
         onClose={() => setScannerOpen(false)}
         pinnedEntityName={pinnedEntityName}
       />
-    </motion.div>
+
+      <MultiEntryConfirmSheet
+        open={multiOpen}
+        rows={multiRows}
+        onChange={setMultiRows}
+        onClose={closeMultiConfirm}
+        onCommit={commitMulti}
+      />
+    </>
   );
 }

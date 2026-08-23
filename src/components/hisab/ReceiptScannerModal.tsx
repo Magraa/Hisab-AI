@@ -93,17 +93,57 @@ export function ReceiptScannerModal({
     }, 300);
   }
 
+  // Phone camera photos are routinely 3-10MB — base64-encoded that comfortably
+  // exceeds most serverless function body limits (e.g. Vercel's 4.5MB), which
+  // fails as a non-JSON "Request Entity Too Large" response. Downscale to a
+  // reasonable max dimension and re-encode as JPEG before it ever leaves the
+  // device, instead of just accepting whatever the camera produced.
+  function compressImage(file: File, maxDimension = 1600, quality = 0.82): Promise<{ dataUrl: string; mimeType: string }> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(reader.error ?? new Error("Failed to read file"));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error("Failed to load image"));
+        img.onload = () => {
+          const scale = Math.min(1, maxDimension / Math.max(img.width, img.height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            reject(new Error("Canvas not supported"));
+            return;
+          }
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve({ dataUrl: canvas.toDataURL("image/jpeg", quality), mimeType: "image/jpeg" });
+        };
+        img.src = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   // File selection
-  function handleFileSelected(file: File) {
+  async function handleFileSelected(file: File) {
     if (!file) return;
     triggerHaptic("light");
-    setImageMime(file.type || "image/jpeg");
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImagePreview(reader.result as string);
+    try {
+      const { dataUrl, mimeType } = await compressImage(file);
+      setImageMime(mimeType);
+      setImagePreview(dataUrl);
       setErrorMsg(null);
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      // Compression failed (unsupported format, etc.) — fall back to the
+      // original file rather than blocking the user entirely.
+      setImageMime(file.type || "image/jpeg");
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result as string);
+        setErrorMsg(null);
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   // Processing message timer
@@ -153,7 +193,19 @@ export function ReceiptScannerModal({
         }),
       });
 
-      const data = await res.json();
+      const rawBody = await res.text();
+      let data: Record<string, unknown>;
+      try {
+        data = JSON.parse(rawBody);
+      } catch {
+        // The response wasn't JSON at all — e.g. a hosting platform's own
+        // "Request Entity Too Large" / gateway error page, not our route.
+        throw new Error(
+          res.status === 413 || /entity too large/i.test(rawBody)
+            ? "That photo is too large to upload. Try again — receipts are now compressed automatically, but a very large image can still fail."
+            : `Scan failed (${res.status}). Please try again.`
+        );
+      }
 
       if (!res.ok) {
         if (data.error === "INVALID_API_KEY") {
@@ -162,10 +214,10 @@ export function ReceiptScannerModal({
         if (data.error === "NO_API_KEY") {
           throw new Error("No API key configured. Please add your free Google Gemini API key in Settings.");
         }
-        throw new Error(data.message || "Failed to scan receipt.");
+        throw new Error((data.message as string) || "Failed to scan receipt.");
       }
 
-      const scanRes = data as ScanReceiptResponse;
+      const scanRes = data as unknown as ScanReceiptResponse;
       setScanSummary(scanRes.summary || scanRes.vendorOrPerson || "Receipt Entries");
 
       const entries: EditableEntry[] = (scanRes.entries || []).map((e, index) => ({

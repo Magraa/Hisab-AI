@@ -30,7 +30,7 @@ export interface AiParsedEntry {
 }
 
 export interface ParseTextResponse {
-  result: AiParsedEntry | null;
+  results: AiParsedEntry[];
   sourceKeyType?: "custom" | "system";
 }
 
@@ -63,9 +63,19 @@ export async function POST(req: Request) {
 
     const promptText = `You are a fast, precise text parser for 'Hisab', an expense and khata (ledger) app used by
 Indian small businesses, freelancers, and individuals. The user typed or spoke a short phrase
-describing ONE money transaction, often in Hinglish or a regional language (typed in Latin or
-Devanagari script), e.g. "500 diesel", "chicken tikka masala 200", "छोले भटूरे 150",
-"Ramesh ko 1000 diye".
+describing one or more money transactions, often in Hinglish or a regional language (typed in
+Latin or Devanagari script), e.g. "500 diesel", "chicken tikka masala 200", "छोले भटूरे 150",
+"Ramesh ko 1000 diye", or a MULTI-transaction line like
+"Prashant ko 200 diye and Anjali ko 600 diye".
+
+Multiple transactions:
+- Most inputs describe exactly ONE transaction — return a single-element results array for those.
+- Only split into multiple entries when the text clearly names more than one distinct
+  transaction (usually joined by "and"/"aur"/"&"/a semicolon, each with its own amount), e.g.
+  two different people each being paid, or two different items each with their own price.
+- Do NOT split a single item/dish name that merely contains the word "and" (e.g. "fish and
+  chips 200" is ONE transaction, not two) — only split when at least two segments each carry
+  their own amount.
 
 Context:
 - Pinned Person/Entity (if any): "${pinnedEntityName || "None"}"
@@ -97,21 +107,24 @@ Decision rules:
 7. Keep itemName/entityName in the same language/script the user used — do not translate to
    English, and do not invent a translation.
 
-Return ONLY a valid JSON object strictly matching this structure:
+Return ONLY a valid JSON object strictly matching this structure — "results" is ALWAYS an array,
+with exactly one element for a normal single-transaction input:
 {
-  "result": {
-    "amount": 200,
-    "type": "category",
-    "categoryId": "refreshments",
-    "itemName": "Chicken Tikka Masala",
-    "entityName": null,
-    "entityType": null,
-    "isExistingEntity": false,
-    "direction": "outgoing",
-    "confidence": 0.92
-  }
+  "results": [
+    {
+      "amount": 200,
+      "type": "category",
+      "categoryId": "refreshments",
+      "itemName": "Chicken Tikka Masala",
+      "entityName": null,
+      "entityType": null,
+      "isExistingEntity": false,
+      "direction": "outgoing",
+      "confidence": 0.92
+    }
+  ]
 }
-If truly nothing usable can be extracted, return { "result": null }.
+If truly nothing usable can be extracted, return { "results": [] }.
 
 User input text: "${text}"`;
 
@@ -170,10 +183,12 @@ User input text: "${text}"`;
       );
     }
 
-    // Validate and sanitize the model's response before trusting it.
-    const result = resultJson.result;
-    if (result) {
-      const knownCategoryIds = new Set((categories ?? []).map((c) => c.id));
+    // Validate and sanitize each entry in the model's response before trusting it.
+    if (!Array.isArray(resultJson.results)) {
+      resultJson.results = [];
+    }
+    const knownCategoryIds = new Set((categories ?? []).map((c) => c.id));
+    for (const result of resultJson.results) {
       result.confidence = Math.max(0, Math.min(1, Number(result.confidence) || 0));
       if (result.type === "category") {
         if (!result.categoryId || !knownCategoryIds.has(result.categoryId)) {

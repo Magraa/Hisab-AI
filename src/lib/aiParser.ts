@@ -14,16 +14,19 @@ interface ParseWithAiOptions {
 /**
  * Calls the Gemini-backed /api/parse-text endpoint and maps its response onto
  * the same ParsedInput shape the local parser produces, so callers don't need
- * to branch on where a result came from. Never throws — any failure (bad
- * response, network error, timeout, or a null AI result) resolves to null so
+ * to branch on where a result came from. Returns an array since one line of
+ * text can describe multiple transactions (e.g. "Prashant ko 200 diye and
+ * Anjali ko 600 diye" -> two entries); a normal single-transaction input just
+ * comes back as a one-element array. Never throws — any failure (bad
+ * response, network error, timeout, or no usable results) resolves to null so
  * the caller can silently fall back to the local parser.
  */
-export async function parseInputWithAI(
+export async function parseInputsWithAI(
   raw: string,
   entities: Entity[],
   categories: Category[],
   opts: ParseWithAiOptions
-): Promise<ParsedInput | null> {
+): Promise<ParsedInput[] | null> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), opts.timeoutMs ?? 7000);
   if (opts.signal) {
@@ -48,9 +51,9 @@ export async function parseInputWithAI(
     if (!res.ok) return null;
 
     const data = (await res.json()) as ParseTextResponse;
-    if (!data.result) return null;
+    if (!Array.isArray(data.results) || data.results.length === 0) return null;
 
-    return mapAiResult(data.result, categories);
+    return data.results.map((r) => mapAiResult(r, categories));
   } catch {
     return null;
   } finally {

@@ -260,6 +260,19 @@ export async function deleteCategoryRow(supabase: Client, userId: string, id: st
   if (error) throw error;
 }
 
+/**
+ * Deletes an entity (a person/vendor ledger account) along with every
+ * transaction linked to it. The FK is ON DELETE SET NULL, not CASCADE, so
+ * orphaned transactions must be removed explicitly rather than left dangling
+ * with a null entity_id.
+ */
+export async function deleteEntityRow(supabase: Client, userId: string, id: string): Promise<void> {
+  const { error: txError } = await supabase.from("transactions").delete().eq("entity_id", id).eq("user_id", userId);
+  if (txError) throw txError;
+  const { error } = await supabase.from("entities").delete().eq("id", id).eq("user_id", userId);
+  if (error) throw error;
+}
+
 /** Seeds the standard built-in category list for an account that has none yet. */
 export async function seedDefaultCategories(supabase: Client, userId: string): Promise<void> {
   const { error } = await supabase
