@@ -185,8 +185,8 @@ export function HisabInput({
           >
             <motion.span
               initial={{ scale: 0 }}
-              animate={{ scale: [0, 1.25, 1] }}
-              transition={{ type: "spring", stiffness: 550, damping: 20 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 500, damping: 15 }}
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
                 successIncoming ? "bg-mint-soft" : "bg-rose-soft"
               }`}

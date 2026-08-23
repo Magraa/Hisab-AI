@@ -65,6 +65,7 @@ export default function InsightsPage() {
           <SelectChip
             label="Period"
             value={period}
+            align="right"
             onChange={(v) => {
               triggerHaptic("light");
               setPeriod(v as Period);
