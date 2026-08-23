@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Sheet } from "@/components/ui/Sheet";
 import { useHisab } from "@/lib/store";
-import { CATEGORIES, getCategory } from "@/lib/categories";
+import { getCategory } from "@/lib/categories";
 import { formatRupees } from "@/lib/format";
 import type { PaymentMethod } from "@/lib/types";
 
@@ -30,7 +30,7 @@ export function TransactionDetailSheet({
   txId: string | null;
   onClose: () => void;
 }) {
-  const { transactions, entities, updateTransaction, deleteTransaction } = useHisab();
+  const { transactions, entities, categories, updateTransaction, deleteTransaction } = useHisab();
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
 
   const tx = useMemo(() => transactions.find((t) => t.id === txId) ?? null, [transactions, txId]);
@@ -42,7 +42,7 @@ export function TransactionDetailSheet({
 
   if (!tx) return null;
 
-  const label = entity ? entity.name : getCategory(tx.categoryId).label;
+  const label = entity ? entity.name : getCategory(categories, tx.categoryId).label;
 
   function startEdit() {
     if (!tx) return;
@@ -116,7 +116,7 @@ export function TransactionDetailSheet({
                 onChange={(e) => setCategoryId(e.target.value)}
                 className="rounded-xl border border-border px-4 py-3 text-sm text-ink outline-none focus:border-primary"
               >
-                {CATEGORIES.map((c) => (
+                {categories.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.label}
                   </option>
@@ -165,7 +165,7 @@ export function TransactionDetailSheet({
           <DetailRow label="Date" value={new Date(tx.createdAt).toLocaleString("en-IN", {
             day: "2-digit", month: "long", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true,
           })} />
-          {!entity && <DetailRow label="Category" value={getCategory(tx.categoryId).label} />}
+          {!entity && <DetailRow label="Category" value={getCategory(categories, tx.categoryId).label} />}
           {entity && <DetailRow label="Account" value={`${entity.name}${entity.relationship ? ` · ${entity.relationship}` : ""}`} />}
           {entity && <DetailRow label="Direction" value={tx.direction === "incoming" ? "You got" : "You gave"} />}
           <DetailRow label="Payment" value={PAYMENT_OPTIONS.find((p) => p.value === tx.paymentMethod)?.label ?? tx.paymentMethod} />

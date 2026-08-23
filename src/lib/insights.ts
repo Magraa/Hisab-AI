@@ -1,5 +1,5 @@
-import type { Transaction } from "./types";
-import { getCategory, CATEGORIES } from "./categories";
+import type { Category, Transaction } from "./types";
+import { getCategory, getCategoryColors } from "./categories";
 import { withinRange, sumAmount } from "./selectors";
 
 export type Period = "this_month" | "last_month" | "all_time";
@@ -43,7 +43,7 @@ export interface CategorySlice {
   bg: string;
 }
 
-export function categoryBreakdown(transactions: Transaction[]): CategorySlice[] {
+export function categoryBreakdown(transactions: Transaction[], categories: Category[]): CategorySlice[] {
   const total = sumAmount(transactions);
   const totals = new Map<string, number>();
   for (const t of transactions) {
@@ -52,14 +52,15 @@ export function categoryBreakdown(transactions: Transaction[]): CategorySlice[] 
   }
   return Array.from(totals.entries())
     .map(([id, amount]) => {
-      const cat = getCategory(id);
+      const cat = getCategory(categories, id);
+      const colors = getCategoryColors(cat.color);
       return {
         id,
         label: cat.label,
         amount,
         pct: total > 0 ? Math.round((amount / total) * 100) : 0,
-        fg: cat.fg,
-        bg: cat.bg,
+        fg: colors.fg,
+        bg: colors.bg,
       };
     })
     .sort((a, b) => b.amount - a.amount);
@@ -110,11 +111,10 @@ export function buildInsightCards(
     const prevSlice = previous.find((p) => p.id === slice.id);
     const diff = slice.amount - (prevSlice?.amount ?? 0);
     if (Math.abs(diff) >= 100) {
-      const cat = CATEGORIES.find((c) => c.id === slice.id);
       cards.push({
         emoji: diff > 0 ? "📈" : "📉",
-        title: `${cat?.label ?? "Spending"} is ${diff > 0 ? "rising" : "falling"}`,
-        body: `You spent ${diff > 0 ? "more" : "less"} on ${(cat?.label ?? "this category").toLowerCase()} — a difference of ₹${Math.abs(Math.round(diff)).toLocaleString("en-IN")} vs last period.`,
+        title: `${slice.label} is ${diff > 0 ? "rising" : "falling"}`,
+        body: `You spent ${diff > 0 ? "more" : "less"} on ${slice.label.toLowerCase()} — a difference of ₹${Math.abs(Math.round(diff)).toLocaleString("en-IN")} vs last period.`,
       });
     }
   }

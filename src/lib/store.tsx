@@ -10,7 +10,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { BusinessProfile, Direction, Entity, PaymentMethod, Transaction, TxSource } from "./types";
+import type { BusinessProfile, Category, Direction, Entity, PaymentMethod, Transaction, TxSource } from "./types";
+import { cloneDefaultCategories } from "./categories";
 // Demo-data seeding is disabled below so a fresh signed-out user goes through
 // real onboarding instead of landing on pre-filled demo data (see
 // OnboardingGate). To restore it for testing, uncomment this import and the
@@ -18,11 +19,15 @@ import type { BusinessProfile, Direction, Entity, PaymentMethod, Transaction, Tx
 // import { seedBusiness, seedEntities, seedTransactions } from "./seed";
 import { createClient } from "./supabase/client";
 import {
+  deleteCategoryRow,
   deleteTransactionRow,
   fetchCloudState,
   importLocalData,
+  insertCategory,
   insertEntity,
   insertTransaction,
+  seedDefaultCategories,
+  updateCategoryRow,
   updateEntityRow,
   updateProfile,
   updateTransactionRow,
@@ -33,6 +38,7 @@ const STORAGE_KEY = "hisab_state_v1";
 interface PersistedState {
   entities: Entity[];
   transactions: Transaction[];
+  categories: Category[];
   business: BusinessProfile;
   enabledPaymentMethods: PaymentMethod[];
   hasOnboarded: boolean;
@@ -42,6 +48,7 @@ function defaultState(): PersistedState {
   return {
     entities: [], // seedEntities(),
     transactions: [], // seedTransactions(),
+    categories: cloneDefaultCategories(),
     business: { name: "", type: "", currency: "INR", accountKind: "individual" }, // seedBusiness(),
     enabledPaymentMethods: ["cash", "upi", "bank", "card", "credit"],
     hasOnboarded: false,
@@ -55,6 +62,7 @@ function emptyCloudState(): PersistedState {
   return {
     entities: [],
     transactions: [],
+    categories: cloneDefaultCategories(),
     business: { name: "", type: "", currency: "INR", accountKind: "individual" },
     enabledPaymentMethods: ["cash", "upi", "bank", "card", "credit"],
     hasOnboarded: false,
@@ -77,9 +85,17 @@ export interface CloudUser {
   email: string | null;
 }
 
+export interface AddCategoryInput {
+  label: string;
+  icon: string;
+  color: Category["color"];
+  keywords?: string[];
+}
+
 interface HisabContextValue {
   entities: Entity[];
   transactions: Transaction[];
+  categories: Category[];
   business: BusinessProfile;
   enabledPaymentMethods: PaymentMethod[];
   hasOnboarded: boolean;
@@ -97,6 +113,9 @@ interface HisabContextValue {
   resolveEntityByName: (name: string) => Entity | undefined;
   completeOnboarding: (profile: Partial<BusinessProfile>) => void;
   resetOnboarding: () => void;
+  addCategory: (input: AddCategoryInput) => Category;
+  updateCategory: (id: string, patch: Partial<Category>) => void;
+  deleteCategory: (id: string) => void;
 }
 
 const HisabContext = createContext<HisabContextValue | null>(null);
@@ -127,6 +146,11 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as PersistedState;
+        // Older snapshots (saved before categories were user-editable) won't
+        // have this field — backfill the defaults rather than starting empty.
+        if (!parsed.categories || parsed.categories.length === 0) {
+          parsed.categories = cloneDefaultCategories();
+        }
         localSnapshotRef.current = parsed;
         setState(parsed);
         return;
@@ -183,6 +207,12 @@ export function HisabProvider({ children }: { children: ReactNode }) {
           if (imported) {
             cloud = await fetchCloudState(supabase, cloudUser.id);
           }
+        }
+        // Covers both a brand-new account (import above had nothing to carry
+        // over) and an existing account from before categories were synced.
+        if (cloud.categories.length === 0) {
+          await seedDefaultCategories(supabase, cloudUser.id);
+          cloud = await fetchCloudState(supabase, cloudUser.id);
         }
         if (cancelled) return;
         setState(cloud);
@@ -414,10 +444,79 @@ export function HisabProvider({ children }: { children: ReactNode }) {
     }
   }, [cloudUser, supabase]);
 
+  const addCategory = useCallback((input: AddCategoryInput): Category => {
+    const category: Category = {
+      id: crypto.randomUUID(),
+      label: input.label,
+      icon: input.icon,
+      color: input.color,
+      keywords: input.keywords ?? [],
+    };
+    setState((s) => ({ ...s, categories: [...s.categories, category] }));
+
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        insertCategory(supabase, uid, category),
+        () => setState((s) => ({ ...s, categories: s.categories.filter((c) => c.id !== category.id) }))
+      );
+    }
+
+    return category;
+  }, [cloudUser, supabase]);
+
+  const updateCategory = useCallback((id: string, patch: Partial<Category>) => {
+    const previous = stateRef.current.categories.find((c) => c.id === id);
+    setState((s) => ({
+      ...s,
+      categories: s.categories.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+    }));
+
+    if (cloudUser && previous) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        updateCategoryRow(supabase, uid, id, patch),
+        () => setState((s) => ({ ...s, categories: s.categories.map((c) => (c.id === id ? previous : c)) }))
+      );
+    }
+  }, [cloudUser, supabase]);
+
+  // Reassigns any expenses in the deleted category to "Other" rather than
+  // leaving them pointing at a categoryId that no longer exists.
+  const deleteCategory = useCallback((id: string) => {
+    if (id === "other") return;
+    const previousCategories = stateRef.current.categories;
+    const reassigned = stateRef.current.transactions.filter((t) => t.categoryId === id);
+    setState((s) => ({
+      ...s,
+      categories: s.categories.filter((c) => c.id !== id),
+      transactions: s.transactions.map((t) => (t.categoryId === id ? { ...t, categoryId: "other" } : t)),
+    }));
+
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        (async () => {
+          await Promise.all(reassigned.map((t) => updateTransactionRow(supabase, uid, t.id, { categoryId: "other" })));
+          await deleteCategoryRow(supabase, uid, id);
+        })(),
+        () =>
+          setState((s) => ({
+            ...s,
+            categories: previousCategories,
+            transactions: s.transactions.map((t) =>
+              reassigned.some((r) => r.id === t.id) ? { ...t, categoryId: id } : t
+            ),
+          }))
+      );
+    }
+  }, [cloudUser, supabase]);
+
   const value = useMemo<HisabContextValue>(
     () => ({
       entities: state.entities,
       transactions: state.transactions,
+      categories: state.categories,
       business: state.business,
       enabledPaymentMethods: state.enabledPaymentMethods,
       hasOnboarded: state.hasOnboarded,
@@ -435,6 +534,9 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       resolveEntityByName,
       completeOnboarding,
       resetOnboarding,
+      addCategory,
+      updateCategory,
+      deleteCategory,
     }),
     [
       state,
@@ -452,6 +554,9 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       resolveEntityByName,
       completeOnboarding,
       resetOnboarding,
+      addCategory,
+      updateCategory,
+      deleteCategory,
     ]
   );
 

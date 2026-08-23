@@ -1,9 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Tables, TablesInsert, TablesUpdate } from "./types";
 import { SEED_ENTITY_IDS } from "../seed";
+import { DEFAULT_CATEGORIES } from "../categories";
 import type {
   AccountKind,
   BusinessProfile,
+  Category,
+  CategoryColor,
   Direction,
   Entity,
   EntityType,
@@ -16,10 +19,12 @@ type Client = SupabaseClient<Database>;
 type EntityRow = Tables<"entities">;
 type TransactionRow = Tables<"transactions">;
 type ProfileRow = Tables<"profiles">;
+type CategoryRow = Tables<"categories">;
 
 export interface CloudState {
   entities: Entity[];
   transactions: Transaction[];
+  categories: Category[];
   business: BusinessProfile;
   enabledPaymentMethods: PaymentMethod[];
   hasOnboarded: boolean;
@@ -55,6 +60,27 @@ function transactionFromRow(row: TransactionRow): Transaction {
     source: row.source as TxSource,
     rawInput: row.raw_input ?? undefined,
     createdAt: row.created_at,
+  };
+}
+
+function categoryFromRow(row: CategoryRow): Category {
+  return {
+    id: row.id,
+    label: row.label,
+    icon: row.icon,
+    color: row.color as CategoryColor,
+    keywords: row.keywords,
+  };
+}
+
+function categoryToInsert(category: Category, userId: string): TablesInsert<"categories"> {
+  return {
+    id: category.id,
+    user_id: userId,
+    label: category.label,
+    icon: category.icon,
+    color: category.color,
+    keywords: category.keywords,
   };
 }
 
@@ -109,19 +135,22 @@ function profilePatchToUpdate(patch: ProfilePatch): TablesUpdate<"profiles"> {
 }
 
 export async function fetchCloudState(supabase: Client, userId: string): Promise<CloudState> {
-  const [profileResult, entitiesResult, transactionsResult] = await Promise.all([
+  const [profileResult, entitiesResult, transactionsResult, categoriesResult] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", userId).single(),
     supabase.from("entities").select("*").eq("user_id", userId).order("created_at", { ascending: true }),
     supabase.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
+    supabase.from("categories").select("*").eq("user_id", userId).order("created_at", { ascending: true }),
   ]);
 
   if (profileResult.error) throw profileResult.error;
   if (entitiesResult.error) throw entitiesResult.error;
   if (transactionsResult.error) throw transactionsResult.error;
+  if (categoriesResult.error) throw categoriesResult.error;
 
   return {
     entities: (entitiesResult.data ?? []).map(entityFromRow),
     transactions: (transactionsResult.data ?? []).map(transactionFromRow),
+    categories: (categoriesResult.data ?? []).map(categoryFromRow),
     business: businessFromRow(profileResult.data),
     enabledPaymentMethods: profileResult.data.enabled_payment_methods as PaymentMethod[],
     hasOnboarded: profileResult.data.has_onboarded,
@@ -147,6 +176,39 @@ export async function updateEntityRow(
   if (patch.phone !== undefined) update.phone = patch.phone ?? null;
   if (patch.notes !== undefined) update.notes = patch.notes ?? null;
   const { error } = await supabase.from("entities").update(update).eq("id", id).eq("user_id", userId);
+  if (error) throw error;
+}
+
+export async function insertCategory(supabase: Client, userId: string, category: Category): Promise<void> {
+  const { error } = await supabase.from("categories").insert(categoryToInsert(category, userId));
+  if (error) throw error;
+}
+
+export async function updateCategoryRow(
+  supabase: Client,
+  userId: string,
+  id: string,
+  patch: Partial<Category>,
+): Promise<void> {
+  const update: TablesUpdate<"categories"> = {};
+  if (patch.label !== undefined) update.label = patch.label;
+  if (patch.icon !== undefined) update.icon = patch.icon;
+  if (patch.color !== undefined) update.color = patch.color;
+  if (patch.keywords !== undefined) update.keywords = patch.keywords;
+  const { error } = await supabase.from("categories").update(update).eq("id", id).eq("user_id", userId);
+  if (error) throw error;
+}
+
+export async function deleteCategoryRow(supabase: Client, userId: string, id: string): Promise<void> {
+  const { error } = await supabase.from("categories").delete().eq("id", id).eq("user_id", userId);
+  if (error) throw error;
+}
+
+/** Seeds the standard built-in category list for an account that has none yet. */
+export async function seedDefaultCategories(supabase: Client, userId: string): Promise<void> {
+  const { error } = await supabase
+    .from("categories")
+    .insert(DEFAULT_CATEGORIES.map((c) => categoryToInsert(c, userId)));
   if (error) throw error;
 }
 
@@ -197,6 +259,7 @@ export async function importLocalData(
   local: {
     entities: Entity[];
     transactions: Transaction[];
+    categories: Category[];
     business: BusinessProfile;
     enabledPaymentMethods: PaymentMethod[];
     hasOnboarded: boolean;
@@ -216,6 +279,13 @@ export async function importLocalData(
     const { error } = await supabase
       .from("transactions")
       .insert(realTransactions.map((t) => transactionToInsert(t, userId)));
+    if (error) throw error;
+  }
+
+  if (local.categories.length > 0) {
+    const { error } = await supabase
+      .from("categories")
+      .insert(local.categories.map((c) => categoryToInsert(c, userId)));
     if (error) throw error;
   }
 

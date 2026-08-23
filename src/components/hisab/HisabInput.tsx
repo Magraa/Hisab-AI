@@ -43,7 +43,7 @@ export function HisabInput({
   onAdded?: () => void;
   placeholder?: string;
 }) {
-  const { entities, addTransaction, resolveEntityByName } = useHisab();
+  const { entities, categories, addTransaction, resolveEntityByName } = useHisab();
   const [text, setText] = useState("");
   const [stage, setStage] = useState<"idle" | "confirm" | "success" | "error">("idle");
   const [pending, setPending] = useState<PendingParse | null>(null);
@@ -67,7 +67,7 @@ export function HisabInput({
   function runParse(raw: string, source: "manual" | "voice") {
     if (!raw.trim()) return;
     const effectiveText = pinnedEntityName ? `${pinnedEntityName} ${raw}` : raw;
-    const result = parseInput(effectiveText, entities);
+    const result = parseInput(effectiveText, entities, categories);
 
     if (result.amount === null) {
       setPending(result);
@@ -98,7 +98,7 @@ export function HisabInput({
       rawInput: raw,
     });
 
-    const label = entityName ?? getCategory(result.categoryId).label;
+    const label = entityName ?? getCategory(categories, result.categoryId).label;
     setSuccessLabel(`${formatRupees(result.amount ?? 0)} · ${entityName ? (existing ? label : `${label} (new)`) : label}`);
     setSuccessIncoming(Boolean(entityName) && result.direction === "incoming");
     setStage("success");
@@ -213,7 +213,7 @@ export function HisabInput({
                 <p className="flex items-baseline gap-2 text-xl font-semibold text-ink">
                   <span>{formatRupees(pending.amount ?? 0)}</span>
                   <span className="text-base font-medium text-muted">
-                    {pinnedEntityName ?? pending.entityName ?? getCategory(pending.categoryId).label}
+                    {pinnedEntityName ?? pending.entityName ?? getCategory(categories, pending.categoryId).label}
                   </span>
                 </p>
               </div>

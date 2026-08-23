@@ -186,7 +186,7 @@ const SECTIONS: Section[] = [
     items: [
       {
         q: "Can I add my own categories?",
-        a: "Not yet — More → Categories shows the built-in set Hisab recognizes automatically. Custom categories are planned for a future update.",
+        a: "Yes — More → Categories lets you add, edit, or delete categories: pick a name, color, icon, and the keywords that should auto-match it. Deleting a category moves its past expenses to \"Other\".",
       },
       {
         q: "Payment methods",

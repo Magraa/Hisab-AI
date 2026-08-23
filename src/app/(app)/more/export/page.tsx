@@ -13,7 +13,7 @@ const RANGE_OPTIONS = [
 ];
 
 export default function ExportPage() {
-  const { transactions, entities } = useHisab();
+  const { transactions, entities, categories } = useHisab();
   const [range, setRange] = useState("this_month");
 
   function getRows() {
@@ -38,7 +38,7 @@ export default function ExportPage() {
       ...rows.map((t) => [
         new Date(t.createdAt).toLocaleString("en-IN"),
         t.entityId ? entityLabel(entities, t.entityId) ?? t.description : t.description,
-        t.entityId ? "Account" : getCategory(t.categoryId).label,
+        t.entityId ? "Account" : getCategory(categories, t.categoryId).label,
         String(t.amount),
         t.paymentMethod,
       ]),

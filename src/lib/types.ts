@@ -31,6 +31,16 @@ export interface Transaction {
   createdAt: string; // ISO datetime
 }
 
+export type CategoryColor = "mint" | "amber" | "rose" | "blue" | "peach" | "violet" | "subtle";
+
+export interface Category {
+  id: string;
+  label: string;
+  icon: string;
+  color: CategoryColor;
+  keywords: string[];
+}
+
 export type AccountKind = "business" | "individual";
 
 export interface BusinessProfile {

@@ -1,4 +1,4 @@
-import type { Direction, Entity } from "./types";
+import type { Category, Direction, Entity } from "./types";
 import { findCategoryByKeyword } from "./categories";
 
 export interface ParsedInput {
@@ -133,7 +133,7 @@ function titleCase(text: string): string {
     .join(" ");
 }
 
-export function parseInput(raw: string, knownEntities: Entity[]): ParsedInput {
+export function parseInput(raw: string, knownEntities: Entity[], categories: Category[]): ParsedInput {
   const text = correctMishears(raw.trim());
   const lower = text.toLowerCase();
 
@@ -146,7 +146,7 @@ export function parseInput(raw: string, knownEntities: Entity[]): ParsedInput {
   else if (INCOMING_WORDS.some((w) => lower.includes(w))) direction = "incoming";
 
   const knownEntity = cleaned ? findKnownEntity(cleaned, knownEntities) : undefined;
-  const category = findCategoryByKeyword(lower);
+  const category = findCategoryByKeyword(categories, lower);
 
   if (knownEntity) {
     return {

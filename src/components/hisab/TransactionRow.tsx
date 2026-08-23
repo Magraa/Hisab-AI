@@ -1,7 +1,8 @@
 "use client";
 
 import type { Transaction } from "@/lib/types";
-import { getCategory } from "@/lib/categories";
+import { useHisab } from "@/lib/store";
+import { getCategory, getCategoryColors, getCategoryIcon } from "@/lib/categories";
 import { formatRupees, formatTime } from "@/lib/format";
 import { IconBadge, InitialsBadge } from "@/components/ui/IconBadge";
 import { ChevronRight, ArrowDownLeft, ArrowUpRight } from "lucide-react";
@@ -15,8 +16,10 @@ export function TransactionRow({
   entityName?: string;
   onClick?: () => void;
 }) {
+  const { categories } = useHisab();
   const isEntity = Boolean(tx.entityId);
-  const category = getCategory(tx.categoryId);
+  const category = getCategory(categories, tx.categoryId);
+  const categoryColors = getCategoryColors(category.color);
   const label = isEntity ? entityName ?? tx.description : category.label;
   const paymentLabel = PAYMENT_LABELS[tx.paymentMethod] ?? tx.paymentMethod;
 
@@ -37,7 +40,7 @@ export function TransactionRow({
         {isEntity ? (
           <InitialsBadge name={label} />
         ) : (
-          <IconBadge icon={category.icon} bg={category.bg} fg={category.fg} />
+          <IconBadge icon={getCategoryIcon(category.icon)} bg={categoryColors.bg} fg={categoryColors.fg} />
         )}
         <span
           className={`absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-surface ${

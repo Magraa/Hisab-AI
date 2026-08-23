@@ -26,7 +26,7 @@ const PERIOD_OPTIONS: Array<{ value: Period; label: string }> = [
 ];
 
 export default function InsightsPage() {
-  const { transactions } = useHisab();
+  const { transactions, categories } = useHisab();
   const [period, setPeriod] = useState<Period>("this_month");
 
   const data = useMemo(() => {
@@ -37,8 +37,8 @@ export default function InsightsPage() {
 
     const currentTotal = sumAmount(current);
     const previousTotal = sumAmount(previous);
-    const currentSlices = categoryBreakdown(current);
-    const previousSlices = categoryBreakdown(previous);
+    const currentSlices = categoryBreakdown(current, categories);
+    const previousSlices = categoryBreakdown(previous, categories);
 
     const trend = dailyTotals(current, range.start, range.end);
     const bestDay = trend.reduce((best, p) => (p.amount > best.amount ? p : best), trend[0] ?? { amount: 0, day: 0, iso: "" });
@@ -50,7 +50,7 @@ export default function InsightsPage() {
     const changePct = previousTotal > 0 ? Math.round(((currentTotal - previousTotal) / previousTotal) * 100) : null;
 
     return { current, currentTotal, previousTotal, currentSlices, trend, bestDay, avgPerDay, cards, changePct };
-  }, [transactions, period]);
+  }, [transactions, categories, period]);
 
   return (
     <div>

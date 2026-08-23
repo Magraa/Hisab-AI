@@ -5,7 +5,7 @@ import { Search, Plus } from "lucide-react";
 import { useHisab } from "@/lib/store";
 import { groupByDay, sumAmount, entityLabel, withinRange } from "@/lib/selectors";
 import { formatRupees, formatDayHeading } from "@/lib/format";
-import { CATEGORIES, getCategory } from "@/lib/categories";
+import { getCategory } from "@/lib/categories";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { SelectChip } from "@/components/ui/Chip";
 import { TransactionRow } from "@/components/hisab/TransactionRow";
@@ -39,7 +39,7 @@ const AMOUNT_OPTIONS = [
 ];
 
 export default function EntriesPage() {
-  const { transactions, entities } = useHisab();
+  const { transactions, entities, categories } = useHisab();
   const [query, setQuery] = useState("");
   const [dateFilter, setDateFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -51,7 +51,7 @@ export default function EntriesPage() {
   const filtered = useMemo(() => {
     const now = new Date();
     let result = transactions.filter((tx) => {
-      const label = tx.entityId ? entityLabel(entities, tx.entityId) ?? "" : getCategory(tx.categoryId).label;
+      const label = tx.entityId ? entityLabel(entities, tx.entityId) ?? "" : getCategory(categories, tx.categoryId).label;
       if (query && !label.toLowerCase().includes(query.trim().toLowerCase())) return false;
       if (categoryFilter !== "all" && tx.categoryId !== categoryFilter) return false;
       if (paymentFilter !== "all" && tx.paymentMethod !== paymentFilter) return false;
@@ -84,7 +84,7 @@ export default function EntriesPage() {
     }
 
     return result;
-  }, [transactions, entities, query, dateFilter, categoryFilter, paymentFilter, amountFilter]);
+  }, [transactions, entities, categories, query, dateFilter, categoryFilter, paymentFilter, amountFilter]);
 
   const groups = useMemo(() => groupByDay(filtered), [filtered]);
   const total = sumAmount(filtered);
@@ -111,7 +111,7 @@ export default function EntriesPage() {
           label="Category"
           value={categoryFilter}
           onChange={setCategoryFilter}
-          options={[{ value: "all", label: "Category" }, ...CATEGORIES.map((c) => ({ value: c.id, label: c.label }))]}
+          options={[{ value: "all", label: "Category" }, ...categories.map((c) => ({ value: c.id, label: c.label }))]}
         />
         <SelectChip label="Payment" value={paymentFilter} onChange={setPaymentFilter} options={PAYMENT_OPTIONS} />
         <SelectChip label="Amount" value={amountFilter} onChange={setAmountFilter} options={AMOUNT_OPTIONS} />
