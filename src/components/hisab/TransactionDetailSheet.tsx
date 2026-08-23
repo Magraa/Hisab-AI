@@ -15,6 +15,7 @@ const SOURCE_LABELS: Record<string, string> = {
   voice: "Voice",
   manual: "Typed",
   settlement: "Settle up",
+  ai_text: "AI parsed",
 };
 
 const PAYMENT_OPTIONS: Array<{ value: PaymentMethod; label: string }> = [

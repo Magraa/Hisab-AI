@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Mic, Camera, Square, ArrowDownLeft, ArrowUpRight, X, Plus } from "lucide-react";
+import { Mic, Camera, Square, ArrowDownLeft, ArrowUpRight, X, Plus, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
 import { parseInput } from "@/lib/parser";
+import { parseInputWithAI } from "@/lib/aiParser";
 import { getCategory } from "@/lib/categories";
 import { formatRupees } from "@/lib/format";
 import { triggerHaptic } from "@/lib/haptics";
@@ -46,16 +47,27 @@ export function HisabInput({
   onAdded?: () => void;
   placeholder?: string;
 }) {
-  const { entities, categories, addTransaction, resolveEntityByName } = useHisab();
+  const {
+    entities,
+    categories,
+    addTransaction,
+    resolveEntityByName,
+    parsingMode,
+    geminiApiKey,
+    dailyTextParsesRemaining,
+    recordTextParseUsage,
+  } = useHisab();
   const [text, setText] = useState("");
-  const [stage, setStage] = useState<"idle" | "confirm" | "success" | "error">("idle");
+  const [stage, setStage] = useState<"idle" | "thinking" | "confirm" | "success" | "error">("idle");
   const [pending, setPending] = useState<PendingParse | null>(null);
+  const [pendingFromAI, setPendingFromAI] = useState(false);
   const [listening, setListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [successLabel, setSuccessLabel] = useState("");
   const [successIncoming, setSuccessIncoming] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const aiControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     const w = window as unknown as {
@@ -66,29 +78,65 @@ export function HisabInput({
     setVoiceSupported(Boolean(Ctor));
   }, []);
 
-  function runParse(raw: string, source: "manual" | "voice") {
+  async function runParse(raw: string, source: "manual" | "voice") {
     if (!raw.trim()) return;
     const effectiveText = pinnedEntityName ? `${pinnedEntityName} ${raw}` : raw;
-    const result = parseInput(effectiveText, entities, categories);
+    const localResult = parseInput(effectiveText, entities, categories);
 
+    // Pinned-entity quick-add rows (e.g. an account's ledger) have nothing
+    // ambiguous to classify — the entity is already fixed — so AI adds no
+    // value there in any mode and would only burn quota/latency.
+    const eligibleForAI =
+      parsingMode !== "local" &&
+      !pinnedEntityName &&
+      (Boolean(geminiApiKey) || dailyTextParsesRemaining > 0) &&
+      (parsingMode === "ai" || (localResult.amount !== null && localResult.confidence < 0.85));
+
+    if (!eligibleForAI) {
+      finalize(localResult, raw, source, false);
+      return;
+    }
+
+    setStage("thinking");
+    triggerHaptic("light");
+    const controller = new AbortController();
+    aiControllerRef.current = controller;
+    const aiResult = await parseInputWithAI(raw, entities, categories, {
+      apiKey: geminiApiKey,
+      pinnedEntityName,
+      signal: controller.signal,
+    });
+    aiControllerRef.current = null;
+    if (aiResult) recordTextParseUsage();
+    finalize(aiResult ?? localResult, raw, source, Boolean(aiResult));
+  }
+
+  function finalize(result: PendingParse, raw: string, source: "manual" | "voice", fromAI: boolean) {
     if (result.amount === null) {
       setPending(result);
+      setPendingFromAI(fromAI);
       setStage("error");
       triggerHaptic("warning");
       return;
     }
 
     if (result.confidence >= 0.85 || pinnedEntityName) {
-      commit(result, raw, source);
+      commit(result, raw, source, fromAI);
       return;
     }
 
     setPending(result);
+    setPendingFromAI(fromAI);
     setStage("confirm");
     triggerHaptic("medium");
   }
 
-  function commit(result: PendingParse, raw: string, source: "manual" | "voice") {
+  function cancelThinking() {
+    triggerHaptic("light");
+    aiControllerRef.current?.abort();
+  }
+
+  function commit(result: PendingParse, raw: string, source: "manual" | "voice", fromAI: boolean) {
     const entityName = pinnedEntityName ?? result.entityName;
     const existing = entityName ? resolveEntityByName(entityName) : undefined;
 
@@ -101,7 +149,7 @@ export function HisabInput({
       entityType: result.entityType,
       entityAvatar: result.entityAvatar,
       direction: result.direction,
-      source,
+      source: fromAI ? "ai_text" : source,
       rawInput: raw,
     });
 
@@ -112,6 +160,7 @@ export function HisabInput({
     triggerHaptic("success");
     setText("");
     setPending(null);
+    setPendingFromAI(false);
     onAdded?.();
 
     setTimeout(() => setStage("idle"), 1400);
@@ -125,6 +174,7 @@ export function HisabInput({
     triggerHaptic("light");
     setStage("idle");
     setPending(null);
+    setPendingFromAI(false);
     setText("");
   }
 
@@ -202,6 +252,29 @@ export function HisabInput({
               )}
             </motion.span>
             <span className="text-[15px] font-semibold text-ink">✓ Added &nbsp;{successLabel}</span>
+          </motion.div>
+        ) : stage === "thinking" ? (
+          <motion.div
+            key="thinking"
+            initial={{ opacity: 0, scale: 0.9, y: 4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 500, damping: 25 }}
+            className="flex items-center gap-3 py-2.5"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
+              <Loader2 size={17} className="animate-spin" />
+            </span>
+            <span className="text-[15px] font-medium text-muted">Thinking&hellip;</span>
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              type="button"
+              onClick={cancelThinking}
+              aria-label="Cancel"
+              className="ml-auto flex h-7 w-7 items-center justify-center rounded-full text-subtle hover:bg-canvas"
+            >
+              <X size={15} />
+            </motion.button>
           </motion.div>
         ) : stage === "confirm" && pending ? (
           <motion.div
@@ -335,7 +408,7 @@ export function HisabInput({
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.97 }}
-                onClick={() => commit(pending, text, "manual")}
+                onClick={() => commit(pending, text, "manual", pendingFromAI)}
                 className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-semibold text-white shadow-sm"
               >
                 Yes, add

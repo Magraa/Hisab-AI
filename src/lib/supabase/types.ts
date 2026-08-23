@@ -89,6 +89,7 @@ export type Database = {
           has_onboarded: boolean
           id: string
           name: string
+          parsing_mode: string
           type: string
         }
         Insert: {
@@ -99,6 +100,7 @@ export type Database = {
           has_onboarded?: boolean
           id: string
           name?: string
+          parsing_mode?: string
           type?: string
         }
         Update: {
@@ -109,6 +111,7 @@ export type Database = {
           has_onboarded?: boolean
           id?: string
           name?: string
+          parsing_mode?: string
           type?: string
         }
         Relationships: []

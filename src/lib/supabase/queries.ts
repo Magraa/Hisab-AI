@@ -10,6 +10,7 @@ import type {
   Direction,
   Entity,
   EntityType,
+  ParsingMode,
   PaymentMethod,
   Transaction,
   TxSource,
@@ -28,11 +29,13 @@ export interface CloudState {
   business: BusinessProfile;
   enabledPaymentMethods: PaymentMethod[];
   hasOnboarded: boolean;
+  parsingMode: ParsingMode;
 }
 
 export type ProfilePatch = Partial<BusinessProfile> & {
   enabledPaymentMethods?: PaymentMethod[];
   hasOnboarded?: boolean;
+  parsingMode?: ParsingMode;
 };
 
 function entityFromRow(row: EntityRow): Entity {
@@ -136,6 +139,7 @@ function profilePatchToUpdate(patch: ProfilePatch): TablesUpdate<"profiles"> {
   if (patch.accountKind !== undefined) update.account_kind = patch.accountKind;
   if (patch.enabledPaymentMethods !== undefined) update.enabled_payment_methods = patch.enabledPaymentMethods;
   if (patch.hasOnboarded !== undefined) update.has_onboarded = patch.hasOnboarded;
+  if (patch.parsingMode !== undefined) update.parsing_mode = patch.parsingMode;
   return update;
 }
 
@@ -175,6 +179,7 @@ export async function fetchCloudState(supabase: Client, userId: string): Promise
       account_kind: "individual",
       enabled_payment_methods: ["cash", "upi", "bank", "card", "credit"],
       has_onboarded: false,
+      parsing_mode: "local",
     };
 
     const { data: createdProfile, error: createError } = await supabase
@@ -199,6 +204,7 @@ export async function fetchCloudState(supabase: Client, userId: string): Promise
     business: businessFromRow(profileRow),
     enabledPaymentMethods: (profileRow.enabled_payment_methods as PaymentMethod[]) ?? ["cash", "upi", "bank", "card", "credit"],
     hasOnboarded: profileRow.has_onboarded ?? false,
+    parsingMode: (profileRow.parsing_mode as ParsingMode) || "local",
   };
 }
 
@@ -314,6 +320,7 @@ export async function importLocalData(
     business: BusinessProfile;
     enabledPaymentMethods: PaymentMethod[];
     hasOnboarded: boolean;
+    parsingMode?: ParsingMode;
   },
 ): Promise<boolean> {
   const realEntities = local.entities.filter((e) => !SEED_ENTITY_IDS.has(e.id));
@@ -347,6 +354,7 @@ export async function importLocalData(
     ...local.business,
     enabledPaymentMethods: local.enabledPaymentMethods,
     hasOnboarded: local.hasOnboarded,
+    parsingMode: local.parsingMode,
   });
 
   return true;

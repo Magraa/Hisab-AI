@@ -1,8 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { MoreHorizontal, Wallet, Bell, Plus, Lightbulb, ArrowRight, CalendarDays } from "lucide-react";
+import {
+  MoreHorizontal,
+  Wallet,
+  Bell,
+  Plus,
+  Lightbulb,
+  ArrowRight,
+  CalendarDays,
+  Camera,
+  Download,
+  Grid2x2,
+  CreditCard,
+  Store,
+  User,
+  Settings,
+  HelpCircle,
+  LayoutGrid,
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
 import { greeting, formatRupees, formatTime } from "@/lib/format";
@@ -22,6 +39,7 @@ import { TransactionRow } from "@/components/hisab/TransactionRow";
 import { TransactionDetailSheet } from "@/components/hisab/TransactionDetailSheet";
 import { DesktopEntryTable } from "@/components/hisab/DesktopEntryTable";
 import { HomeSpendChart } from "@/components/hisab/HomeSpendChart";
+import { ReceiptScannerModal } from "@/components/hisab/ReceiptScannerModal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { Card } from "@/components/ui/Card";
@@ -35,6 +53,29 @@ export default function HomePage() {
   const { transactions, entities, categories, business } = useHisab();
   const [selectedTxId, setSelectedTxId] = useState<string | null>(null);
   const [showAddSheet, setShowAddSheet] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    function handleClickOutside(e: MouseEvent | TouchEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMobileMenuOpen(false);
+      }
+    }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [mobileMenuOpen]);
 
   const todays = useMemo(
     () =>
@@ -94,14 +135,205 @@ export default function HomePage() {
             <h1 className="text-xl font-semibold text-ink">{greeting()}, {business.userName || business.name || "Hisab User"} 👋</h1>
             <p className="text-sm text-muted">Here&rsquo;s your Hisab</p>
           </div>
-          <Link
-            href="/more"
-            aria-label="More"
-            onClick={() => triggerHaptic("light")}
-            className="tap-active flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted transition-colors active:bg-primary-soft/40"
-          >
-            <MoreHorizontal size={18} />
-          </Link>
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              aria-label="More options"
+              aria-expanded={mobileMenuOpen}
+              onClick={() => {
+                triggerHaptic("light");
+                setMobileMenuOpen((prev) => !prev);
+              }}
+              className={`tap-active flex h-9 w-9 items-center justify-center rounded-full border transition-colors cursor-pointer ${
+                mobileMenuOpen
+                  ? "border-primary bg-primary text-white shadow-xs"
+                  : "border-border text-muted active:bg-primary-soft/40 hover:bg-canvas"
+              }`}
+            >
+              <MoreHorizontal size={18} />
+            </button>
+
+            <AnimatePresence>
+              {mobileMenuOpen && (
+                <>
+                  {/* Backdrop overlay to close on outside touch */}
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setMobileMenuOpen(false)}
+                  />
+
+                  {/* Dropdown Menu */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.94, y: -6 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.94, y: -6 }}
+                    transition={{ duration: 0.16, ease: [0.2, 0, 0, 1] }}
+                    className="absolute right-0 top-11 z-50 w-64 origin-top-right overflow-hidden rounded-2xl border border-border/80 bg-surface/98 p-1.5 shadow-xl backdrop-blur-md"
+                  >
+                    {/* Quick Actions */}
+                    <div className="space-y-0.5">
+                      {/* Scan Receipt option - commented out
+                      <button
+                        type="button"
+                        onClick={() => {
+                          triggerHaptic("light");
+                          setMobileMenuOpen(false);
+                          setScannerOpen(true);
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-all hover:bg-canvas active:scale-[0.98] active:bg-primary-soft/40 cursor-pointer"
+                      >
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-mint-soft text-mint">
+                          <Camera size={16} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-semibold text-ink leading-tight">Scan Receipt</p>
+                          <p className="text-[11px] text-muted leading-tight truncate">AI bill & khata extractor</p>
+                        </div>
+                      </button>
+                      */}
+
+                      <Link
+                        href="/more/export"
+                        onClick={() => {
+                          triggerHaptic("light");
+                          setMobileMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-all hover:bg-canvas active:scale-[0.98] active:bg-primary-soft/40 cursor-pointer"
+                      >
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                          <Download size={16} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-semibold text-ink leading-tight">Export Hisab</p>
+                          <p className="text-[11px] text-muted leading-tight truncate">Download PDF & Excel</p>
+                        </div>
+                      </Link>
+                    </div>
+
+                    <div className="my-1 border-t border-border/60" />
+
+                    {/* Management & Profile */}
+                    <div className="space-y-0.5">
+                      <Link
+                        href="/more/categories"
+                        onClick={() => {
+                          triggerHaptic("light");
+                          setMobileMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-all hover:bg-canvas active:scale-[0.98] active:bg-primary-soft/40 cursor-pointer"
+                      >
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink border border-border/70">
+                          <Grid2x2 size={16} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-semibold text-ink leading-tight">Categories</p>
+                          <p className="text-[11px] text-muted leading-tight truncate">Manage expense tags</p>
+                        </div>
+                      </Link>
+
+                      {/* Payment Methods option - commented out
+                      <Link
+                        href="/more/payment-methods"
+                        onClick={() => {
+                          triggerHaptic("light");
+                          setMobileMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-all hover:bg-canvas active:scale-[0.98] active:bg-primary-soft/40 cursor-pointer"
+                      >
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink border border-border/70">
+                          <CreditCard size={16} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-semibold text-ink leading-tight">Payment Methods</p>
+                          <p className="text-[11px] text-muted leading-tight truncate">UPI, Cash & Bank</p>
+                        </div>
+                      </Link>
+                      */}
+
+                      <Link
+                        href="/more/business"
+                        onClick={() => {
+                          triggerHaptic("light");
+                          setMobileMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-all hover:bg-canvas active:scale-[0.98] active:bg-primary-soft/40 cursor-pointer"
+                      >
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink border border-border/70">
+                          {business.accountKind === "individual" ? <User size={16} /> : <Store size={16} />}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-semibold text-ink leading-tight">
+                            {business.accountKind === "individual" ? "Personal Profile" : "Business Details"}
+                          </p>
+                          <p className="text-[11px] text-muted leading-tight truncate">
+                            {business.userName || business.name || "Manage account"}
+                          </p>
+                        </div>
+                      </Link>
+                    </div>
+
+                    <div className="my-1 border-t border-border/60" />
+
+                    {/* App Settings & More */}
+                    <div className="space-y-0.5">
+                      <Link
+                        href="/more/settings"
+                        onClick={() => {
+                          triggerHaptic("light");
+                          setMobileMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-all hover:bg-canvas active:scale-[0.98] active:bg-primary-soft/40 cursor-pointer"
+                      >
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink border border-border/70">
+                          <Settings size={16} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-semibold text-ink leading-tight">Settings</p>
+                          <p className="text-[11px] text-muted leading-tight truncate">Theme, reminders & sync</p>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/more/help"
+                        onClick={() => {
+                          triggerHaptic("light");
+                          setMobileMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-all hover:bg-canvas active:scale-[0.98] active:bg-primary-soft/40 cursor-pointer"
+                      >
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink border border-border/70">
+                          <HelpCircle size={16} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-semibold text-ink leading-tight">Help & Support</p>
+                          <p className="text-[11px] text-muted leading-tight truncate">Guides, FAQs & contact</p>
+                        </div>
+                      </Link>
+
+                      {/* All Options - commented out
+                      <Link
+                        href="/more"
+                        onClick={() => {
+                          triggerHaptic("light");
+                          setMobileMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-all hover:bg-canvas active:scale-[0.98] active:bg-primary-soft/40 cursor-pointer"
+                      >
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink border border-border/70">
+                          <LayoutGrid size={16} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-semibold text-ink leading-tight">All Options</p>
+                          <p className="text-[11px] text-muted leading-tight truncate">Open full menu</p>
+                        </div>
+                      </Link>
+                      */}
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         <motion.div
@@ -385,6 +617,11 @@ export default function HomePage() {
         <p className="mb-3 text-base font-semibold text-ink">Add an expense</p>
         <HisabInput onAdded={() => setShowAddSheet(false)} />
       </Sheet>
+
+      <ReceiptScannerModal
+        open={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+      />
     </>
   );
 }

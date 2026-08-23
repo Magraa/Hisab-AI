@@ -5,7 +5,12 @@ export type Direction = "outgoing" | "incoming";
 
 export type PaymentMethod = "cash" | "upi" | "bank" | "card" | "credit" | "other";
 
-export type TxSource = "local_text" | "voice" | "manual" | "settlement" | "receipt";
+export type TxSource = "local_text" | "voice" | "manual" | "settlement" | "receipt" | "ai_text";
+
+// "local" = the built-in rule-based parser only (default, no network calls).
+// "ai" = every entry is sent to the Gemini text parser.
+// "auto" = local parser first, Gemini only when local confidence is low.
+export type ParsingMode = "local" | "ai" | "auto";
 
 export interface Entity {
   id: string;

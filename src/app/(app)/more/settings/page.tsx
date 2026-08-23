@@ -21,8 +21,22 @@ import { createClient } from "@/lib/supabase/client";
 import { useHisab } from "@/lib/store";
 import { triggerHaptic } from "@/lib/haptics";
 
+const PARSING_MODES = [
+  { value: "local" as const, label: "Local only" },
+  { value: "auto" as const, label: "Smart Auto" },
+  { value: "ai" as const, label: "Always AI" },
+];
+
 export default function SettingsPage() {
-  const { cloudUser, geminiApiKey, setGeminiApiKey, dailyScansRemaining } = useHisab();
+  const {
+    cloudUser,
+    geminiApiKey,
+    setGeminiApiKey,
+    dailyScansRemaining,
+    parsingMode,
+    setParsingMode,
+    dailyTextParsesRemaining,
+  } = useHisab();
   const [notifications, setNotifications] = useState(true);
   const [signingOut, setSigningOut] = useState(false);
 
@@ -147,11 +161,11 @@ export default function SettingsPage() {
               <Sparkles size={20} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[15px] font-semibold text-ink">Google Gemini Vision Engine</p>
+              <p className="text-[15px] font-semibold text-ink">Google Gemini AI Engine</p>
               <p className="text-xs text-muted">
                 {geminiApiKey
-                  ? "Powered by your personal Google AI key with 1,500 free daily scans."
-                  : `Free tier includes 3 scans/day. Add your own free key for 1,500 scans/day.`}
+                  ? "Powered by your personal Google AI key — used for both receipt scanning and AI text parsing, with 1,500 free daily requests each."
+                  : "This key powers both receipt scanning (3 free scans/day) and AI text parsing below. Add your own free key to unlock 1,500 free requests/day for each."}
               </p>
             </div>
           </div>
@@ -257,6 +271,57 @@ export default function SettingsPage() {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* TEXT & VOICE PARSING SECTION */}
+      <div className="mx-5 mb-6">
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Text & Voice Parsing</p>
+          {geminiApiKey ? (
+            <span className="flex items-center gap-1 rounded-full bg-mint-soft px-2 py-0.5 text-[11px] font-semibold text-mint">
+              <span className="h-1.5 w-1.5 rounded-full bg-mint animate-pulse" />
+              Custom Key Active
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 rounded-full bg-primary-soft px-2 py-0.5 text-[11px] font-semibold text-primary">
+              <Zap size={11} /> Free Tier ({dailyTextParsesRemaining} left today)
+            </span>
+          )}
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-border bg-surface p-4 space-y-3">
+          <p className="text-xs text-muted">
+            Choose how typed/voice entries like &ldquo;chicken tikka masala 200&rdquo; get understood.
+            AI parsing shares your Gemini key from the scanner above but has its own daily free-tier limit.
+          </p>
+
+          <div className="flex rounded-xl border border-border bg-canvas p-1">
+            {PARSING_MODES.map((m) => (
+              <button
+                key={m.value}
+                type="button"
+                onClick={() => {
+                  triggerHaptic("light");
+                  setParsingMode(m.value);
+                }}
+                className={`flex-1 rounded-lg py-2 text-xs font-semibold transition-all ${
+                  parsingMode === m.value ? "bg-primary text-white shadow-xs" : "text-muted hover:text-ink"
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+
+          <p className="text-[11px] text-subtle">
+            {parsingMode === "local" &&
+              "Fastest, fully offline, never contacts Google. Default."}
+            {parsingMode === "auto" &&
+              "Uses the fast local guesser first; only asks AI when it's unsure — best of both."}
+            {parsingMode === "ai" &&
+              "Every entry is classified by Gemini AI for maximum accuracy on unusual items."}
+          </p>
         </div>
       </div>
 

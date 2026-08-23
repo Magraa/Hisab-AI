@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { BusinessProfile, Category, Direction, Entity, EntityType, PaymentMethod, Transaction, TxSource } from "./types";
+import type { BusinessProfile, Category, Direction, Entity, EntityType, ParsingMode, PaymentMethod, Transaction, TxSource } from "./types";
 import { cloneDefaultCategories } from "./categories";
 import { getRandomCreativeName } from "./creativeNames";
 import { getAvatarForName } from "./avatars";
@@ -47,6 +47,10 @@ interface PersistedState {
   hasOnboarded: boolean;
   geminiApiKey?: string | null;
   scanUsage?: { date: string; count: number };
+  /** Synced via profiles.parsing_mode — default "local" so AI text parsing is always opt-in. */
+  parsingMode?: ParsingMode;
+  /** Client-local only, mirrors scanUsage but tracks the separate text-parsing free-tier quota. */
+  textParseUsage?: { date: string; count: number };
 }
 
 function defaultState(): PersistedState {
@@ -59,6 +63,8 @@ function defaultState(): PersistedState {
     hasOnboarded: false,
     geminiApiKey: null,
     scanUsage: undefined,
+    parsingMode: "local",
+    textParseUsage: undefined,
   };
 }
 
@@ -75,6 +81,8 @@ function emptyCloudState(): PersistedState {
     hasOnboarded: false,
     geminiApiKey: null,
     scanUsage: undefined,
+    parsingMode: "local",
+    textParseUsage: undefined,
   };
 }
 
@@ -121,6 +129,10 @@ interface HisabContextValue {
   setGeminiApiKey: (key: string | null) => void;
   dailyScansRemaining: number;
   recordScanUsage: () => void;
+  parsingMode: ParsingMode;
+  setParsingMode: (mode: ParsingMode) => void;
+  dailyTextParsesRemaining: number;
+  recordTextParseUsage: () => void;
   addTransaction: (input: AddTransactionInput) => Transaction;
   addTransactionsBulk: (inputs: AddTransactionInput[]) => Transaction[];
   addSettlement: (entityId: string, amount: number, direction: Direction) => void;
@@ -356,6 +368,30 @@ function enrichStateWithMerchants(s: PersistedState): PersistedState {
       return {
         ...s,
         scanUsage: {
+          date: today,
+          count: currentCount + 1,
+        },
+      };
+    });
+  }, []);
+
+  // Separate free-tier counter from receipt scanning: text parsing fires
+  // implicitly on low-confidence entries (not a deliberate button press), so
+  // it gets a more generous daily cap.
+  const dailyTextParsesRemaining = useMemo(() => {
+    if (state.geminiApiKey) return 1500;
+    const today = new Date().toISOString().slice(0, 10);
+    const count = state.textParseUsage?.date === today ? state.textParseUsage.count : 0;
+    return Math.max(0, 25 - count);
+  }, [state.geminiApiKey, state.textParseUsage]);
+
+  const recordTextParseUsage = useCallback(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    setState((s) => {
+      const currentCount = s.textParseUsage?.date === today ? s.textParseUsage.count : 0;
+      return {
+        ...s,
+        textParseUsage: {
           date: today,
           count: currentCount + 1,
         },
@@ -665,6 +701,19 @@ function enrichStateWithMerchants(s: PersistedState): PersistedState {
     }
   }, [cloudUser, supabase]);
 
+  const setParsingMode = useCallback((mode: ParsingMode) => {
+    const previous = stateRef.current.parsingMode ?? "local";
+    setState((s) => ({ ...s, parsingMode: mode }));
+
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        updateProfile(supabase, uid, { parsingMode: mode }),
+        () => setState((s) => ({ ...s, parsingMode: previous }))
+      );
+    }
+  }, [cloudUser, supabase]);
+
   const completeOnboarding = useCallback((profile: Partial<BusinessProfile>) => {
     const previousBusiness = stateRef.current.business;
     const previousHasOnboarded = stateRef.current.hasOnboarded;
@@ -776,6 +825,10 @@ function enrichStateWithMerchants(s: PersistedState): PersistedState {
       setGeminiApiKey,
       dailyScansRemaining,
       recordScanUsage,
+      parsingMode: state.parsingMode ?? "local",
+      setParsingMode,
+      dailyTextParsesRemaining,
+      recordTextParseUsage,
       addTransaction,
       addTransactionsBulk,
       addSettlement,
@@ -801,6 +854,9 @@ function enrichStateWithMerchants(s: PersistedState): PersistedState {
       setGeminiApiKey,
       dailyScansRemaining,
       recordScanUsage,
+      setParsingMode,
+      dailyTextParsesRemaining,
+      recordTextParseUsage,
       addTransaction,
       addTransactionsBulk,
       addSettlement,
