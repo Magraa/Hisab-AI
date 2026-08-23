@@ -13,14 +13,15 @@
     <a href="#-tech-stack"><img src="https://img.shields.io/badge/Framework-Next.js%2016%20(App%20Router)-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js 16" /></a>
     <a href="#-tech-stack"><img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" /></a>
     <a href="#-tech-stack"><img src="https://img.shields.io/badge/Database-Supabase%20Postgres-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" /></a>
-    <a href="#-tech-stack"><img src="https://img.shields.io/badge/Styling-Tailwind%20CSS%20v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS v4" /></a>
-    <a href="#-tech-stack"><img src="https://img.shields.io/badge/Animations-Motion-FF4154?style=for-the-badge&logo=framer&logoColor=white" alt="Motion" /></a>
+    <a href="#-tech-stack"><img src="https://img.shields.io/badge/PWA-Installable%20%26%20Offline-FF6B6B?style=for-the-badge&logo=pwa&logoColor=white" alt="PWA Ready" /></a>
+    <a href="#-tech-stack"><img src="https://img.shields.io/badge/Avatars-260%2B%20Included-8A2BE2?style=for-the-badge" alt="260+ Avatars" /></a>
     <a href="#license"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License: MIT" /></a>
   </p>
 
   <p align="center">
     <a href="#-live-ui-showcase">UI Showcase</a> •
     <a href="#-superpowers--core-features">Features</a> •
+    <a href="#-260-avatar-system">Avatars</a> •
     <a href="#-architecture">Architecture</a> •
     <a href="#-nlp-engine-in-action">NLP Engine</a> •
     <a href="#-getting-started">Quickstart</a> •
@@ -114,18 +115,54 @@ Equipped with **Google Gemini 2.0 Flash Vision AI**, Hisab also scans printed re
 - **Daily Spending Trend Charts**: Clean SVG visualization of daily cash flow.
 - **Auto-Generated Financial Health Cards**: Contextual warnings on spike spending, highest-debt customers, and cash vs. digital split.
 
-### 📄 6. PDF Statements & 1-Tap WhatsApp Dispatch
+### 📲 6. Progressive Web App (PWA) & Offline Mode
+- **Installable on Any Device**: Native standalone experience on iOS (Safari Add to Home Screen) and Android (Chrome PWA prompt).
+- **Service Worker Offline Caching**: Full cache fallback for core assets and routes, allowing continuous access even in zero-connectivity areas.
+
+### 📄 7. PDF Statements & 1-Tap WhatsApp Dispatch
 - **Custom-Engineered PDF Export**: Auto-formatted account statements with transaction histories, debt balance boxes, and clean rupee typography.
 - **WhatsApp Direct Dispatch**: Native Web Share API integration to send PDFs or formatted ledger balances directly to party WhatsApp numbers.
 
-### ☁️ 7. Dual-Mode Architecture & Cloud Sync
+### ☁️ 8. Dual-Mode Cloud Architecture & Google Auth
 - **Signed-Out Mode**: 100% offline-ready, single-device `localStorage` persistence.
-- **Signed-In Mode**: Supabase Cloud Sync with Row-Level Security (RLS), optimistic UI updates, background syncing, and automatic seed-to-cloud migration on first login.
+- **Signed-In Mode**: Supabase Cloud Sync with Row-Level Security (RLS), Google 1-Tap OAuth & Email/Password auth, optimistic UI updates, and automatic seed-to-cloud migration on first login.
 
-### 🎨 8. Pastel & Sage Design System
+### 🎨 9. Pastel & Sage Design System
 - **Mobile-First Luxury UI**: Designed with delicate pastel tones, soft borders, clean card elevation, and tactile typography.
 - **Smooth Spring Physics**: Powered by `motion` with gesture-driven swipeable sheets and tactile haptics.
 - **Instant Theme Switching**: Sage (warm earthy palette) and Indigo (crisp modern palette) with zero-flash CSS variable tokens.
+
+---
+
+## 🎭 260+ Avatar System
+
+Hisab includes a built-in library of **260+ vibrant 3D & illustrated WebP avatars** with deterministic name hashing. Every party, vendor, and business profile receives a unique, charming avatar automatically:
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><img src="./public/Assets/avatars/astronaut-coral.webp" width="52" height="52" style="border-radius:50%;" alt="Astronaut" /><br/><sub>Astronaut</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/baby-dragon.webp" width="52" height="52" style="border-radius:50%;" alt="Dragon" /><br/><sub>Dragon</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/alpaca.webp" width="52" height="52" style="border-radius:50%;" alt="Alpaca" /><br/><sub>Alpaca</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/arctic-fox-2.webp" width="52" height="52" style="border-radius:50%;" alt="Arctic Fox" /><br/><sub>Arctic Fox</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/axolotl.webp" width="52" height="52" style="border-radius:50%;" alt="Axolotl" /><br/><sub>Axolotl</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/beagle.webp" width="52" height="52" style="border-radius:50%;" alt="Beagle" /><br/><sub>Beagle</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/bee.webp" width="52" height="52" style="border-radius:50%;" alt="Bee" /><br/><sub>Bee</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/bento-box.webp" width="52" height="52" style="border-radius:50%;" alt="Bento" /><br/><sub>Bento</sub></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="./public/Assets/avatars/bonsai.webp" width="52" height="52" style="border-radius:50%;" alt="Bonsai" /><br/><sub>Bonsai</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/camera.webp" width="52" height="52" style="border-radius:50%;" alt="Camera" /><br/><sub>Camera</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/cat.webp" width="52" height="52" style="border-radius:50%;" alt="Cat" /><br/><sub>Cat</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/corgi.webp" width="52" height="52" style="border-radius:50%;" alt="Corgi" /><br/><sub>Corgi</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/coffee-mug-2.webp" width="52" height="52" style="border-radius:50%;" alt="Coffee" /><br/><sub>Coffee</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/badger.webp" width="52" height="52" style="border-radius:50%;" alt="Badger" /><br/><sub>Badger</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/baby-seal.webp" width="52" height="52" style="border-radius:50%;" alt="Baby Seal" /><br/><sub>Baby Seal</sub></td>
+      <td align="center"><img src="./public/Assets/avatars/backpack.webp" width="52" height="52" style="border-radius:50%;" alt="Backpack" /><br/><sub>Backpack</sub></td>
+    </tr>
+  </table>
+  <p><em>...and 244+ more collectible avatars optimized for instant rendering!</em></p>
+</div>
 
 ---
 
@@ -158,17 +195,18 @@ Input: "Sent 4500 to Sharma Hardware for cement via UPI"
 
 ```mermaid
 flowchart TD
-    subgraph Client ["Client (Browser / PWA)"]
+    subgraph Client ["Client (Browser / PWA / Service Worker)"]
         UI["React 19 + Next.js App Router"]
         Input["HisabInput / Voice Speech API"]
         OCR["Camera / Receipt Upload"]
         Parser["Local NLP & Keyword Engine"]
         Store["State Layer (Optimistic Store)"]
+        SW["Service Worker (Offline Cache)"]
     end
 
     subgraph AI_Cloud ["AI & Cloud Services"]
         GeminiAPI["Google Gemini 2.0 Flash Vision API"]
-        SupabaseAuth["Supabase Auth (GoTrue)"]
+        SupabaseAuth["Supabase Auth (Google OAuth & Email)"]
         SupabaseDB[("Supabase PostgreSQL (RLS)")]
         PDFGen["jsPDF + AutoTable Engine"]
     end
@@ -181,6 +219,7 @@ flowchart TD
     Store <--> |Signed In / Optimistic Sync| SupabaseDB
     Store --> PDFGen
     PDFGen --> WhatsApp["WhatsApp / Web Share API"]
+    SW <--> UI
 ```
 
 ---
@@ -225,7 +264,12 @@ flowchart TD
       <tr>
         <td><strong>Backend & Database</strong></td>
         <td><a href="https://supabase.com/">Supabase (PostgreSQL)</a></td>
-        <td>Auth, relational schema with foreign keys, and Row-Level Security</td>
+        <td>Google OAuth, relational schema, and Row-Level Security</td>
+      </tr>
+      <tr>
+        <td><strong>PWA & Offline</strong></td>
+        <td><a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps">Progressive Web App</a></td>
+        <td>Service worker offline caching and home-screen installability</td>
       </tr>
       <tr>
         <td><strong>Document Generation</strong></td>
@@ -233,9 +277,9 @@ flowchart TD
         <td>Client-side vector PDF statement generator with Rupee formatting</td>
       </tr>
       <tr>
-        <td><strong>Icons</strong></td>
-        <td><a href="https://lucide.dev/">Lucide React</a></td>
-        <td>Clean, lightweight modern icons</td>
+        <td><strong>Icons & Avatars</strong></td>
+        <td><a href="https://lucide.dev/">Lucide React</a> + 260+ WebP Avatars</td>
+        <td>Deterministic visual representation and lightweight SVG icons</td>
       </tr>
     </tbody>
   </table>
@@ -258,7 +302,7 @@ HisabAI/
 │   │   │   │   └── more/               # Settings, themes, categories, export
 │   │   │   ├── api/
 │   │   │   │   └── scan-receipt/       # Gemini 2.0 Flash multimodal OCR route
-│   │   │   ├── login/                  # Auth portal (Sign in / Sign up)
+│   │   │   ├── login/                  # Auth portal (Google OAuth / Email)
 │   │   │   └── onboarding/             # Guided setup wizard
 │   │   ├── components/
 │   │   │   ├── hisab/                  # Account detail, transaction row, OCR modal
@@ -269,14 +313,17 @@ HisabAI/
 │   │   └── lib/
 │   │       ├── parser.ts               # Local NLP parser & phonetic normalizer
 │   │       ├── store.tsx               # Unified Dual-Mode State Provider
+│   │       ├── avatars.ts              # 260+ Avatar catalog & deterministic hasher
 │   │       ├── categories.ts           # Category dictionary & keyword registry
 │   │       ├── statementPdf.ts         # PDF statement engine with Rupee support
 │   │       ├── whatsapp.ts             # Direct WhatsApp sharing handler
 │   │       ├── selectors.ts            # Khata balance computation algorithms
 │   │       └── supabase/               # SSR client, server queries, RLS mappers
 │   └── public/
-│       ├── Assets/                     # Brand logos, icons, & illustrations
-│       └── screenshots/                # Showcase captures for web & mobile
+│       ├── Assets/                     # Brand logos, icons, & 260+ avatars
+│       ├── screenshots/                # Showcase captures for web & mobile
+│       ├── sw.js                       # Service worker for PWA offline caching
+│       └── manifest.json               # Web App Manifest
 └── UI Plan/                            # Complete product UX specifications & mockups
 ```
 
@@ -364,10 +411,12 @@ WITH CHECK (auth.uid() = user_id);
 
 - [x] **Core MVP**: Natural language parsing, transaction feeds, and Bahi-Khata ledger.
 - [x] **Supabase Sync**: Real-time cloud backup, authentication, and offline rollback.
+- [x] **Google OAuth**: One-tap sign-in and account backup.
 - [x] **Gemini 2.0 Flash OCR**: Multimodal receipt and handwritten note scanner.
 - [x] **Dynamic Categories**: User-customizable categories with custom keywords.
+- [x] **260+ Deterministic Avatars**: Instant visual identities for contacts & accounts.
+- [x] **Progressive Web App (PWA)**: Offline service worker caching & install prompt.
 - [x] **PDF & WhatsApp**: Auto-generated statements with direct WhatsApp share.
-- [ ] **PWA Offline Service Worker**: Background sync queue for zero-connectivity areas.
 - [ ] **Multi-Currency Support**: International currencies beyond INR (`₹`).
 - [ ] **GST Invoice Export**: One-tap monthly GST breakdown reports for Indian businesses.
 - [ ] **SMS Auto-Detection**: Android companion to parse bank transactional SMS.
@@ -396,3 +445,4 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more informa
   <p>Crafted with ❤️ for Indian MSMEs, Freelancers, and Small Businesses.</p>
   <p><strong>Hisab AI</strong> • <em>Your business. Your Hisab.</em></p>
 </div>
+
