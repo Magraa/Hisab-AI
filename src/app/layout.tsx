@@ -4,6 +4,7 @@ import "./globals.css";
 import { HisabProvider } from "@/lib/store";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeScript } from "@/components/theme/ThemeScript";
+import { PointerPatch } from "@/components/layout/PointerPatch";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="flex min-h-full justify-center bg-canvas">
+        <PointerPatch />
         <ThemeScript />
         <ThemeProvider>
           <HisabProvider>{children}</HisabProvider>

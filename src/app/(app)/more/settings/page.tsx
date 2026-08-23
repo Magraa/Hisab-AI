@@ -79,6 +79,44 @@ export default function SettingsPage() {
         </button>
       </div>
 
+      <p className="mx-5 mb-2 text-xs font-semibold uppercase tracking-wide text-muted">AI Receipt Scanner</p>
+      <div className="mx-5 mb-6 overflow-hidden rounded-2xl border border-border bg-surface p-4 space-y-3">
+        <div>
+          <p className="text-[15px] font-medium text-ink">Google Gemini API Key</p>
+          <p className="text-xs text-muted">
+            Used for OCR scanning of bills and handwritten khata slips. Free 1,500 scans/day from{" "}
+            <a
+              href="https://aistudio.google.com/app/apikey"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary font-semibold underline"
+            >
+              Google AI Studio
+            </a>
+            .
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <input
+            type="password"
+            defaultValue={typeof window !== "undefined" ? localStorage.getItem("hisab_gemini_api_key") || "" : ""}
+            placeholder="Paste your free API Key (AIzaSy...)"
+            onChange={(e) => {
+              try {
+                if (e.target.value.trim()) {
+                  localStorage.setItem("hisab_gemini_api_key", e.target.value.trim());
+                } else {
+                  localStorage.removeItem("hisab_gemini_api_key");
+                }
+              } catch {
+                // ignore
+              }
+            }}
+            className="flex-1 rounded-xl border border-border bg-canvas px-3 py-2 text-xs text-ink placeholder:text-subtle focus:border-primary focus:outline-none"
+          />
+        </div>
+      </div>
+
       <p className="mx-5 mt-4 text-xs text-muted">
         {cloudUser
           ? "Your data is backed up to the cloud and available wherever you sign in."

@@ -104,6 +104,7 @@ interface HisabContextValue {
   cloudError: string | null;
   dismissCloudError: () => void;
   addTransaction: (input: AddTransactionInput) => Transaction;
+  addTransactionsBulk: (inputs: AddTransactionInput[]) => Transaction[];
   addSettlement: (entityId: string, amount: number, direction: Direction) => void;
   updateTransaction: (id: string, patch: Partial<Transaction>) => void;
   deleteTransaction: (id: string) => void;
@@ -323,6 +324,82 @@ export function HisabProvider({ children }: { children: ReactNode }) {
     return tx;
   }, [resolveEntityByName, cloudUser, supabase]);
 
+  const addTransactionsBulk = useCallback((inputs: AddTransactionInput[]): Transaction[] => {
+    if (inputs.length === 0) return [];
+    const newEntities: Entity[] = [];
+    const createdTxs: Transaction[] = [];
+
+    // Helper map of local entities including those created in this same batch
+    const tempEntities = [...state.entities];
+
+    for (const input of inputs) {
+      let entityId: string | undefined;
+      if (input.entityName) {
+        const lower = input.entityName.trim().toLowerCase();
+        let existing = tempEntities.find(
+          (e) => e.name.toLowerCase() === lower || e.aliases.some((a) => a.toLowerCase() === lower)
+        );
+        if (!existing) {
+          existing = {
+            id: crypto.randomUUID(),
+            name: input.entityName.trim(),
+            aliases: [],
+            type: "person",
+            createdAt: new Date().toISOString(),
+          };
+          tempEntities.push(existing);
+          newEntities.push(existing);
+        }
+        entityId = existing.id;
+      }
+
+      const tx: Transaction = {
+        id: crypto.randomUUID(),
+        amount: input.amount,
+        categoryId: input.entityName ? undefined : input.categoryId ?? "other",
+        description: input.description,
+        entityId,
+        direction: input.entityName ? input.direction ?? "outgoing" : undefined,
+        paymentMethod: input.paymentMethod ?? "cash",
+        source: input.source ?? "receipt",
+        rawInput: input.rawInput,
+        createdAt: new Date().toISOString(),
+      };
+      createdTxs.push(tx);
+    }
+
+    setState((s) => ({
+      ...s,
+      entities: newEntities.length > 0 ? [...s.entities, ...newEntities] : s.entities,
+      transactions: [...createdTxs, ...s.transactions],
+    }));
+
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        (async () => {
+          for (const ent of newEntities) {
+            await insertEntity(supabase, uid, ent);
+          }
+          for (const tx of createdTxs) {
+            await insertTransaction(supabase, uid, tx);
+          }
+        })(),
+        () => {
+          const newEntityIds = new Set(newEntities.map((e) => e.id));
+          const newTxIds = new Set(createdTxs.map((t) => t.id));
+          setState((s) => ({
+            ...s,
+            entities: s.entities.filter((e) => !newEntityIds.has(e.id)),
+            transactions: s.transactions.filter((t) => !newTxIds.has(t.id)),
+          }));
+        }
+      );
+    }
+
+    return createdTxs;
+  }, [state.entities, cloudUser, supabase]);
+
   const addSettlement = useCallback((entityId: string, amount: number, direction: Direction) => {
     const tx: Transaction = {
       id: crypto.randomUUID(),
@@ -525,6 +602,7 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       cloudError,
       dismissCloudError,
       addTransaction,
+      addTransactionsBulk,
       addSettlement,
       updateTransaction,
       deleteTransaction,
@@ -545,6 +623,7 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       cloudError,
       dismissCloudError,
       addTransaction,
+      addTransactionsBulk,
       addSettlement,
       updateTransaction,
       deleteTransaction,

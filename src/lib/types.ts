@@ -5,7 +5,7 @@ export type Direction = "outgoing" | "incoming";
 
 export type PaymentMethod = "cash" | "upi" | "bank" | "card" | "credit" | "other";
 
-export type TxSource = "local_text" | "voice" | "manual" | "settlement";
+export type TxSource = "local_text" | "voice" | "manual" | "settlement" | "receipt";
 
 export interface Entity {
   id: string;

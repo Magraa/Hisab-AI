@@ -77,11 +77,23 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    title: "Scan receipt",
+    title: "Scan receipt & handwritten khata",
     items: [
       {
-        q: "Does it read the amount off a photo automatically?",
-        a: "Not yet — tapping it opens your camera/gallery so you can capture the receipt, but automatic reading needs an AI step that isn't wired up. Add the amount in the text box for now; this is on the roadmap.",
+        q: "How does receipt scanning work?",
+        a: "Tap 'Scan receipt' below the input box or on any account page to take a photo or upload an image. Hisab uses Google Gemini Vision AI to read printed bills, grocery slips, and handwritten bahi-khata ledger entries automatically.",
+      },
+      {
+        q: "Can it handle handwritten pages with multiple entries?",
+        a: "Yes! If you upload a handwritten khata sheet with multiple items or daily records, Hisab extracts every entry into a review list where you can check, edit amounts, tag categories or people, and add all entries in one tap.",
+      },
+      {
+        q: "Can I provide extra details with the image?",
+        a: "Yes — before scanning, you can add optional notes like 'All entries are for Suresh', 'Paid via UPI', or 'Exclude crossed-out item' to guide the AI.",
+      },
+      {
+        q: "Is it free to use?",
+        a: "Yes! Google Gemini provides a free tier with 1,500 scans every day. You can add your free API key in Settings → AI Receipt Scanner.",
       },
     ],
   },

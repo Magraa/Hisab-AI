@@ -8,6 +8,7 @@ import { parseInput } from "@/lib/parser";
 import { getCategory } from "@/lib/categories";
 import { formatRupees } from "@/lib/format";
 import { triggerHaptic } from "@/lib/haptics";
+import { ReceiptScannerModal } from "./ReceiptScannerModal";
 
 interface SpeechRecognitionAlternativeLike {
   transcript: string;
@@ -53,9 +54,8 @@ export function HisabInput({
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [successLabel, setSuccessLabel] = useState("");
   const [successIncoming, setSuccessIncoming] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [receiptNote, setReceiptNote] = useState(false);
 
   useEffect(() => {
     const w = window as unknown as {
@@ -321,33 +321,19 @@ export function HisabInput({
               )}
             </AnimatePresence>
 
-            {receiptNote && (
-              <p className="mt-2 text-xs text-muted">
-                Got the photo. Automatic reading needs AI setup — add the amount here for now.
-              </p>
-            )}
-
             <div className="mt-2 flex items-center gap-4 border-t border-border pt-2 text-sm font-medium text-primary">
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={() => {
                   triggerHaptic("light");
-                  fileInputRef.current?.click();
+                  setScannerOpen(true);
                 }}
                 className="flex items-center gap-1.5"
               >
                 <Camera size={16} />
                 Scan receipt
               </motion.button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={() => setReceiptNote(true)}
-              />
               {text.trim().length > 0 && (
                 <motion.button
                   initial={{ opacity: 0, x: 10 }}
@@ -364,6 +350,12 @@ export function HisabInput({
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ReceiptScannerModal
+        open={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        pinnedEntityName={pinnedEntityName}
+      />
     </motion.div>
   );
 }
