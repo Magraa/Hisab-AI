@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Store,
@@ -15,7 +14,6 @@ import {
   ChevronRight,
   LogOut,
   Bell,
-  Sparkles,
   Mail,
 } from "lucide-react";
 import { useHisab } from "@/lib/store";
@@ -25,8 +23,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { BackupPromoCard } from "@/components/layout/BackupPromoCard";
 
 export default function MorePage() {
-  const { business, resetOnboarding, cloudUser } = useHisab();
-  const router = useRouter();
+  const { business, cloudUser } = useHisab();
   const [signingOut, setSigningOut] = useState(false);
   const isIndividual = business.accountKind === "individual";
 
@@ -108,26 +105,6 @@ export default function MorePage() {
         <MenuRow href="/more/settings" icon={SettingsIcon} title="Settings" subtitle="Language, notifications, privacy" />
         <MenuRow href="/more/help" icon={HelpCircle} title="Help & Support" subtitle="Get help, contact us" />
         <MenuRow href="/more/about" icon={Info} title="About Hisab" subtitle="Version 0.1.0" last />
-      </MenuList>
-
-      <SectionLabel>Developer</SectionLabel>
-      <MenuList>
-        <button
-          onClick={() => {
-            resetOnboarding();
-            router.push("/onboarding");
-          }}
-          className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft">
-            <Sparkles size={18} className="text-primary" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[15px] font-medium text-ink">Restart onboarding</p>
-            <p className="truncate text-xs text-muted">Replay the welcome flow</p>
-          </div>
-          <ChevronRight size={16} className="text-subtle" />
-        </button>
       </MenuList>
 
       {cloudUser ? (

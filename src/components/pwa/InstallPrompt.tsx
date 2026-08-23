@@ -17,7 +17,7 @@ export function InstallPwaBanner() {
       <div className="flex items-center gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-primary/20 bg-surface p-1 shadow-xs">
           <Image
-            src="/Assets/Logo.png"
+            src="/Assets/logo.webp"
             alt="Hisab Logo"
             width={38}
             height={38}
