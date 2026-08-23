@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, MoreHorizontal, Download, MessageCircle, ArrowDownLeft, ArrowUpRight, X } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
 import { computeBalance, entityTransactions } from "@/lib/selectors";
 import { formatRupees, formatDayLabel } from "@/lib/format";
@@ -10,6 +11,9 @@ import { HisabInput } from "@/components/hisab/HisabInput";
 import { TransactionDetailSheet } from "@/components/hisab/TransactionDetailSheet";
 import { Sheet } from "@/components/ui/Sheet";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { PageTransition } from "@/components/ui/MotionWrapper";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { triggerHaptic } from "@/lib/haptics";
 import type { Direction, Entity } from "@/lib/types";
 import { buildStatementPdf, statementFilename } from "@/lib/statementPdf";
 import { sendStatementToWhatsApp } from "@/lib/whatsapp";
@@ -87,8 +91,6 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
     if (result === "shared") {
       setWaStatus("Sent to the WhatsApp share sheet.");
     } else if (result === "opened-chat") {
-      // Text-only chat links can't carry an attachment, so make sure the
-      // file is on the device to attach manually.
       handleDownloadPdf();
       setWaStatus("Opened WhatsApp chat — attach the PDF that just downloaded.");
     } else {
@@ -97,15 +99,23 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
   }
 
   return (
-    <div>
+    <PageTransition>
       <div className="flex items-center justify-between px-5 pt-6">
-        <Link href="/accounts" aria-label="Back" className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-ink">
+        <Link
+          href="/accounts"
+          aria-label="Back"
+          onClick={() => triggerHaptic("light")}
+          className="tap-active flex h-9 w-9 items-center justify-center rounded-full border border-border text-ink transition-colors active:bg-primary-soft/40"
+        >
           <ArrowLeft size={18} />
         </Link>
         <button
-          onClick={() => setShowEdit(true)}
+          onClick={() => {
+            triggerHaptic("light");
+            setShowEdit(true);
+          }}
           aria-label="Edit account"
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted"
+          className="tap-active flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted transition-colors active:bg-primary-soft/40"
         >
           <MoreHorizontal size={18} />
         </button>
@@ -116,36 +126,53 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
         {entity.relationship && <p className="text-sm text-muted">{entity.relationship}</p>}
 
         <p className="mt-5 text-sm text-muted">Balance</p>
-        <p className="text-4xl font-semibold text-ink">{formatRupees(balance.displayAmount)}</p>
+        <p className="text-4xl font-semibold text-ink">
+          <AnimatedNumber value={balance.displayAmount} />
+        </p>
         <p className={`text-sm font-medium ${balance.label === "They owe you" ? "text-mint" : "text-muted"}`}>
           {balance.label}
         </p>
       </div>
 
       <div className="mx-5 mt-5 flex gap-3">
-        <button
-          onClick={() => setShowAdd((s) => !s)}
-          className="flex-1 rounded-xl bg-primary py-3 text-sm font-semibold text-white"
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => {
+            triggerHaptic("light");
+            setShowAdd((s) => !s);
+          }}
+          className="flex-1 rounded-xl bg-primary py-3 text-sm font-semibold text-white shadow-xs"
         >
           + Add expense
-        </button>
-        <button
-          onClick={() => setShowSettle(true)}
-          className="flex-1 rounded-xl border border-border py-3 text-sm font-semibold text-ink"
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => {
+            triggerHaptic("light");
+            setShowSettle(true);
+          }}
+          className="flex-1 rounded-xl border border-border bg-surface py-3 text-sm font-semibold text-ink shadow-2xs"
         >
           Settle up
-        </button>
+        </motion.button>
       </div>
 
-      {showAdd && (
-        <div className="mx-5 mt-3">
-          <HisabInput
-            pinnedEntityName={entity.name}
-            placeholder={`What did you spend on ${entity.name}?`}
-            onAdded={() => setShowAdd(false)}
-          />
-        </div>
-      )}
+      <AnimatePresence>
+        {showAdd && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mx-5 mt-3 overflow-hidden"
+          >
+            <HisabInput
+              pinnedEntityName={entity.name}
+              placeholder={`What did you spend on ${entity.name}?`}
+              onAdded={() => setShowAdd(false)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="mx-5 my-5 h-px bg-border" />
 
@@ -264,7 +291,7 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
           setShowEdit(false);
         }}
       />
-    </div>
+    </PageTransition>
   );
 }
 

@@ -7,7 +7,7 @@ export function SubPageHeader({ title, subtitle }: { title: string; subtitle?: s
       <Link
         href="/more"
         aria-label="Back"
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-ink"
+        className="tap-active flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-ink transition-colors active:bg-primary-soft/40"
       >
         <ArrowLeft size={18} />
       </Link>

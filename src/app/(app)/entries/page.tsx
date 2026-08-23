@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Search, Plus } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
 import { groupByDay, sumAmount, entityLabel, withinRange } from "@/lib/selectors";
 import { formatRupees, formatDayHeading } from "@/lib/format";
@@ -13,6 +14,9 @@ import { TransactionDetailSheet } from "@/components/hisab/TransactionDetailShee
 import { HisabInput } from "@/components/hisab/HisabInput";
 import { Sheet } from "@/components/ui/Sheet";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { PageTransition } from "@/components/ui/MotionWrapper";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { triggerHaptic } from "@/lib/haptics";
 
 const DATE_OPTIONS = [
   { value: "all", label: "All dates" },
@@ -90,11 +94,11 @@ export default function EntriesPage() {
   const total = sumAmount(filtered);
 
   return (
-    <div>
+    <PageTransition>
       <PageHeader title="Your Hisab" subtitle="All your expenses in one place" />
 
       <div className="px-5">
-        <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5">
+        <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 shadow-2xs">
           <Search size={16} className="text-subtle" />
           <input
             value={query}
@@ -122,14 +126,20 @@ export default function EntriesPage() {
           <EmptyState title="Nothing here yet" subtitle="Try a different search or filter." />
         ) : (
           groups.map((group) => (
-            <div key={group.key} className="mb-5">
+            <motion.div
+              key={group.key}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="mb-5"
+            >
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted">
                   {formatDayHeading(group.iso)}
                 </p>
                 <p className="text-sm font-semibold text-mint">{formatRupees(sumAmount(group.items))}</p>
               </div>
-              <div className="overflow-hidden rounded-2xl border border-border bg-surface">
+              <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-xs">
                 {group.items.map((tx) => (
                   <TransactionRow
                     key={tx.id}
@@ -139,26 +149,36 @@ export default function EntriesPage() {
                   />
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))
         )}
       </div>
 
       <div className="pointer-events-none fixed bottom-24 left-1/2 z-20 flex w-full max-w-[440px] -translate-x-1/2 items-center justify-between px-5">
         {groups.length > 0 ? (
-          <div className="pointer-events-auto rounded-full bg-surface px-4 py-2 text-xs font-medium text-muted shadow-lg">
-            Total: <span className="text-ink">{formatRupees(total)}</span>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 12, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="pointer-events-auto rounded-full border border-border bg-surface/95 px-4 py-2 text-xs font-medium text-muted shadow-lg backdrop-blur-md"
+          >
+            Total: <span className="font-semibold text-ink"><AnimatedNumber value={total} /></span>
+          </motion.div>
         ) : (
           <span />
         )}
-        <button
-          onClick={() => setShowAdd(true)}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.92 }}
+          transition={{ type: "spring", stiffness: 500, damping: 25 }}
+          onClick={() => {
+            triggerHaptic("medium");
+            setShowAdd(true);
+          }}
           aria-label="Add expense"
-          className="pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-xl"
+          className="pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-xl shadow-primary/30"
         >
           <Plus size={24} />
-        </button>
+        </motion.button>
       </div>
 
       <TransactionDetailSheet txId={selectedTxId} onClose={() => setSelectedTxId(null)} />
@@ -167,6 +187,7 @@ export default function EntriesPage() {
         <p className="mb-3 text-base font-semibold text-ink">Add an expense</p>
         <HisabInput onAdded={() => setShowAdd(false)} />
       </Sheet>
-    </div>
+    </PageTransition>
   );
 }
+

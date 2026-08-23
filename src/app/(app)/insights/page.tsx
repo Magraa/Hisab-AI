@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { motion } from "motion/react";
 import { useHisab } from "@/lib/store";
 import { formatRupees } from "@/lib/format";
 import {
@@ -18,6 +19,9 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { SelectChip } from "@/components/ui/Chip";
 import { TrendChart } from "@/components/hisab/TrendChart";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { PageTransition } from "@/components/ui/MotionWrapper";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { triggerHaptic } from "@/lib/haptics";
 
 const PERIOD_OPTIONS: Array<{ value: Period; label: string }> = [
   { value: "this_month", label: "This Month" },
@@ -53,26 +57,40 @@ export default function InsightsPage() {
   }, [transactions, categories, period]);
 
   return (
-    <div>
+    <PageTransition>
       <PageHeader
         title="Insights"
         subtitle="Understand your business better"
         action={
-          <SelectChip label="Period" value={period} onChange={(v) => setPeriod(v as Period)} options={PERIOD_OPTIONS} />
+          <SelectChip
+            label="Period"
+            value={period}
+            onChange={(v) => {
+              triggerHaptic("light");
+              setPeriod(v as Period);
+            }}
+            options={PERIOD_OPTIONS}
+          />
         }
       />
 
-      <div className="mx-5 rounded-2xl bg-mint-soft px-5 py-5">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mx-5 rounded-2xl bg-mint-soft px-5 py-5 shadow-xs"
+      >
         <p className="text-xs font-semibold uppercase tracking-wide text-mint">
           Total spent {period === "this_month" ? "this month" : period === "last_month" ? "last month" : ""}
         </p>
-        <p className="mt-1 text-3xl font-semibold text-ink">{formatRupees(data.currentTotal)}</p>
+        <p className="mt-1 text-3xl font-semibold text-ink">
+          <AnimatedNumber value={data.currentTotal} />
+        </p>
         {data.changePct !== null && (
           <p className="mt-1 text-sm font-medium text-mint">
             {data.changePct >= 0 ? "↑" : "↓"} {Math.abs(data.changePct)}% {data.changePct >= 0 ? "more" : "less"} than previous period
           </p>
         )}
-      </div>
+      </motion.div>
 
       <div className="mx-5 mt-4 grid grid-cols-2 gap-3">
         <StatTile label="Avg. per day" value={formatRupees(data.avgPerDay)} />
@@ -88,7 +106,7 @@ export default function InsightsPage() {
         />
       </div>
 
-      <div className="mx-5 mt-5 rounded-2xl border border-border bg-surface p-5">
+      <div className="mx-5 mt-5 rounded-2xl border border-border bg-surface p-5 shadow-xs">
         <div className="mb-4 flex items-center justify-between">
           <p className="text-sm font-semibold text-ink">Where is your money going?</p>
         </div>
@@ -97,15 +115,20 @@ export default function InsightsPage() {
           <EmptyState title="No categorized expenses yet" subtitle="Add a few entries to see the breakdown." />
         ) : (
           <div className="flex items-center gap-5">
-            <div
-              className="relative h-32 w-32 shrink-0 rounded-full"
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 350, damping: 25 }}
+              className="relative h-32 w-32 shrink-0 rounded-full shadow-xs"
               style={{ backgroundImage: conicGradient(data.currentSlices) }}
             >
-              <div className="absolute inset-[18%] flex flex-col items-center justify-center rounded-full bg-surface text-center">
+              <div className="absolute inset-[18%] flex flex-col items-center justify-center rounded-full bg-surface text-center shadow-xs">
                 <span className="text-[10px] text-muted">Total</span>
-                <span className="text-sm font-semibold text-ink">{formatRupees(data.currentTotal)}</span>
+                <span className="text-sm font-semibold text-ink">
+                  <AnimatedNumber value={data.currentTotal} />
+                </span>
               </div>
-            </div>
+            </motion.div>
             <div className="flex-1 space-y-2">
               {data.currentSlices.slice(0, 5).map((s) => (
                 <div key={s.id} className="flex items-center justify-between text-sm">
@@ -121,7 +144,7 @@ export default function InsightsPage() {
         )}
       </div>
 
-      <div className="mx-5 mt-4 rounded-2xl border border-border bg-surface p-5">
+      <div className="mx-5 mt-4 rounded-2xl border border-border bg-surface p-5 shadow-xs">
         <p className="mb-3 text-sm font-semibold text-ink">Spending trend</p>
         <TrendChart points={data.trend} />
       </div>
@@ -131,26 +154,36 @@ export default function InsightsPage() {
           <p className="mb-3 text-sm font-semibold text-ink">Insights</p>
           <div className="grid grid-cols-1 gap-3">
             {data.cards.map((c, i) => (
-              <div key={i} className="rounded-2xl border border-border bg-surface p-4">
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * i }}
+                className="rounded-2xl border border-border bg-surface p-4 shadow-2xs"
+              >
                 <p className="text-sm font-medium text-ink">
                   {c.emoji} {c.title}
                 </p>
                 <p className="mt-1 text-sm text-muted">{c.body}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }
 
 function StatTile({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-surface p-4">
+    <motion.div
+      whileTap={{ scale: 0.98 }}
+      className="rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-colors"
+    >
       <p className="text-xs text-muted">{label}</p>
       <p className="mt-1 text-lg font-semibold text-ink">{value}</p>
       {hint && <p className="text-xs text-muted">{hint}</p>}
-    </div>
+    </motion.div>
   );
 }
+

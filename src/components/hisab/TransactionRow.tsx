@@ -7,6 +7,9 @@ import { formatRupees, formatTime } from "@/lib/format";
 import { IconBadge, InitialsBadge } from "@/components/ui/IconBadge";
 import { ChevronRight, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 
+import { motion } from "motion/react";
+import { triggerHaptic } from "@/lib/haptics";
+
 export function TransactionRow({
   tx,
   entityName,
@@ -31,10 +34,15 @@ export function TransactionRow({
   const amountPrefix = isEntity ? (isIncoming ? "+" : "-") : "";
 
   return (
-    <button
+    <motion.button
       type="button"
-      onClick={onClick}
-      className="flex w-full items-center gap-3 border-b border-border px-5 py-3.5 text-left last:border-b-0"
+      whileTap={{ scale: 0.985, backgroundColor: "var(--color-primary-soft, #f4f5fa)" }}
+      transition={{ duration: 0.1 }}
+      onClick={() => {
+        triggerHaptic("light");
+        onClick?.();
+      }}
+      className="flex w-full items-center gap-3 border-b border-border px-5 py-3.5 text-left last:border-b-0 transition-colors"
     >
       <div className="relative shrink-0">
         {isEntity ? (
@@ -66,7 +74,7 @@ export function TransactionRow({
         {formatRupees(tx.amount)}
       </span>
       <ChevronRight size={16} className="text-subtle" />
-    </button>
+    </motion.button>
   );
 }
 

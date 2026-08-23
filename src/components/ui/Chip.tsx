@@ -8,9 +8,9 @@ export function Chip({
   return (
     <button
       type="button"
-      className={`whitespace-nowrap rounded-full border px-3.5 py-2 text-sm font-medium transition-colors ${
+      className={`tap-active whitespace-nowrap rounded-full border px-3.5 py-2 text-sm font-medium transition-colors ${
         active
-          ? "border-primary bg-primary-soft text-primary"
+          ? "border-primary bg-primary-soft text-primary font-semibold shadow-xs"
           : "border-border bg-surface text-muted"
       } ${className}`}
       {...props}

@@ -2,12 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
 import { computeBalance } from "@/lib/selectors";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Chip } from "@/components/ui/Chip";
 import { AccountRow } from "@/components/hisab/AccountRow";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { PageTransition } from "@/components/ui/MotionWrapper";
+import { triggerHaptic } from "@/lib/haptics";
 
 type FilterKey = "all" | "you_owe" | "they_owe" | "vendor" | "customer" | "employee";
 
@@ -39,11 +42,11 @@ export default function AccountsPage() {
   }, [entities, transactions, query, filter]);
 
   return (
-    <div>
+    <PageTransition>
       <PageHeader title="Accounts" subtitle="Every person and vendor in your Hisab" />
 
       <div className="px-5">
-        <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5">
+        <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 shadow-2xs">
           <Search size={16} className="text-subtle" />
           <input
             value={query}
@@ -56,7 +59,14 @@ export default function AccountsPage() {
 
       <div className="mt-3 flex gap-2 overflow-x-auto px-5 pb-1">
         {FILTERS.map((f) => (
-          <Chip key={f.key} active={filter === f.key} onClick={() => setFilter(f.key)}>
+          <Chip
+            key={f.key}
+            active={filter === f.key}
+            onClick={() => {
+              triggerHaptic("light");
+              setFilter(f.key);
+            }}
+          >
             {f.label}
           </Chip>
         ))}
@@ -73,13 +83,27 @@ export default function AccountsPage() {
             }
           />
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-border bg-surface">
-            {rows.map(({ entity, balance }) => (
-              <AccountRow key={entity.id} entity={entity} balance={balance} />
-            ))}
-          </div>
+          <motion.div
+            layout
+            className="overflow-hidden rounded-2xl border border-border bg-surface shadow-xs"
+          >
+            <AnimatePresence initial={false}>
+              {rows.map(({ entity, balance }) => (
+                <motion.div
+                  key={entity.id}
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <AccountRow entity={entity} balance={balance} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         )}
       </div>
-    </div>
+    </PageTransition>
   );
 }
+

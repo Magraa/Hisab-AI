@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
 import type { AccountKind } from "@/lib/types";
 import { WelcomeStep } from "./WelcomeStep";
@@ -52,59 +53,104 @@ export function OnboardingFlow() {
     router.push(`/login?mode=${mode}`);
   }
 
-  if (stage === "welcome") {
-    return <WelcomeStep onGetStarted={() => setStage("name")} />;
-  }
-
-  if (stage === "name") {
-    return (
-      <OnboardingShell step={stepNumber.name} totalSteps={totalSteps} onBack={() => setStage("welcome")}>
-        <NameStep
-          accountKind={accountKind}
-          name={name}
-          onChangeAccountKind={setAccountKind}
-          onChangeName={setName}
-          onContinue={() => setStage(isBusiness ? "type" : "record")}
-        />
-      </OnboardingShell>
-    );
-  }
-
-  if (stage === "type") {
-    return (
-      <OnboardingShell step={stepNumber.type} totalSteps={totalSteps} onBack={() => setStage("name")}>
-        <TypeStep value={businessType} onChange={setBusinessType} onContinue={() => setStage("record")} />
-      </OnboardingShell>
-    );
-  }
-
-  if (stage === "record") {
-    return (
-      <OnboardingShell
-        step={stepNumber.record}
-        totalSteps={totalSteps}
-        onBack={() => setStage(isBusiness ? "type" : "name")}
-      >
-        <RecordStep onContinue={() => setStage("first")} />
-      </OnboardingShell>
-    );
-  }
-
-  if (stage === "first") {
-    return (
-      <OnboardingShell step={stepNumber.first} totalSteps={totalSteps} onBack={() => setStage("record")}>
-        <FirstExpenseStep onFinish={() => setStage("backup")} />
-      </OnboardingShell>
-    );
-  }
-
   return (
-    <OnboardingShell step={stepNumber.backup} totalSteps={totalSteps} onBack={() => setStage("first")}>
-      <BackupPromptStep
-        onSignUp={() => goToAuth("signup")}
-        onLogIn={() => goToAuth("signin")}
-        onSkip={finishLocally}
-      />
-    </OnboardingShell>
+    <AnimatePresence mode="wait">
+      {stage === "welcome" && (
+        <motion.div
+          key="welcome"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.25 }}
+        >
+          <WelcomeStep onGetStarted={() => setStage("name")} />
+        </motion.div>
+      )}
+
+      {stage === "name" && (
+        <motion.div
+          key="name"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.25 }}
+        >
+          <OnboardingShell step={stepNumber.name} totalSteps={totalSteps} onBack={() => setStage("welcome")}>
+            <NameStep
+              accountKind={accountKind}
+              name={name}
+              onChangeAccountKind={setAccountKind}
+              onChangeName={setName}
+              onContinue={() => setStage(isBusiness ? "type" : "record")}
+            />
+          </OnboardingShell>
+        </motion.div>
+      )}
+
+      {stage === "type" && (
+        <motion.div
+          key="type"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.25 }}
+        >
+          <OnboardingShell step={stepNumber.type} totalSteps={totalSteps} onBack={() => setStage("name")}>
+            <TypeStep value={businessType} onChange={setBusinessType} onContinue={() => setStage("record")} />
+          </OnboardingShell>
+        </motion.div>
+      )}
+
+      {stage === "record" && (
+        <motion.div
+          key="record"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.25 }}
+        >
+          <OnboardingShell
+            step={stepNumber.record}
+            totalSteps={totalSteps}
+            onBack={() => setStage(isBusiness ? "type" : "name")}
+          >
+            <RecordStep onContinue={() => setStage("first")} />
+          </OnboardingShell>
+        </motion.div>
+      )}
+
+      {stage === "first" && (
+        <motion.div
+          key="first"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.25 }}
+        >
+          <OnboardingShell step={stepNumber.first} totalSteps={totalSteps} onBack={() => setStage("record")}>
+            <FirstExpenseStep onFinish={() => setStage("backup")} />
+          </OnboardingShell>
+        </motion.div>
+      )}
+
+      {stage === "backup" && (
+        <motion.div
+          key="backup"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.25 }}
+        >
+          <OnboardingShell step={stepNumber.backup} totalSteps={totalSteps} onBack={() => setStage("first")}>
+            <BackupPromptStep
+              onSignUp={() => goToAuth("signup")}
+              onLogIn={() => goToAuth("signin")}
+              onSkip={finishLocally}
+            />
+          </OnboardingShell>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
+
