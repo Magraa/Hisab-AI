@@ -89,10 +89,14 @@ Equipped with **Google Gemini 2.0 Flash Vision AI**, Hisab also scans printed re
 
 ## ⚡ Superpowers & Core Features
 
-### 🧠 1. Sub-Second Natural Language Entry (NLP)
-- **Zero Friction**: Type `Chai 40`, `Salary 15000 Rahul`, or `Got 2500 from ABC Traders`.
-- **Phonetic Speech Tolerance**: Built-in phonetic normalization correcting common speech-to-text mishearings (`sent ↔ saint`, `kal ↔ call`, `maal ↔ mall`).
-- **Real-Time Confidence Scoring**: Dynamic chips preview amount, entity, direction (*You gave / You got*), and category before saving.
+### 🧠 1. Hybrid Natural Language Entry & Gemini 2.0 Flash AI Parsing
+- **3-Way Parsing Mode Switch** *(Settings → Parsing Engine)*:
+  - ⚡ **Local**: Instant on-device NLP parser running in <2ms with phonetic speech-to-text mishearing normalization (`sent ↔ saint`, `kal ↔ call`, `maal ↔ mall`). 100% offline-ready.
+  - 🧠 **Smart Auto**: Fast local parser runs first; if confidence is low or complex sentence structures are detected, it seamlessly escalates to **Gemini 2.0 Flash AI**.
+  - 🤖 **Always AI**: Routes every entry through Gemini 2.0 Flash for maximum contextual and semantic extraction.
+- **Resilient, Non-Blocking UX**: Displays an animated *"Thinking…"* state with a **Cancel** button while the AI call is in flight. Silently and instantly falls back to the local parser on any timeout, offline state, or quota exhaustion — **user entry is never blocked**.
+- **Dedicated Daily Quotas**: Built-in free tier with **25 AI text parses/day** (independent of the 3/day receipt scan quota), or unlimited usage by entering your own free Gemini API key in Settings.
+- **Provenance & AI Tagging**: Entries parsed by Gemini are tagged `source: "ai_text"` and display a distinctive *"AI parsed"* badge in the Transaction Detail Sheet.
 
 ### 🎙️ 2. Native Voice-to-Hisab
 - Tap the microphone and speak your transaction in Hinglish or English.
@@ -166,28 +170,30 @@ Hisab includes a built-in library of **260+ vibrant 3D & illustrated WebP avatar
 
 ---
 
-## 💡 NLP Engine in Action
+## 💡 Hybrid NLP & AI Engine in Action
 
-The custom client-side parsing engine processes inputs in under **2 milliseconds**:
+Hisab dynamically routes parsing based on your chosen engine mode (**Local**, **Smart Auto**, or **Always AI**):
 
 ```
 Input: "Sent 4500 to Sharma Hardware for cement via UPI"
 │
-├── 💰 Amount      : ₹4,500
-├── 👤 Entity      : Sharma Hardware (matched alias: "cement supplier")
-├── 🏷️ Category    : Construction / Materials (matched keyword: "cement")
-├── 🔄 Direction   : Outgoing ("You gave")
-├── 💳 Payment     : UPI
-└── 🎯 Confidence  : 98% (Auto-suggests one-tap record)
+├── 🤖 Engine       : Gemini 2.0 Flash / Local Fallback
+├── 💰 Amount       : ₹4,500
+├── 👤 Entity       : Sharma Hardware (matched alias: "cement supplier")
+├── 🏷️ Category     : Construction / Materials (matched keyword: "cement")
+├── 🔄 Direction    : Outgoing ("You gave")
+├── 💳 Payment      : UPI
+├── 🏷️ Source       : ai_text (Tagged with "AI parsed" badge)
+└── 🎯 Confidence   : 98% (Auto-suggests one-tap record)
 ```
 
-| Input Sample | Detected Entity | Amount | Category | Direction |
-| :--- | :--- | :--- | :--- | :--- |
-| `500 diesel petrol pump` | *None* | ₹500 | Fuel & Travel | Outgoing |
-| `Ramesh gave 1200 cash` | Ramesh | ₹1,200 | Income / Settlement | Incoming |
-| `15000 salary to Mukesh` | Mukesh | ₹15,000 | Salaries & Wages | Outgoing |
-| `Tea snacks 120` | *None* | ₹120 | Food & Dining | Outgoing |
-| `Received 5000 from ABC Corp` | ABC Corp | ₹5,000 | Sales / Income | Incoming |
+| Input Sample | Detected Entity | Amount | Category | Direction | Source |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `500 diesel petrol pump` | *None* | ₹500 | Fuel & Travel | Outgoing | Local (<2ms) |
+| `Ramesh gave 1200 cash for rent` | Ramesh | ₹1,200 | Rent & Utilities | Incoming | Local (<2ms) |
+| `Paid 15000 salary to Mukesh via NEFT` | Mukesh | ₹15,000 | Salaries & Wages | Outgoing | Gemini AI |
+| `Tea snacks with client 120` | *None* | ₹120 | Food & Dining | Outgoing | Local (<2ms) |
+| `Received 5000 from ABC Corp for invoice 42` | ABC Corp | ₹5,000 | Sales / Income | Incoming | Gemini AI |
 
 ---
 
@@ -197,24 +203,32 @@ Input: "Sent 4500 to Sharma Hardware for cement via UPI"
 flowchart TD
     subgraph Client ["Client (Browser / PWA / Service Worker)"]
         UI["React 19 + Next.js App Router"]
-        Input["HisabInput / Voice Speech API"]
+        Input["HisabInput (Thinking State & Fallback)"]
+        Voice["Web Speech API"]
         OCR["Camera / Receipt Upload"]
-        Parser["Local NLP & Keyword Engine"]
-        Store["State Layer (Optimistic Store)"]
+        LocalParser["Local NLP & Phonetic Engine (<2ms)"]
+        AIHelper["src/lib/aiParser.ts"]
+        Store["Dual-Mode State Layer (Optimistic Store)"]
         SW["Service Worker (Offline Cache)"]
     end
 
     subgraph AI_Cloud ["AI & Cloud Services"]
-        GeminiAPI["Google Gemini 2.0 Flash Vision API"]
+        GeminiText["Gemini 2.0 Flash (/api/parse-text)"]
+        GeminiVision["Gemini 2.0 Flash Vision (/api/scan-receipt)"]
         SupabaseAuth["Supabase Auth (Google OAuth & Email)"]
-        SupabaseDB[("Supabase PostgreSQL (RLS)")]
+        SupabaseDB[("Supabase PostgreSQL (RLS & Profiles)")]
         PDFGen["jsPDF + AutoTable Engine"]
     end
 
-    Input --> Parser
-    OCR --> GeminiAPI
-    GeminiAPI --> Parser
-    Parser --> Store
+    Input --> |Local / Fallback| LocalParser
+    Input --> |Smart Auto / Always AI| AIHelper
+    Voice --> Input
+    AIHelper --> GeminiText
+    GeminiText -.-> |Silent Fallback on Timeout| LocalParser
+    OCR --> GeminiVision
+    GeminiVision --> Store
+    LocalParser --> Store
+    AIHelper --> Store
     Store <--> |Signed Out| LocalStorage[("Browser localStorage")]
     Store <--> |Signed In / Optimistic Sync| SupabaseDB
     Store --> PDFGen
@@ -413,6 +427,7 @@ WITH CHECK (auth.uid() = user_id);
 - [x] **Supabase Sync**: Real-time cloud backup, authentication, and offline rollback.
 - [x] **Google OAuth**: One-tap sign-in and account backup.
 - [x] **Gemini 2.0 Flash OCR**: Multimodal receipt and handwritten note scanner.
+- [x] **Hybrid AI Text Parsing**: Gemini 2.0 Flash text endpoint (`/api/parse-text`) + 3-Way Mode Switch.
 - [x] **Dynamic Categories**: User-customizable categories with custom keywords.
 - [x] **260+ Deterministic Avatars**: Instant visual identities for contacts & accounts.
 - [x] **Progressive Web App (PWA)**: Offline service worker caching & install prompt.
