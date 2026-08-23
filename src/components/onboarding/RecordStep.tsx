@@ -77,7 +77,7 @@ export function RecordStep({ onContinue }: { onContinue: () => void }) {
             style={{ backgroundColor: "var(--color-peach-soft)" }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/Assets/receipt-scanner-icon.png" alt="" className="h-16 w-16 object-contain" />
+            <img src="/Assets/onboarding/receipt-scanner-icon.webp" alt="" className="h-16 w-16 object-contain" />
           </div>
         </div>
       </div>

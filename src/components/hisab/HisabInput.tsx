@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Mic, Camera, Square, ArrowDownLeft, ArrowUpRight, X } from "lucide-react";
+import { Mic, Camera, Square, ArrowDownLeft, ArrowUpRight, X, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
 import { parseInput } from "@/lib/parser";
@@ -386,7 +386,7 @@ export function HisabInput({
               )}
             </AnimatePresence>
 
-            <div className="mt-2 flex items-center gap-4 border-t border-border pt-2 text-sm font-medium text-primary">
+            <div className="mt-2 flex items-center gap-4 border-t border-border pt-2 text-sm font-medium text-primary lg:hidden">
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 type="button"
@@ -411,6 +411,32 @@ export function HisabInput({
                   Add →
                 </motion.button>
               )}
+            </div>
+
+            <div className="mt-3 hidden items-center gap-3 border-t border-border pt-3 text-sm font-medium lg:flex">
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic("light");
+                  setScannerOpen(true);
+                }}
+                className="flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-ink transition-colors hover:bg-canvas"
+              >
+                <Camera size={15} />
+                Scan receipt
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={text.trim().length === 0}
+                className="flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-ink transition-colors hover:bg-canvas disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent"
+              >
+                <Plus size={15} />
+                Add manually
+              </button>
+              <span className="ml-auto text-xs text-subtle">
+                Tip: try &ldquo;500 diesel&rdquo; or &ldquo;rent 5000&rdquo;
+              </span>
             </div>
           </motion.div>
         )}

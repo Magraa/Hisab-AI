@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useHisab } from "@/lib/store";
 import { createClient } from "@/lib/supabase/client";
+import { InitialsBadge } from "@/components/ui/IconBadge";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { BackupPromoCard } from "@/components/layout/BackupPromoCard";
 
@@ -48,13 +49,20 @@ export default function MorePage() {
       </div>
 
       <div className="mx-5 mt-4 flex items-center justify-between rounded-2xl bg-mint-soft px-5 py-4">
-        <div>
-          <p className="font-semibold text-ink">{business.name}</p>
-          <p className="text-xs text-muted">{isIndividual ? "Individual" : `${business.type} · Business Owner`}</p>
+        <div className="flex items-center gap-3.5 min-w-0">
+          <InitialsBadge
+            name={business.userName || business.name || "Hisab User"}
+            avatarUrl={business.avatar}
+            size={48}
+          />
+          <div className="min-w-0">
+            <p className="truncate font-semibold text-ink">{business.accountKind === "business" ? (business.name || "My Business") : (business.userName || "Your Hisab")}</p>
+            <p className="truncate text-xs text-muted">{isIndividual ? (business.userName ? `${business.userName} · Individual` : "Individual") : `${business.type} · ${business.userName || "Business Owner"}`}</p>
+          </div>
         </div>
         <Link
           href="/more/business"
-          className="rounded-lg border border-mint/40 bg-surface px-3 py-1.5 text-sm font-medium text-mint"
+          className="shrink-0 rounded-lg border border-mint/40 bg-surface px-3 py-1.5 text-sm font-medium text-mint"
         >
           Edit
         </Link>

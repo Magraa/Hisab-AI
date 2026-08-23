@@ -10,6 +10,7 @@ import {
   CATEGORY_ICON_KEYS,
   getCategoryColors,
   getCategoryIcon,
+  getCategoryImage,
 } from "@/lib/categories";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
 import { IconBadge } from "@/components/ui/IconBadge";
@@ -36,7 +37,13 @@ export default function CategoriesPage() {
                 i === categories.length - 1 ? "" : "border-b border-border"
               }`}
             >
-              <IconBadge icon={getCategoryIcon(c.icon)} bg={colors.bg} fg={colors.fg} size={38} />
+              <IconBadge
+                icon={getCategoryIcon(c.icon)}
+                imageSrc={getCategoryImage(c.id)}
+                bg={colors.bg}
+                fg={colors.fg}
+                size={44}
+              />
               <div className="min-w-0 flex-1">
                 <p className="text-[15px] font-medium text-ink">{c.label}</p>
                 {c.keywords.length > 0 && (
@@ -170,7 +177,13 @@ function CategoryEditorSheet({
       ) : (
         <div className="flex flex-col gap-4 pt-2">
           <div className="flex items-center gap-3">
-            <IconBadge icon={getCategoryIcon(icon)} bg={CATEGORY_COLORS[color].bg} fg={CATEGORY_COLORS[color].fg} size={48} />
+            <IconBadge
+              icon={getCategoryIcon(icon)}
+              imageSrc={category ? getCategoryImage(category.id) : undefined}
+              bg={CATEGORY_COLORS[color].bg}
+              fg={CATEGORY_COLORS[color].fg}
+              size={48}
+            />
             <p className="text-base font-semibold text-ink">{isNew ? "Add category" : "Edit category"}</p>
           </div>
 

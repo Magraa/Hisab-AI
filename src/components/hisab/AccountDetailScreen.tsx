@@ -12,6 +12,7 @@ import { HisabInput } from "@/components/hisab/HisabInput";
 import { TransactionDetailSheet } from "@/components/hisab/TransactionDetailSheet";
 import { Sheet } from "@/components/ui/Sheet";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { InitialsBadge } from "@/components/ui/IconBadge";
 import { PageTransition } from "@/components/ui/MotionWrapper";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { triggerHaptic } from "@/lib/haptics";
@@ -168,9 +169,13 @@ export function AccountDetailScreen({ entityId }: { entityId: string }) {
       </div>
 
       <div className="mt-2 flex flex-col items-center px-5 text-center">
-        {isGeneralExpenses && (
+        {isGeneralExpenses ? (
           <div className="mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-amber-soft text-amber shadow-2xs">
             <Receipt size={28} strokeWidth={2.2} />
+          </div>
+        ) : (
+          <div className="mb-3">
+            <InitialsBadge name={entity.name} avatarUrl={entity.avatar} size={72} />
           </div>
         )}
         <h1 className="text-2xl font-semibold text-ink">{entity.name}</h1>

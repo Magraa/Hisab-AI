@@ -12,5 +12,5 @@ const BOOTSTRAP = `
 
 export function ThemeScript() {
   // eslint-disable-next-line react/no-danger
-  return <script dangerouslySetInnerHTML={{ __html: BOOTSTRAP }} />;
+  return <script dangerouslySetInnerHTML={{ __html: BOOTSTRAP }} suppressHydrationWarning />;
 }

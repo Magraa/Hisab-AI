@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
+import { getRandomCreativeName } from "@/lib/creativeNames";
 import type { AccountKind } from "@/lib/types";
 import { WelcomeStep } from "./WelcomeStep";
 import { NameStep } from "./NameStep";
@@ -22,7 +23,12 @@ export function OnboardingFlow() {
   const [stage, setStage] = useState<Stage>("welcome");
   const [accountKind, setAccountKind] = useState<AccountKind>("business");
   const [name, setName] = useState("");
+  const [userName, setUserName] = useState("");
   const [businessType, setBusinessType] = useState("Retail");
+
+  useEffect(() => {
+    setUserName(getRandomCreativeName());
+  }, []);
 
   const isBusiness = accountKind === "business";
   const totalSteps = isBusiness ? 4 : 3;
@@ -36,8 +42,11 @@ export function OnboardingFlow() {
   };
 
   function saveProfile() {
+    const cleanUserName = userName.trim() || getRandomCreativeName();
+    const cleanBusinessName = name.trim() || (isBusiness ? "My Business" : cleanUserName);
     completeOnboarding({
-      name: name.trim() || (isBusiness ? "My Business" : "My Hisab"),
+      name: isBusiness ? cleanBusinessName : cleanUserName,
+      userName: cleanUserName,
       type: isBusiness ? businessType : "Individual",
       accountKind,
     });
@@ -78,9 +87,11 @@ export function OnboardingFlow() {
           <OnboardingShell step={stepNumber.name} totalSteps={totalSteps} onBack={() => setStage("welcome")}>
             <NameStep
               accountKind={accountKind}
-              name={name}
+              businessName={name}
+              userName={userName}
               onChangeAccountKind={setAccountKind}
-              onChangeName={setName}
+              onChangeBusinessName={setName}
+              onChangeUserName={setUserName}
               onContinue={() => setStage(isBusiness ? "type" : "record")}
             />
           </OnboardingShell>

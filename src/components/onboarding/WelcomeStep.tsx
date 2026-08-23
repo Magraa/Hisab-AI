@@ -13,7 +13,7 @@ export function WelcomeStep({ onGetStarted }: { onGetStarted: () => void }) {
       <div className="flex flex-1 flex-col items-center text-center">
         <span className="flex h-20 w-20 items-center justify-center rounded-full bg-primary-soft">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/Assets/logo.png" alt="" className="h-14 w-14 object-contain" />
+          <img src="/Assets/onboarding/logo.webp" alt="" className="h-14 w-14 object-contain" />
         </span>
         <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-ink">HISAB</h1>
         <p className="mt-1 text-base text-muted">Your business. Finally in control.</p>
@@ -43,7 +43,7 @@ export function WelcomeStep({ onGetStarted }: { onGetStarted: () => void }) {
 
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/Assets/ledger-desk.png"
+          src="/Assets/onboarding/ledger-desk.webp"
           alt="A notebook ledger with a pen and a receipt on a desk"
           className="mt-8 -mx-6 h-56 w-[calc(100%+3rem)] max-w-none object-cover"
         />

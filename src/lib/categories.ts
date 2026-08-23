@@ -98,6 +98,23 @@ export function getCategoryColors(color: CategoryColor): { bg: string; fg: strin
   return CATEGORY_COLORS[color] ?? CATEGORY_COLORS.subtle;
 }
 
+export const CATEGORY_IMAGES: Record<string, string> = {
+  raw_material: "/Assets/categories/raw-material.webp",
+  fuel: "/Assets/categories/fuel.webp",
+  supplies: "/Assets/categories/shop-supplies.webp",
+  refreshments: "/Assets/categories/refreshments.webp",
+  transport: "/Assets/categories/transport.webp",
+  maintenance: "/Assets/categories/machine-repair.webp",
+  electricity: "/Assets/categories/electricity.webp",
+  rent: "/Assets/categories/rent.webp",
+  labour: "/Assets/categories/labour.webp",
+};
+
+export function getCategoryImage(categoryIdOrIconKey: string | undefined): string | undefined {
+  if (!categoryIdOrIconKey) return undefined;
+  return CATEGORY_IMAGES[categoryIdOrIconKey];
+}
+
 export function getCategory(categories: Category[], id: string | undefined): Category {
   return (
     categories.find((c) => c.id === id) ??

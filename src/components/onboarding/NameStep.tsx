@@ -1,25 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { Store, User, Lightbulb, X } from "lucide-react";
+import { Store, User, Lightbulb, X, Sparkles } from "lucide-react";
 import type { AccountKind } from "@/lib/types";
 
 export function NameStep({
   accountKind,
-  name,
+  businessName,
+  userName,
   onChangeAccountKind,
-  onChangeName,
+  onChangeBusinessName,
+  onChangeUserName,
   onContinue,
 }: {
   accountKind: AccountKind;
-  name: string;
+  businessName: string;
+  userName: string;
   onChangeAccountKind: (kind: AccountKind) => void;
-  onChangeName: (name: string) => void;
+  onChangeBusinessName: (name: string) => void;
+  onChangeUserName: (userName: string) => void;
   onContinue: () => void;
 }) {
   const isBusiness = accountKind === "business";
   const [touched, setTouched] = useState(false);
-  const canContinue = name.trim().length > 0;
+
+  const canContinue = isBusiness
+    ? businessName.trim().length > 0 && userName.trim().length > 0
+    : userName.trim().length > 0;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -44,32 +51,67 @@ export function NameStep({
         </div>
 
         <h1 className="mt-6 text-[26px] font-bold leading-snug text-ink">
-          {isBusiness ? <>What do you call your business?</> : <>What should we call you?</>}
+          {isBusiness ? <>Tell us about your business</> : <>What should we call you?</>}
         </h1>
-        <p className="mt-2 text-sm text-muted">This will be used across Hisab.</p>
+        <p className="mt-2 text-sm text-muted">This will be used across your Hisab.</p>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-8 flex flex-col gap-4">
+        {isBusiness && (
+          <label
+            className={`block rounded-2xl border-2 px-4 pb-3 pt-2 ${
+              touched && businessName.trim().length === 0 ? "border-amber" : "border-primary"
+            }`}
+          >
+            <span className="text-xs font-semibold text-primary">Business name</span>
+            <span className="flex items-center gap-2">
+              <input
+                autoFocus
+                value={businessName}
+                onChange={(e) => onChangeBusinessName(e.target.value)}
+                onBlur={() => setTouched(true)}
+                placeholder="Sharma Traders"
+                className="min-w-0 flex-1 bg-transparent text-lg text-ink outline-none"
+              />
+              {businessName && (
+                <button
+                  type="button"
+                  onClick={() => onChangeBusinessName("")}
+                  aria-label="Clear business name"
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"
+                >
+                  <X size={13} />
+                </button>
+              )}
+            </span>
+          </label>
+        )}
+
         <label
           className={`block rounded-2xl border-2 px-4 pb-3 pt-2 ${
-            touched && !canContinue ? "border-amber" : "border-primary"
+            touched && userName.trim().length === 0 ? "border-amber" : "border-primary"
           }`}
         >
-          <span className="text-xs font-semibold text-primary">{isBusiness ? "Business name" : "Your name"}</span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-primary">Your name</span>
+            <span className="flex items-center gap-1 text-[11px] font-medium text-muted">
+              <Sparkles size={11} className="text-primary" /> Alias prefilled
+            </span>
+          </div>
           <span className="flex items-center gap-2">
             <input
-              autoFocus
-              value={name}
-              onChange={(e) => onChangeName(e.target.value)}
+              autoFocus={!isBusiness}
+              value={userName}
+              onChange={(e) => onChangeUserName(e.target.value)}
               onBlur={() => setTouched(true)}
-              placeholder={isBusiness ? "Sharma Traders" : "Mayank Agrawal"}
+              placeholder="BudgetMafia"
               className="min-w-0 flex-1 bg-transparent text-lg text-ink outline-none"
             />
-            {name && (
+            {userName && (
               <button
                 type="button"
-                onClick={() => onChangeName("")}
-                aria-label="Clear"
+                onClick={() => onChangeUserName("")}
+                aria-label="Clear user name"
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"
               >
                 <X size={13} />
@@ -78,10 +120,10 @@ export function NameStep({
           </span>
         </label>
 
-        <div className="mt-5 flex items-start gap-3 rounded-2xl bg-primary-soft px-4 py-3.5">
+        <div className="mt-1 flex items-start gap-3 rounded-2xl bg-primary-soft px-4 py-3.5">
           <Lightbulb size={18} className="mt-0.5 shrink-0 text-primary" />
           <p className="text-sm text-ink">
-            You can change this later from {isBusiness ? "Business settings" : "Settings"}.
+            You can change your name or business details anytime from {isBusiness ? "Business settings" : "Settings"}.
           </p>
         </div>
       </div>

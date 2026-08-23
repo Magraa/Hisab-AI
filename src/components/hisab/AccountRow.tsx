@@ -20,7 +20,7 @@ export function AccountRow({ entity, balance }: { entity: Entity; balance: Entit
       onClick={() => triggerHaptic("light")}
       className="tap-active flex items-center gap-3 border-b border-border px-5 py-4 last:border-b-0 transition-colors active:bg-primary-soft/40"
     >
-      <InitialsBadge name={entity.name} size={46} bg={style.bg} fg={style.fg} />
+      <InitialsBadge name={entity.name} avatarUrl={entity.avatar} size={46} bg={style.bg} fg={style.fg} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[15px] font-medium text-ink">{entity.name}</p>
         {entity.relationship && (

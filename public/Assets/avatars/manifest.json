@@ -1,0 +1,3649 @@
+[
+  {
+    "id": "accordion",
+    "name": "Accordion",
+    "filename": "accordion.webp",
+    "path": "/Assets/avatars/accordion.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "acorn-2",
+    "name": "Acorn 2",
+    "filename": "acorn-2.webp",
+    "path": "/Assets/avatars/acorn-2.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "acorn-plum",
+    "name": "Acorn Plum",
+    "filename": "acorn-plum.webp",
+    "path": "/Assets/avatars/acorn-plum.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "acorn-wizard",
+    "name": "Acorn Wizard",
+    "filename": "acorn-wizard.webp",
+    "path": "/Assets/avatars/acorn-wizard.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "alarm-clock-magenta-2",
+    "name": "Alarm Clock Magenta 2",
+    "filename": "alarm-clock-magenta-2.webp",
+    "path": "/Assets/avatars/alarm-clock-magenta-2.webp",
+    "size_kb": 5.6
+  },
+  {
+    "id": "alarm-clock-magenta",
+    "name": "Alarm Clock Magenta",
+    "filename": "alarm-clock-magenta.webp",
+    "path": "/Assets/avatars/alarm-clock-magenta.webp",
+    "size_kb": 5.7
+  },
+  {
+    "id": "alarm-clock",
+    "name": "Alarm Clock",
+    "filename": "alarm-clock.webp",
+    "path": "/Assets/avatars/alarm-clock.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "alpaca-2",
+    "name": "Alpaca 2",
+    "filename": "alpaca-2.webp",
+    "path": "/Assets/avatars/alpaca-2.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "alpaca-3",
+    "name": "Alpaca 3",
+    "filename": "alpaca-3.webp",
+    "path": "/Assets/avatars/alpaca-3.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "alpaca-4",
+    "name": "Alpaca 4",
+    "filename": "alpaca-4.webp",
+    "path": "/Assets/avatars/alpaca-4.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "alpaca-5",
+    "name": "Alpaca 5",
+    "filename": "alpaca-5.webp",
+    "path": "/Assets/avatars/alpaca-5.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "alpaca",
+    "name": "Alpaca",
+    "filename": "alpaca.webp",
+    "path": "/Assets/avatars/alpaca.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "anglerfish-2",
+    "name": "Anglerfish 2",
+    "filename": "anglerfish-2.webp",
+    "path": "/Assets/avatars/anglerfish-2.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "anglerfish",
+    "name": "Anglerfish",
+    "filename": "anglerfish.webp",
+    "path": "/Assets/avatars/anglerfish.webp",
+    "size_kb": 5.6
+  },
+  {
+    "id": "arctic-fox-2",
+    "name": "Arctic Fox 2",
+    "filename": "arctic-fox-2.webp",
+    "path": "/Assets/avatars/arctic-fox-2.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "arctic-fox-3",
+    "name": "Arctic Fox 3",
+    "filename": "arctic-fox-3.webp",
+    "path": "/Assets/avatars/arctic-fox-3.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "armadillo-3",
+    "name": "Armadillo 3",
+    "filename": "armadillo-3.webp",
+    "path": "/Assets/avatars/armadillo-3.webp",
+    "size_kb": 6.4
+  },
+  {
+    "id": "armadillo",
+    "name": "Armadillo",
+    "filename": "armadillo.webp",
+    "path": "/Assets/avatars/armadillo.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "artichoke-2",
+    "name": "Artichoke 2",
+    "filename": "artichoke-2.webp",
+    "path": "/Assets/avatars/artichoke-2.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "artichoke",
+    "name": "Artichoke",
+    "filename": "artichoke.webp",
+    "path": "/Assets/avatars/artichoke.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "astronaut-coral",
+    "name": "Astronaut Coral",
+    "filename": "astronaut-coral.webp",
+    "path": "/Assets/avatars/astronaut-coral.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "axolotl-3",
+    "name": "Axolotl 3",
+    "filename": "axolotl-3.webp",
+    "path": "/Assets/avatars/axolotl-3.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "axolotl-6",
+    "name": "Axolotl 6",
+    "filename": "axolotl-6.webp",
+    "path": "/Assets/avatars/axolotl-6.webp",
+    "size_kb": 4.7
+  },
+  {
+    "id": "axolotl-glaucous",
+    "name": "Axolotl Glaucous",
+    "filename": "axolotl-glaucous.webp",
+    "path": "/Assets/avatars/axolotl-glaucous.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "axolotl",
+    "name": "Axolotl",
+    "filename": "axolotl.webp",
+    "path": "/Assets/avatars/axolotl.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "baby-dragon",
+    "name": "Baby Dragon",
+    "filename": "baby-dragon.webp",
+    "path": "/Assets/avatars/baby-dragon.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "baby-seal",
+    "name": "Baby Seal",
+    "filename": "baby-seal.webp",
+    "path": "/Assets/avatars/baby-seal.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "backpack",
+    "name": "Backpack",
+    "filename": "backpack.webp",
+    "path": "/Assets/avatars/backpack.webp",
+    "size_kb": 5.8
+  },
+  {
+    "id": "badger-4",
+    "name": "Badger 4",
+    "filename": "badger-4.webp",
+    "path": "/Assets/avatars/badger-4.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "badger",
+    "name": "Badger",
+    "filename": "badger.webp",
+    "path": "/Assets/avatars/badger.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "baguette",
+    "name": "Baguette",
+    "filename": "baguette.webp",
+    "path": "/Assets/avatars/baguette.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "balloon-whisk",
+    "name": "Balloon Whisk",
+    "filename": "balloon-whisk.webp",
+    "path": "/Assets/avatars/balloon-whisk.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "bamboo",
+    "name": "Bamboo",
+    "filename": "bamboo.webp",
+    "path": "/Assets/avatars/bamboo.webp",
+    "size_kb": 3.7
+  },
+  {
+    "id": "bat-2",
+    "name": "Bat 2",
+    "filename": "bat-2.webp",
+    "path": "/Assets/avatars/bat-2.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "bat-5",
+    "name": "Bat 5",
+    "filename": "bat-5.webp",
+    "path": "/Assets/avatars/bat-5.webp",
+    "size_kb": 6.9
+  },
+  {
+    "id": "battery",
+    "name": "Battery",
+    "filename": "battery.webp",
+    "path": "/Assets/avatars/battery.webp",
+    "size_kb": 2.5
+  },
+  {
+    "id": "beagle",
+    "name": "Beagle",
+    "filename": "beagle.webp",
+    "path": "/Assets/avatars/beagle.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "bear-glaucous",
+    "name": "Bear Glaucous",
+    "filename": "bear-glaucous.webp",
+    "path": "/Assets/avatars/bear-glaucous.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "bear-moss-gray",
+    "name": "Bear Moss Gray",
+    "filename": "bear-moss-gray.webp",
+    "path": "/Assets/avatars/bear-moss-gray.webp",
+    "size_kb": 2.0
+  },
+  {
+    "id": "beaver",
+    "name": "Beaver",
+    "filename": "beaver.webp",
+    "path": "/Assets/avatars/beaver.webp",
+    "size_kb": 2.5
+  },
+  {
+    "id": "bee",
+    "name": "Bee",
+    "filename": "bee.webp",
+    "path": "/Assets/avatars/bee.webp",
+    "size_kb": 5.7
+  },
+  {
+    "id": "beetle-2",
+    "name": "Beetle 2",
+    "filename": "beetle-2.webp",
+    "path": "/Assets/avatars/beetle-2.webp",
+    "size_kb": 7.2
+  },
+  {
+    "id": "bell-pepper",
+    "name": "Bell Pepper",
+    "filename": "bell-pepper.webp",
+    "path": "/Assets/avatars/bell-pepper.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "bell",
+    "name": "Bell",
+    "filename": "bell.webp",
+    "path": "/Assets/avatars/bell.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "beluga-whale",
+    "name": "Beluga Whale",
+    "filename": "beluga-whale.webp",
+    "path": "/Assets/avatars/beluga-whale.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "bento-box",
+    "name": "Bento Box",
+    "filename": "bento-box.webp",
+    "path": "/Assets/avatars/bento-box.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "bicycle",
+    "name": "Bicycle",
+    "filename": "bicycle.webp",
+    "path": "/Assets/avatars/bicycle.webp",
+    "size_kb": 6.8
+  },
+  {
+    "id": "binoculars",
+    "name": "Binoculars",
+    "filename": "binoculars.webp",
+    "path": "/Assets/avatars/binoculars.webp",
+    "size_kb": 5.9
+  },
+  {
+    "id": "bison-2",
+    "name": "Bison 2",
+    "filename": "bison-2.webp",
+    "path": "/Assets/avatars/bison-2.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "boar",
+    "name": "Boar",
+    "filename": "boar.webp",
+    "path": "/Assets/avatars/boar.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "bonsai",
+    "name": "Bonsai",
+    "filename": "bonsai.webp",
+    "path": "/Assets/avatars/bonsai.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "book-spirit",
+    "name": "Book Spirit",
+    "filename": "book-spirit.webp",
+    "path": "/Assets/avatars/book-spirit.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "book",
+    "name": "Book",
+    "filename": "book.webp",
+    "path": "/Assets/avatars/book.webp",
+    "size_kb": 3.7
+  },
+  {
+    "id": "bot-forest-green",
+    "name": "Bot Forest Green",
+    "filename": "bot-forest-green.webp",
+    "path": "/Assets/avatars/bot-forest-green.webp",
+    "size_kb": 1.9
+  },
+  {
+    "id": "bot",
+    "name": "Bot",
+    "filename": "bot.webp",
+    "path": "/Assets/avatars/bot.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "bread-loaf",
+    "name": "Bread Loaf",
+    "filename": "bread-loaf.webp",
+    "path": "/Assets/avatars/bread-loaf.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "brown-bear",
+    "name": "Brown Bear",
+    "filename": "brown-bear.webp",
+    "path": "/Assets/avatars/brown-bear.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "bumblebee-2",
+    "name": "Bumblebee 2",
+    "filename": "bumblebee-2.webp",
+    "path": "/Assets/avatars/bumblebee-2.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "butterfly",
+    "name": "Butterfly",
+    "filename": "butterfly.webp",
+    "path": "/Assets/avatars/butterfly.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "cactus-2",
+    "name": "Cactus 2",
+    "filename": "cactus-2.webp",
+    "path": "/Assets/avatars/cactus-2.webp",
+    "size_kb": 3.7
+  },
+  {
+    "id": "cactus-4",
+    "name": "Cactus 4",
+    "filename": "cactus-4.webp",
+    "path": "/Assets/avatars/cactus-4.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "cactus-5",
+    "name": "Cactus 5",
+    "filename": "cactus-5.webp",
+    "path": "/Assets/avatars/cactus-5.webp",
+    "size_kb": 2.5
+  },
+  {
+    "id": "cactus-6",
+    "name": "Cactus 6",
+    "filename": "cactus-6.webp",
+    "path": "/Assets/avatars/cactus-6.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "cactus-terracotta",
+    "name": "Cactus Terracotta",
+    "filename": "cactus-terracotta.webp",
+    "path": "/Assets/avatars/cactus-terracotta.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "camel-2",
+    "name": "Camel 2",
+    "filename": "camel-2.webp",
+    "path": "/Assets/avatars/camel-2.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "camel-3",
+    "name": "Camel 3",
+    "filename": "camel-3.webp",
+    "path": "/Assets/avatars/camel-3.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "camera",
+    "name": "Camera",
+    "filename": "camera.webp",
+    "path": "/Assets/avatars/camera.webp",
+    "size_kb": 6.3
+  },
+  {
+    "id": "capybara-10",
+    "name": "Capybara 10",
+    "filename": "capybara-10.webp",
+    "path": "/Assets/avatars/capybara-10.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "capybara-6",
+    "name": "Capybara 6",
+    "filename": "capybara-6.webp",
+    "path": "/Assets/avatars/capybara-6.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "capybara-7",
+    "name": "Capybara 7",
+    "filename": "capybara-7.webp",
+    "path": "/Assets/avatars/capybara-7.webp",
+    "size_kb": 1.7
+  },
+  {
+    "id": "capybara-8",
+    "name": "Capybara 8",
+    "filename": "capybara-8.webp",
+    "path": "/Assets/avatars/capybara-8.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "capybara",
+    "name": "Capybara",
+    "filename": "capybara.webp",
+    "path": "/Assets/avatars/capybara.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "cassette-cream-2",
+    "name": "Cassette Cream 2",
+    "filename": "cassette-cream-2.webp",
+    "path": "/Assets/avatars/cassette-cream-2.webp",
+    "size_kb": 7.6
+  },
+  {
+    "id": "cassette-cream",
+    "name": "Cassette Cream",
+    "filename": "cassette-cream.webp",
+    "path": "/Assets/avatars/cassette-cream.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "cassette",
+    "name": "Cassette",
+    "filename": "cassette.webp",
+    "path": "/Assets/avatars/cassette.webp",
+    "size_kb": 2.2
+  },
+  {
+    "id": "cassowary-2",
+    "name": "Cassowary 2",
+    "filename": "cassowary-2.webp",
+    "path": "/Assets/avatars/cassowary-2.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "cat-2",
+    "name": "Cat 2",
+    "filename": "cat-2.webp",
+    "path": "/Assets/avatars/cat-2.webp",
+    "size_kb": 2.6
+  },
+  {
+    "id": "cat-3",
+    "name": "Cat 3",
+    "filename": "cat-3.webp",
+    "path": "/Assets/avatars/cat-3.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "cat-rounded-calibration",
+    "name": "Cat Rounded Calibration",
+    "filename": "cat-rounded-calibration.webp",
+    "path": "/Assets/avatars/cat-rounded-calibration.webp",
+    "size_kb": 2.2
+  },
+  {
+    "id": "cat-scale-calibration",
+    "name": "Cat Scale Calibration",
+    "filename": "cat-scale-calibration.webp",
+    "path": "/Assets/avatars/cat-scale-calibration.webp",
+    "size_kb": 2.2
+  },
+  {
+    "id": "cat",
+    "name": "Cat",
+    "filename": "cat.webp",
+    "path": "/Assets/avatars/cat.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "chameleon-5",
+    "name": "Chameleon 5",
+    "filename": "chameleon-5.webp",
+    "path": "/Assets/avatars/chameleon-5.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "chameleon",
+    "name": "Chameleon",
+    "filename": "chameleon.webp",
+    "path": "/Assets/avatars/chameleon.webp",
+    "size_kb": 5.6
+  },
+  {
+    "id": "chanterelle",
+    "name": "Chanterelle",
+    "filename": "chanterelle.webp",
+    "path": "/Assets/avatars/chanterelle.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "cheese-wheel",
+    "name": "Cheese Wheel",
+    "filename": "cheese-wheel.webp",
+    "path": "/Assets/avatars/cheese-wheel.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "chef-hat",
+    "name": "Chef Hat",
+    "filename": "chef-hat.webp",
+    "path": "/Assets/avatars/chef-hat.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "chestnut-2",
+    "name": "Chestnut 2",
+    "filename": "chestnut-2.webp",
+    "path": "/Assets/avatars/chestnut-2.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "chinchilla-2",
+    "name": "Chinchilla 2",
+    "filename": "chinchilla-2.webp",
+    "path": "/Assets/avatars/chinchilla-2.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "chipmunk",
+    "name": "Chipmunk",
+    "filename": "chipmunk.webp",
+    "path": "/Assets/avatars/chipmunk.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "cloud-2",
+    "name": "Cloud 2",
+    "filename": "cloud-2.webp",
+    "path": "/Assets/avatars/cloud-2.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "cloud-navy",
+    "name": "Cloud Navy",
+    "filename": "cloud-navy.webp",
+    "path": "/Assets/avatars/cloud-navy.webp",
+    "size_kb": 2.5
+  },
+  {
+    "id": "cloud",
+    "name": "Cloud",
+    "filename": "cloud.webp",
+    "path": "/Assets/avatars/cloud.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "coati",
+    "name": "Coati",
+    "filename": "coati.webp",
+    "path": "/Assets/avatars/coati.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "cockatoo-2",
+    "name": "Cockatoo 2",
+    "filename": "cockatoo-2.webp",
+    "path": "/Assets/avatars/cockatoo-2.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "coconut",
+    "name": "Coconut",
+    "filename": "coconut.webp",
+    "path": "/Assets/avatars/coconut.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "coffee-bean-2",
+    "name": "Coffee Bean 2",
+    "filename": "coffee-bean-2.webp",
+    "path": "/Assets/avatars/coffee-bean-2.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "coffee-bean",
+    "name": "Coffee Bean",
+    "filename": "coffee-bean.webp",
+    "path": "/Assets/avatars/coffee-bean.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "coffee-grinder",
+    "name": "Coffee Grinder",
+    "filename": "coffee-grinder.webp",
+    "path": "/Assets/avatars/coffee-grinder.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "coffee-mug-2",
+    "name": "Coffee Mug 2",
+    "filename": "coffee-mug-2.webp",
+    "path": "/Assets/avatars/coffee-mug-2.webp",
+    "size_kb": 5.7
+  },
+  {
+    "id": "colander",
+    "name": "Colander",
+    "filename": "colander.webp",
+    "path": "/Assets/avatars/colander.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "compass-2",
+    "name": "Compass 2",
+    "filename": "compass-2.webp",
+    "path": "/Assets/avatars/compass-2.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "coral",
+    "name": "Coral",
+    "filename": "coral.webp",
+    "path": "/Assets/avatars/coral.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "corgi-2",
+    "name": "Corgi 2",
+    "filename": "corgi-2.webp",
+    "path": "/Assets/avatars/corgi-2.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "corgi",
+    "name": "Corgi",
+    "filename": "corgi.webp",
+    "path": "/Assets/avatars/corgi.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "corkscrew",
+    "name": "Corkscrew",
+    "filename": "corkscrew.webp",
+    "path": "/Assets/avatars/corkscrew.webp",
+    "size_kb": 6.0
+  },
+  {
+    "id": "cow-2",
+    "name": "Cow 2",
+    "filename": "cow-2.webp",
+    "path": "/Assets/avatars/cow-2.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "cow",
+    "name": "Cow",
+    "filename": "cow.webp",
+    "path": "/Assets/avatars/cow.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "cowboy-cactus-parchment",
+    "name": "Cowboy Cactus Parchment",
+    "filename": "cowboy-cactus-parchment.webp",
+    "path": "/Assets/avatars/cowboy-cactus-parchment.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "crab-4",
+    "name": "Crab 4",
+    "filename": "crab-4.webp",
+    "path": "/Assets/avatars/crab-4.webp",
+    "size_kb": 5.6
+  },
+  {
+    "id": "crab",
+    "name": "Crab",
+    "filename": "crab.webp",
+    "path": "/Assets/avatars/crab.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "crescent-moon-2",
+    "name": "Crescent Moon 2",
+    "filename": "crescent-moon-2.webp",
+    "path": "/Assets/avatars/crescent-moon-2.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "crescent-moon",
+    "name": "Crescent Moon",
+    "filename": "crescent-moon.webp",
+    "path": "/Assets/avatars/crescent-moon.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "croissant-2",
+    "name": "Croissant 2",
+    "filename": "croissant-2.webp",
+    "path": "/Assets/avatars/croissant-2.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "croissant-3",
+    "name": "Croissant 3",
+    "filename": "croissant-3.webp",
+    "path": "/Assets/avatars/croissant-3.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "croissant",
+    "name": "Croissant",
+    "filename": "croissant.webp",
+    "path": "/Assets/avatars/croissant.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "cupcake-2",
+    "name": "Cupcake 2",
+    "filename": "cupcake-2.webp",
+    "path": "/Assets/avatars/cupcake-2.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "cupcake",
+    "name": "Cupcake",
+    "filename": "cupcake.webp",
+    "path": "/Assets/avatars/cupcake.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "dachshund",
+    "name": "Dachshund",
+    "filename": "dachshund.webp",
+    "path": "/Assets/avatars/dachshund.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "deep-exploration-submarine",
+    "name": "Deep Exploration Submarine",
+    "filename": "deep-exploration-submarine.webp",
+    "path": "/Assets/avatars/deep-exploration-submarine.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "deer",
+    "name": "Deer",
+    "filename": "deer.webp",
+    "path": "/Assets/avatars/deer.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "dog-cobalt-bg",
+    "name": "Dog Cobalt Bg",
+    "filename": "dog-cobalt-bg.webp",
+    "path": "/Assets/avatars/dog-cobalt-bg.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "dog",
+    "name": "Dog",
+    "filename": "dog.webp",
+    "path": "/Assets/avatars/dog.webp",
+    "size_kb": 2.0
+  },
+  {
+    "id": "dolphin",
+    "name": "Dolphin",
+    "filename": "dolphin.webp",
+    "path": "/Assets/avatars/dolphin.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "donkey",
+    "name": "Donkey",
+    "filename": "donkey.webp",
+    "path": "/Assets/avatars/donkey.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "donut",
+    "name": "Donut",
+    "filename": "donut.webp",
+    "path": "/Assets/avatars/donut.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "dragonfly-3",
+    "name": "Dragonfly 3",
+    "filename": "dragonfly-3.webp",
+    "path": "/Assets/avatars/dragonfly-3.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "duck-2",
+    "name": "Duck 2",
+    "filename": "duck-2.webp",
+    "path": "/Assets/avatars/duck-2.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "duck-white-bg",
+    "name": "Duck White Bg",
+    "filename": "duck-white-bg.webp",
+    "path": "/Assets/avatars/duck-white-bg.webp",
+    "size_kb": 2.4
+  },
+  {
+    "id": "duck",
+    "name": "Duck",
+    "filename": "duck.webp",
+    "path": "/Assets/avatars/duck.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "dumpling",
+    "name": "Dumpling",
+    "filename": "dumpling.webp",
+    "path": "/Assets/avatars/dumpling.webp",
+    "size_kb": 2.4
+  },
+  {
+    "id": "dwarf-hamster",
+    "name": "Dwarf Hamster",
+    "filename": "dwarf-hamster.webp",
+    "path": "/Assets/avatars/dwarf-hamster.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "eagle",
+    "name": "Eagle",
+    "filename": "eagle.webp",
+    "path": "/Assets/avatars/eagle.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "elephant-lavender-bg",
+    "name": "Elephant Lavender Bg",
+    "filename": "elephant-lavender-bg.webp",
+    "path": "/Assets/avatars/elephant-lavender-bg.webp",
+    "size_kb": 2.2
+  },
+  {
+    "id": "elephant-seal",
+    "name": "Elephant Seal",
+    "filename": "elephant-seal.webp",
+    "path": "/Assets/avatars/elephant-seal.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "elephant",
+    "name": "Elephant",
+    "filename": "elephant.webp",
+    "path": "/Assets/avatars/elephant.webp",
+    "size_kb": 6.1
+  },
+  {
+    "id": "emperor-penguin-3",
+    "name": "Emperor Penguin 3",
+    "filename": "emperor-penguin-3.webp",
+    "path": "/Assets/avatars/emperor-penguin-3.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "envelope",
+    "name": "Envelope",
+    "filename": "envelope.webp",
+    "path": "/Assets/avatars/envelope.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "fennec-fox-2",
+    "name": "Fennec Fox 2",
+    "filename": "fennec-fox-2.webp",
+    "path": "/Assets/avatars/fennec-fox-2.webp",
+    "size_kb": 6.4
+  },
+  {
+    "id": "fennec-fox-3",
+    "name": "Fennec Fox 3",
+    "filename": "fennec-fox-3.webp",
+    "path": "/Assets/avatars/fennec-fox-3.webp",
+    "size_kb": 5.5
+  },
+  {
+    "id": "fennec-fox-4",
+    "name": "Fennec Fox 4",
+    "filename": "fennec-fox-4.webp",
+    "path": "/Assets/avatars/fennec-fox-4.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "fennec-fox",
+    "name": "Fennec Fox",
+    "filename": "fennec-fox.webp",
+    "path": "/Assets/avatars/fennec-fox.webp",
+    "size_kb": 6.4
+  },
+  {
+    "id": "fern",
+    "name": "Fern",
+    "filename": "fern.webp",
+    "path": "/Assets/avatars/fern.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "ferret",
+    "name": "Ferret",
+    "filename": "ferret.webp",
+    "path": "/Assets/avatars/ferret.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "firefly-deep-twilight-2",
+    "name": "Firefly Deep Twilight 2",
+    "filename": "firefly-deep-twilight-2.webp",
+    "path": "/Assets/avatars/firefly-deep-twilight-2.webp",
+    "size_kb": 5.5
+  },
+  {
+    "id": "firefly-deep-twilight",
+    "name": "Firefly Deep Twilight",
+    "filename": "firefly-deep-twilight.webp",
+    "path": "/Assets/avatars/firefly-deep-twilight.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "flamingo-3",
+    "name": "Flamingo 3",
+    "filename": "flamingo-3.webp",
+    "path": "/Assets/avatars/flamingo-3.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "flamingo-4",
+    "name": "Flamingo 4",
+    "filename": "flamingo-4.webp",
+    "path": "/Assets/avatars/flamingo-4.webp",
+    "size_kb": 6.4
+  },
+  {
+    "id": "flamingo",
+    "name": "Flamingo",
+    "filename": "flamingo.webp",
+    "path": "/Assets/avatars/flamingo.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "flashlight",
+    "name": "Flashlight",
+    "filename": "flashlight.webp",
+    "path": "/Assets/avatars/flashlight.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "flying-squirrel",
+    "name": "Flying Squirrel",
+    "filename": "flying-squirrel.webp",
+    "path": "/Assets/avatars/flying-squirrel.webp",
+    "size_kb": 6.1
+  },
+  {
+    "id": "fox-2",
+    "name": "Fox 2",
+    "filename": "fox-2.webp",
+    "path": "/Assets/avatars/fox-2.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "fox-terracotta",
+    "name": "Fox Terracotta",
+    "filename": "fox-terracotta.webp",
+    "path": "/Assets/avatars/fox-terracotta.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "fox",
+    "name": "Fox",
+    "filename": "fox.webp",
+    "path": "/Assets/avatars/fox.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "french-bulldog",
+    "name": "French Bulldog",
+    "filename": "french-bulldog.webp",
+    "path": "/Assets/avatars/french-bulldog.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "frog-3",
+    "name": "Frog 3",
+    "filename": "frog-3.webp",
+    "path": "/Assets/avatars/frog-3.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "frog-4",
+    "name": "Frog 4",
+    "filename": "frog-4.webp",
+    "path": "/Assets/avatars/frog-4.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "frog-5",
+    "name": "Frog 5",
+    "filename": "frog-5.webp",
+    "path": "/Assets/avatars/frog-5.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "frog-6",
+    "name": "Frog 6",
+    "filename": "frog-6.webp",
+    "path": "/Assets/avatars/frog-6.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "frog-sage",
+    "name": "Frog Sage",
+    "filename": "frog-sage.webp",
+    "path": "/Assets/avatars/frog-sage.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "frog",
+    "name": "Frog",
+    "filename": "frog.webp",
+    "path": "/Assets/avatars/frog.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "game-controller",
+    "name": "Game Controller",
+    "filename": "game-controller.webp",
+    "path": "/Assets/avatars/game-controller.webp",
+    "size_kb": 4.7
+  },
+  {
+    "id": "garlic-bulb",
+    "name": "Garlic Bulb",
+    "filename": "garlic-bulb.webp",
+    "path": "/Assets/avatars/garlic-bulb.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "gecko-3",
+    "name": "Gecko 3",
+    "filename": "gecko-3.webp",
+    "path": "/Assets/avatars/gecko-3.webp",
+    "size_kb": 5.3
+  },
+  {
+    "id": "gecko-4",
+    "name": "Gecko 4",
+    "filename": "gecko-4.webp",
+    "path": "/Assets/avatars/gecko-4.webp",
+    "size_kb": 5.5
+  },
+  {
+    "id": "gecko-5",
+    "name": "Gecko 5",
+    "filename": "gecko-5.webp",
+    "path": "/Assets/avatars/gecko-5.webp",
+    "size_kb": 6.7
+  },
+  {
+    "id": "ghost-6",
+    "name": "Ghost 6",
+    "filename": "ghost-6.webp",
+    "path": "/Assets/avatars/ghost-6.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "ghost-7",
+    "name": "Ghost 7",
+    "filename": "ghost-7.webp",
+    "path": "/Assets/avatars/ghost-7.webp",
+    "size_kb": 2.5
+  },
+  {
+    "id": "ghost-8",
+    "name": "Ghost 8",
+    "filename": "ghost-8.webp",
+    "path": "/Assets/avatars/ghost-8.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "ghost-deep-twilight",
+    "name": "Ghost Deep Twilight",
+    "filename": "ghost-deep-twilight.webp",
+    "path": "/Assets/avatars/ghost-deep-twilight.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "ghost-mug",
+    "name": "Ghost Mug",
+    "filename": "ghost-mug.webp",
+    "path": "/Assets/avatars/ghost-mug.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "ghost-plum",
+    "name": "Ghost Plum",
+    "filename": "ghost-plum.webp",
+    "path": "/Assets/avatars/ghost-plum.webp",
+    "size_kb": 2.5
+  },
+  {
+    "id": "giant-panda-2",
+    "name": "Giant Panda 2",
+    "filename": "giant-panda-2.webp",
+    "path": "/Assets/avatars/giant-panda-2.webp",
+    "size_kb": 4.7
+  },
+  {
+    "id": "ginkgo-leaf-3",
+    "name": "Ginkgo Leaf 3",
+    "filename": "ginkgo-leaf-3.webp",
+    "path": "/Assets/avatars/ginkgo-leaf-3.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "giraffe",
+    "name": "Giraffe",
+    "filename": "giraffe.webp",
+    "path": "/Assets/avatars/giraffe.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "goat-2",
+    "name": "Goat 2",
+    "filename": "goat-2.webp",
+    "path": "/Assets/avatars/goat-2.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "goat-4",
+    "name": "Goat 4",
+    "filename": "goat-4.webp",
+    "path": "/Assets/avatars/goat-4.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "golden-retriever",
+    "name": "Golden Retriever",
+    "filename": "golden-retriever.webp",
+    "path": "/Assets/avatars/golden-retriever.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "goldfish",
+    "name": "Goldfish",
+    "filename": "goldfish.webp",
+    "path": "/Assets/avatars/goldfish.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "goose",
+    "name": "Goose",
+    "filename": "goose.webp",
+    "path": "/Assets/avatars/goose.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "gorilla-2",
+    "name": "Gorilla 2",
+    "filename": "gorilla-2.webp",
+    "path": "/Assets/avatars/gorilla-2.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "gorilla",
+    "name": "Gorilla",
+    "filename": "gorilla.webp",
+    "path": "/Assets/avatars/gorilla.webp",
+    "size_kb": 5.5
+  },
+  {
+    "id": "grasshopper",
+    "name": "Grasshopper",
+    "filename": "grasshopper.webp",
+    "path": "/Assets/avatars/grasshopper.webp",
+    "size_kb": 5.4
+  },
+  {
+    "id": "guinea-pig",
+    "name": "Guinea Pig",
+    "filename": "guinea-pig.webp",
+    "path": "/Assets/avatars/guinea-pig.webp",
+    "size_kb": 3.7
+  },
+  {
+    "id": "hammerhead-shark-2",
+    "name": "Hammerhead Shark 2",
+    "filename": "hammerhead-shark-2.webp",
+    "path": "/Assets/avatars/hammerhead-shark-2.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "hamster-2",
+    "name": "Hamster 2",
+    "filename": "hamster-2.webp",
+    "path": "/Assets/avatars/hamster-2.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "hamster-3",
+    "name": "Hamster 3",
+    "filename": "hamster-3.webp",
+    "path": "/Assets/avatars/hamster-3.webp",
+    "size_kb": 5.5
+  },
+  {
+    "id": "hamster",
+    "name": "Hamster",
+    "filename": "hamster.webp",
+    "path": "/Assets/avatars/hamster.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "handbell-2",
+    "name": "Handbell 2",
+    "filename": "handbell-2.webp",
+    "path": "/Assets/avatars/handbell-2.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "harbor-seal-2",
+    "name": "Harbor Seal 2",
+    "filename": "harbor-seal-2.webp",
+    "path": "/Assets/avatars/harbor-seal-2.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "harbor-seal-3",
+    "name": "Harbor Seal 3",
+    "filename": "harbor-seal-3.webp",
+    "path": "/Assets/avatars/harbor-seal-3.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "harbor-seal",
+    "name": "Harbor Seal",
+    "filename": "harbor-seal.webp",
+    "path": "/Assets/avatars/harbor-seal.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "headphones",
+    "name": "Headphones",
+    "filename": "headphones.webp",
+    "path": "/Assets/avatars/headphones.webp",
+    "size_kb": 6.0
+  },
+  {
+    "id": "hedgehog-2",
+    "name": "Hedgehog 2",
+    "filename": "hedgehog-2.webp",
+    "path": "/Assets/avatars/hedgehog-2.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "hedgehog-3",
+    "name": "Hedgehog 3",
+    "filename": "hedgehog-3.webp",
+    "path": "/Assets/avatars/hedgehog-3.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "hedgehog",
+    "name": "Hedgehog",
+    "filename": "hedgehog.webp",
+    "path": "/Assets/avatars/hedgehog.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "hermit-crab-3",
+    "name": "Hermit Crab 3",
+    "filename": "hermit-crab-3.webp",
+    "path": "/Assets/avatars/hermit-crab-3.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "hippo",
+    "name": "Hippo",
+    "filename": "hippo.webp",
+    "path": "/Assets/avatars/hippo.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "hippopotamus-2",
+    "name": "Hippopotamus 2",
+    "filename": "hippopotamus-2.webp",
+    "path": "/Assets/avatars/hippopotamus-2.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "honey-jar",
+    "name": "Honey Jar",
+    "filename": "honey-jar.webp",
+    "path": "/Assets/avatars/honey-jar.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "horse",
+    "name": "Horse",
+    "filename": "horse.webp",
+    "path": "/Assets/avatars/horse.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "horseshoe-magnet",
+    "name": "Horseshoe Magnet",
+    "filename": "horseshoe-magnet.webp",
+    "path": "/Assets/avatars/horseshoe-magnet.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "hot-air-balloon-2",
+    "name": "Hot Air Balloon 2",
+    "filename": "hot-air-balloon-2.webp",
+    "path": "/Assets/avatars/hot-air-balloon-2.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "hot-air-balloon",
+    "name": "Hot Air Balloon",
+    "filename": "hot-air-balloon.webp",
+    "path": "/Assets/avatars/hot-air-balloon.webp",
+    "size_kb": 6.6
+  },
+  {
+    "id": "hourglass",
+    "name": "Hourglass",
+    "filename": "hourglass.webp",
+    "path": "/Assets/avatars/hourglass.webp",
+    "size_kb": 5.8
+  },
+  {
+    "id": "hummingbird-2",
+    "name": "Hummingbird 2",
+    "filename": "hummingbird-2.webp",
+    "path": "/Assets/avatars/hummingbird-2.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "hummingbird-3",
+    "name": "Hummingbird 3",
+    "filename": "hummingbird-3.webp",
+    "path": "/Assets/avatars/hummingbird-3.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "ibex-2",
+    "name": "Ibex 2",
+    "filename": "ibex-2.webp",
+    "path": "/Assets/avatars/ibex-2.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "ibex",
+    "name": "Ibex",
+    "filename": "ibex.webp",
+    "path": "/Assets/avatars/ibex.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "ice-cream-sandwich",
+    "name": "Ice Cream Sandwich",
+    "filename": "ice-cream-sandwich.webp",
+    "path": "/Assets/avatars/ice-cream-sandwich.webp",
+    "size_kb": 2.7
+  },
+  {
+    "id": "iguana-2",
+    "name": "Iguana 2",
+    "filename": "iguana-2.webp",
+    "path": "/Assets/avatars/iguana-2.webp",
+    "size_kb": 4.7
+  },
+  {
+    "id": "jackrabbit",
+    "name": "Jackrabbit",
+    "filename": "jackrabbit.webp",
+    "path": "/Assets/avatars/jackrabbit.webp",
+    "size_kb": 5.8
+  },
+  {
+    "id": "jam-jar",
+    "name": "Jam Jar",
+    "filename": "jam-jar.webp",
+    "path": "/Assets/avatars/jam-jar.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "jellyfish-10",
+    "name": "Jellyfish 10",
+    "filename": "jellyfish-10.webp",
+    "path": "/Assets/avatars/jellyfish-10.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "jellyfish-11",
+    "name": "Jellyfish 11",
+    "filename": "jellyfish-11.webp",
+    "path": "/Assets/avatars/jellyfish-11.webp",
+    "size_kb": 1.9
+  },
+  {
+    "id": "jellyfish-3",
+    "name": "Jellyfish 3",
+    "filename": "jellyfish-3.webp",
+    "path": "/Assets/avatars/jellyfish-3.webp",
+    "size_kb": 5.5
+  },
+  {
+    "id": "jellyfish-4",
+    "name": "Jellyfish 4",
+    "filename": "jellyfish-4.webp",
+    "path": "/Assets/avatars/jellyfish-4.webp",
+    "size_kb": 5.5
+  },
+  {
+    "id": "jellyfish-5",
+    "name": "Jellyfish 5",
+    "filename": "jellyfish-5.webp",
+    "path": "/Assets/avatars/jellyfish-5.webp",
+    "size_kb": 5.6
+  },
+  {
+    "id": "jellyfish-6",
+    "name": "Jellyfish 6",
+    "filename": "jellyfish-6.webp",
+    "path": "/Assets/avatars/jellyfish-6.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "jellyfish-7",
+    "name": "Jellyfish 7",
+    "filename": "jellyfish-7.webp",
+    "path": "/Assets/avatars/jellyfish-7.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "jellyfish-9",
+    "name": "Jellyfish 9",
+    "filename": "jellyfish-9.webp",
+    "path": "/Assets/avatars/jellyfish-9.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "kangaroo",
+    "name": "Kangaroo",
+    "filename": "kangaroo.webp",
+    "path": "/Assets/avatars/kangaroo.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "kettle-bot",
+    "name": "Kettle Bot",
+    "filename": "kettle-bot.webp",
+    "path": "/Assets/avatars/kettle-bot.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "key",
+    "name": "Key",
+    "filename": "key.webp",
+    "path": "/Assets/avatars/key.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "kingfisher-2",
+    "name": "Kingfisher 2",
+    "filename": "kingfisher-2.webp",
+    "path": "/Assets/avatars/kingfisher-2.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "kingfisher",
+    "name": "Kingfisher",
+    "filename": "kingfisher.webp",
+    "path": "/Assets/avatars/kingfisher.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "kiwi-bird-3",
+    "name": "Kiwi Bird 3",
+    "filename": "kiwi-bird-3.webp",
+    "path": "/Assets/avatars/kiwi-bird-3.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "kiwi-bird-4",
+    "name": "Kiwi Bird 4",
+    "filename": "kiwi-bird-4.webp",
+    "path": "/Assets/avatars/kiwi-bird-4.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "kiwi-bird-5",
+    "name": "Kiwi Bird 5",
+    "filename": "kiwi-bird-5.webp",
+    "path": "/Assets/avatars/kiwi-bird-5.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "kiwi-bird",
+    "name": "Kiwi Bird",
+    "filename": "kiwi-bird.webp",
+    "path": "/Assets/avatars/kiwi-bird.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "knight-2",
+    "name": "Knight 2",
+    "filename": "knight-2.webp",
+    "path": "/Assets/avatars/knight-2.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "knight-3",
+    "name": "Knight 3",
+    "filename": "knight-3.webp",
+    "path": "/Assets/avatars/knight-3.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "knight-4",
+    "name": "Knight 4",
+    "filename": "knight-4.webp",
+    "path": "/Assets/avatars/knight-4.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "knight-7",
+    "name": "Knight 7",
+    "filename": "knight-7.webp",
+    "path": "/Assets/avatars/knight-7.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "knight-teal",
+    "name": "Knight Teal",
+    "filename": "knight-teal.webp",
+    "path": "/Assets/avatars/knight-teal.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "knight",
+    "name": "Knight",
+    "filename": "knight.webp",
+    "path": "/Assets/avatars/knight.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "knowledge-mushroom",
+    "name": "Knowledge Mushroom",
+    "filename": "knowledge-mushroom.webp",
+    "path": "/Assets/avatars/knowledge-mushroom.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "koala-2",
+    "name": "Koala 2",
+    "filename": "koala-2.webp",
+    "path": "/Assets/avatars/koala-2.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "koala-3",
+    "name": "Koala 3",
+    "filename": "koala-3.webp",
+    "path": "/Assets/avatars/koala-3.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "koala",
+    "name": "Koala",
+    "filename": "koala.webp",
+    "path": "/Assets/avatars/koala.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "koi-3",
+    "name": "Koi 3",
+    "filename": "koi-3.webp",
+    "path": "/Assets/avatars/koi-3.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "koi-4",
+    "name": "Koi 4",
+    "filename": "koi-4.webp",
+    "path": "/Assets/avatars/koi-4.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "lady-beetle",
+    "name": "Lady Beetle",
+    "filename": "lady-beetle.webp",
+    "path": "/Assets/avatars/lady-beetle.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "ladybug-2",
+    "name": "Ladybug 2",
+    "filename": "ladybug-2.webp",
+    "path": "/Assets/avatars/ladybug-2.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "ladybug",
+    "name": "Ladybug",
+    "filename": "ladybug.webp",
+    "path": "/Assets/avatars/ladybug.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "lantern-2",
+    "name": "Lantern 2",
+    "filename": "lantern-2.webp",
+    "path": "/Assets/avatars/lantern-2.webp",
+    "size_kb": 3.7
+  },
+  {
+    "id": "lantern-3",
+    "name": "Lantern 3",
+    "filename": "lantern-3.webp",
+    "path": "/Assets/avatars/lantern-3.webp",
+    "size_kb": 4.7
+  },
+  {
+    "id": "lantern-jellyfish-charcoal",
+    "name": "Lantern Jellyfish Charcoal",
+    "filename": "lantern-jellyfish-charcoal.webp",
+    "path": "/Assets/avatars/lantern-jellyfish-charcoal.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "lemon-squeezer",
+    "name": "Lemon Squeezer",
+    "filename": "lemon-squeezer.webp",
+    "path": "/Assets/avatars/lemon-squeezer.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "lemur-2",
+    "name": "Lemur 2",
+    "filename": "lemur-2.webp",
+    "path": "/Assets/avatars/lemur-2.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "lemur",
+    "name": "Lemur",
+    "filename": "lemur.webp",
+    "path": "/Assets/avatars/lemur.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "lightbulb-2",
+    "name": "Lightbulb 2",
+    "filename": "lightbulb-2.webp",
+    "path": "/Assets/avatars/lightbulb-2.webp",
+    "size_kb": 3.7
+  },
+  {
+    "id": "lightbulb",
+    "name": "Lightbulb",
+    "filename": "lightbulb.webp",
+    "path": "/Assets/avatars/lightbulb.webp",
+    "size_kb": 4.7
+  },
+  {
+    "id": "lion-cub",
+    "name": "Lion Cub",
+    "filename": "lion-cub.webp",
+    "path": "/Assets/avatars/lion-cub.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "lion-ochre",
+    "name": "Lion Ochre",
+    "filename": "lion-ochre.webp",
+    "path": "/Assets/avatars/lion-ochre.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "llama",
+    "name": "Llama",
+    "filename": "llama.webp",
+    "path": "/Assets/avatars/llama.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "lobster",
+    "name": "Lobster",
+    "filename": "lobster.webp",
+    "path": "/Assets/avatars/lobster.webp",
+    "size_kb": 5.6
+  },
+  {
+    "id": "lop-rabbit",
+    "name": "Lop Rabbit",
+    "filename": "lop-rabbit.webp",
+    "path": "/Assets/avatars/lop-rabbit.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "lotus-pod",
+    "name": "Lotus Pod",
+    "filename": "lotus-pod.webp",
+    "path": "/Assets/avatars/lotus-pod.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "lotus-robot",
+    "name": "Lotus Robot",
+    "filename": "lotus-robot.webp",
+    "path": "/Assets/avatars/lotus-robot.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "lotus-spirit",
+    "name": "Lotus Spirit",
+    "filename": "lotus-spirit.webp",
+    "path": "/Assets/avatars/lotus-spirit.webp",
+    "size_kb": 5.9
+  },
+  {
+    "id": "lotus",
+    "name": "Lotus",
+    "filename": "lotus.webp",
+    "path": "/Assets/avatars/lotus.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "luna-moth-2",
+    "name": "Luna Moth 2",
+    "filename": "luna-moth-2.webp",
+    "path": "/Assets/avatars/luna-moth-2.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "magnet",
+    "name": "Magnet",
+    "filename": "magnet.webp",
+    "path": "/Assets/avatars/magnet.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "mailbox-2",
+    "name": "Mailbox 2",
+    "filename": "mailbox-2.webp",
+    "path": "/Assets/avatars/mailbox-2.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "mailbox-3",
+    "name": "Mailbox 3",
+    "filename": "mailbox-3.webp",
+    "path": "/Assets/avatars/mailbox-3.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "manatee-2",
+    "name": "Manatee 2",
+    "filename": "manatee-2.webp",
+    "path": "/Assets/avatars/manatee-2.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "manatee-3",
+    "name": "Manatee 3",
+    "filename": "manatee-3.webp",
+    "path": "/Assets/avatars/manatee-3.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "manta-coral",
+    "name": "Manta Coral",
+    "filename": "manta-coral.webp",
+    "path": "/Assets/avatars/manta-coral.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "manta-ray-4",
+    "name": "Manta Ray 4",
+    "filename": "manta-ray-4.webp",
+    "path": "/Assets/avatars/manta-ray-4.webp",
+    "size_kb": 4.7
+  },
+  {
+    "id": "map-pin",
+    "name": "Map Pin",
+    "filename": "map-pin.webp",
+    "path": "/Assets/avatars/map-pin.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "measuring-cup",
+    "name": "Measuring Cup",
+    "filename": "measuring-cup.webp",
+    "path": "/Assets/avatars/measuring-cup.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "meerkat-2",
+    "name": "Meerkat 2",
+    "filename": "meerkat-2.webp",
+    "path": "/Assets/avatars/meerkat-2.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "meerkat-4",
+    "name": "Meerkat 4",
+    "filename": "meerkat-4.webp",
+    "path": "/Assets/avatars/meerkat-4.webp",
+    "size_kb": 5.4
+  },
+  {
+    "id": "meerkat",
+    "name": "Meerkat",
+    "filename": "meerkat.webp",
+    "path": "/Assets/avatars/meerkat.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "microphone",
+    "name": "Microphone",
+    "filename": "microphone.webp",
+    "path": "/Assets/avatars/microphone.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "moka-pot-3",
+    "name": "Moka Pot 3",
+    "filename": "moka-pot-3.webp",
+    "path": "/Assets/avatars/moka-pot-3.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "moka-pot",
+    "name": "Moka Pot",
+    "filename": "moka-pot.webp",
+    "path": "/Assets/avatars/moka-pot.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "mole-2",
+    "name": "Mole 2",
+    "filename": "mole-2.webp",
+    "path": "/Assets/avatars/mole-2.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "mole-3",
+    "name": "Mole 3",
+    "filename": "mole-3.webp",
+    "path": "/Assets/avatars/mole-3.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "mole-5",
+    "name": "Mole 5",
+    "filename": "mole-5.webp",
+    "path": "/Assets/avatars/mole-5.webp",
+    "size_kb": 3.7
+  },
+  {
+    "id": "monkey",
+    "name": "Monkey",
+    "filename": "monkey.webp",
+    "path": "/Assets/avatars/monkey.webp",
+    "size_kb": 5.3
+  },
+  {
+    "id": "moon-deep-twilight-2",
+    "name": "Moon Deep Twilight 2",
+    "filename": "moon-deep-twilight-2.webp",
+    "path": "/Assets/avatars/moon-deep-twilight-2.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "moon-deep-twilight",
+    "name": "Moon Deep Twilight",
+    "filename": "moon-deep-twilight.webp",
+    "path": "/Assets/avatars/moon-deep-twilight.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "moon-moth",
+    "name": "Moon Moth",
+    "filename": "moon-moth.webp",
+    "path": "/Assets/avatars/moon-moth.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "moon",
+    "name": "Moon",
+    "filename": "moon.webp",
+    "path": "/Assets/avatars/moon.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "moth",
+    "name": "Moth",
+    "filename": "moth.webp",
+    "path": "/Assets/avatars/moth.webp",
+    "size_kb": 6.6
+  },
+  {
+    "id": "mouse-2",
+    "name": "Mouse 2",
+    "filename": "mouse-2.webp",
+    "path": "/Assets/avatars/mouse-2.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "mouse",
+    "name": "Mouse",
+    "filename": "mouse.webp",
+    "path": "/Assets/avatars/mouse.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "mushroom-10",
+    "name": "Mushroom 10",
+    "filename": "mushroom-10.webp",
+    "path": "/Assets/avatars/mushroom-10.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "mushroom-5",
+    "name": "Mushroom 5",
+    "filename": "mushroom-5.webp",
+    "path": "/Assets/avatars/mushroom-5.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "mushroom-6",
+    "name": "Mushroom 6",
+    "filename": "mushroom-6.webp",
+    "path": "/Assets/avatars/mushroom-6.webp",
+    "size_kb": 4.7
+  },
+  {
+    "id": "mushroom-8",
+    "name": "Mushroom 8",
+    "filename": "mushroom-8.webp",
+    "path": "/Assets/avatars/mushroom-8.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "mushroom-9",
+    "name": "Mushroom 9",
+    "filename": "mushroom-9.webp",
+    "path": "/Assets/avatars/mushroom-9.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "mushroom-knight",
+    "name": "Mushroom Knight",
+    "filename": "mushroom-knight.webp",
+    "path": "/Assets/avatars/mushroom-knight.webp",
+    "size_kb": 3.7
+  },
+  {
+    "id": "mushroom-navy",
+    "name": "Mushroom Navy",
+    "filename": "mushroom-navy.webp",
+    "path": "/Assets/avatars/mushroom-navy.webp",
+    "size_kb": 2.3
+  },
+  {
+    "id": "mushroom-sage",
+    "name": "Mushroom Sage",
+    "filename": "mushroom-sage.webp",
+    "path": "/Assets/avatars/mushroom-sage.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "musk-ox",
+    "name": "Musk Ox",
+    "filename": "musk-ox.webp",
+    "path": "/Assets/avatars/musk-ox.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "narwhal-3",
+    "name": "Narwhal 3",
+    "filename": "narwhal-3.webp",
+    "path": "/Assets/avatars/narwhal-3.webp",
+    "size_kb": 3.7
+  },
+  {
+    "id": "narwhal-4",
+    "name": "Narwhal 4",
+    "filename": "narwhal-4.webp",
+    "path": "/Assets/avatars/narwhal-4.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "nautilus-2",
+    "name": "Nautilus 2",
+    "filename": "nautilus-2.webp",
+    "path": "/Assets/avatars/nautilus-2.webp",
+    "size_kb": 5.3
+  },
+  {
+    "id": "nautilus-3",
+    "name": "Nautilus 3",
+    "filename": "nautilus-3.webp",
+    "path": "/Assets/avatars/nautilus-3.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "octopus-3",
+    "name": "Octopus 3",
+    "filename": "octopus-3.webp",
+    "path": "/Assets/avatars/octopus-3.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "octopus-4",
+    "name": "Octopus 4",
+    "filename": "octopus-4.webp",
+    "path": "/Assets/avatars/octopus-4.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "octopus-5",
+    "name": "Octopus 5",
+    "filename": "octopus-5.webp",
+    "path": "/Assets/avatars/octopus-5.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "octopus",
+    "name": "Octopus",
+    "filename": "octopus.webp",
+    "path": "/Assets/avatars/octopus.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "okapi-2",
+    "name": "Okapi 2",
+    "filename": "okapi-2.webp",
+    "path": "/Assets/avatars/okapi-2.webp",
+    "size_kb": 5.8
+  },
+  {
+    "id": "open-book",
+    "name": "Open Book",
+    "filename": "open-book.webp",
+    "path": "/Assets/avatars/open-book.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "orangutan-2",
+    "name": "Orangutan 2",
+    "filename": "orangutan-2.webp",
+    "path": "/Assets/avatars/orangutan-2.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "orangutan",
+    "name": "Orangutan",
+    "filename": "orangutan.webp",
+    "path": "/Assets/avatars/orangutan.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "orca-2",
+    "name": "Orca 2",
+    "filename": "orca-2.webp",
+    "path": "/Assets/avatars/orca-2.webp",
+    "size_kb": 6.0
+  },
+  {
+    "id": "orca-ochre",
+    "name": "Orca Ochre",
+    "filename": "orca-ochre.webp",
+    "path": "/Assets/avatars/orca-ochre.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "otter-2",
+    "name": "Otter 2",
+    "filename": "otter-2.webp",
+    "path": "/Assets/avatars/otter-2.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "otter-3",
+    "name": "Otter 3",
+    "filename": "otter-3.webp",
+    "path": "/Assets/avatars/otter-3.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "otter",
+    "name": "Otter",
+    "filename": "otter.webp",
+    "path": "/Assets/avatars/otter.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "oven-mitt",
+    "name": "Oven Mitt",
+    "filename": "oven-mitt.webp",
+    "path": "/Assets/avatars/oven-mitt.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "owl-10",
+    "name": "Owl 10",
+    "filename": "owl-10.webp",
+    "path": "/Assets/avatars/owl-10.webp",
+    "size_kb": 5.4
+  },
+  {
+    "id": "owl-4",
+    "name": "Owl 4",
+    "filename": "owl-4.webp",
+    "path": "/Assets/avatars/owl-4.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "owl-5",
+    "name": "Owl 5",
+    "filename": "owl-5.webp",
+    "path": "/Assets/avatars/owl-5.webp",
+    "size_kb": 5.9
+  },
+  {
+    "id": "owl-7",
+    "name": "Owl 7",
+    "filename": "owl-7.webp",
+    "path": "/Assets/avatars/owl-7.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "owl-8",
+    "name": "Owl 8",
+    "filename": "owl-8.webp",
+    "path": "/Assets/avatars/owl-8.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "owl",
+    "name": "Owl",
+    "filename": "owl.webp",
+    "path": "/Assets/avatars/owl.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "paintbrush",
+    "name": "Paintbrush",
+    "filename": "paintbrush.webp",
+    "path": "/Assets/avatars/paintbrush.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "pancake-stack",
+    "name": "Pancake Stack",
+    "filename": "pancake-stack.webp",
+    "path": "/Assets/avatars/pancake-stack.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "panda",
+    "name": "Panda",
+    "filename": "panda.webp",
+    "path": "/Assets/avatars/panda.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "pangolin-3",
+    "name": "Pangolin 3",
+    "filename": "pangolin-3.webp",
+    "path": "/Assets/avatars/pangolin-3.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "pangolin-4",
+    "name": "Pangolin 4",
+    "filename": "pangolin-4.webp",
+    "path": "/Assets/avatars/pangolin-4.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "pangolin-5",
+    "name": "Pangolin 5",
+    "filename": "pangolin-5.webp",
+    "path": "/Assets/avatars/pangolin-5.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "pangolin-cream-2",
+    "name": "Pangolin Cream 2",
+    "filename": "pangolin-cream-2.webp",
+    "path": "/Assets/avatars/pangolin-cream-2.webp",
+    "size_kb": 6.7
+  },
+  {
+    "id": "pangolin-cream",
+    "name": "Pangolin Cream",
+    "filename": "pangolin-cream.webp",
+    "path": "/Assets/avatars/pangolin-cream.webp",
+    "size_kb": 5.5
+  },
+  {
+    "id": "pangolin",
+    "name": "Pangolin",
+    "filename": "pangolin.webp",
+    "path": "/Assets/avatars/pangolin.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "parrot-2",
+    "name": "Parrot 2",
+    "filename": "parrot-2.webp",
+    "path": "/Assets/avatars/parrot-2.webp",
+    "size_kb": 5.7
+  },
+  {
+    "id": "parrot-3",
+    "name": "Parrot 3",
+    "filename": "parrot-3.webp",
+    "path": "/Assets/avatars/parrot-3.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "parrot",
+    "name": "Parrot",
+    "filename": "parrot.webp",
+    "path": "/Assets/avatars/parrot.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "peacock-2",
+    "name": "Peacock 2",
+    "filename": "peacock-2.webp",
+    "path": "/Assets/avatars/peacock-2.webp",
+    "size_kb": 6.1
+  },
+  {
+    "id": "peacock",
+    "name": "Peacock",
+    "filename": "peacock.webp",
+    "path": "/Assets/avatars/peacock.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "pear-2",
+    "name": "Pear 2",
+    "filename": "pear-2.webp",
+    "path": "/Assets/avatars/pear-2.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "pear-3",
+    "name": "Pear 3",
+    "filename": "pear-3.webp",
+    "path": "/Assets/avatars/pear-3.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "pear",
+    "name": "Pear",
+    "filename": "pear.webp",
+    "path": "/Assets/avatars/pear.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "pelican-4",
+    "name": "Pelican 4",
+    "filename": "pelican-4.webp",
+    "path": "/Assets/avatars/pelican-4.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "pelican-5",
+    "name": "Pelican 5",
+    "filename": "pelican-5.webp",
+    "path": "/Assets/avatars/pelican-5.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "pelican-7",
+    "name": "Pelican 7",
+    "filename": "pelican-7.webp",
+    "path": "/Assets/avatars/pelican-7.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "pelican-glaucous-2",
+    "name": "Pelican Glaucous 2",
+    "filename": "pelican-glaucous-2.webp",
+    "path": "/Assets/avatars/pelican-glaucous-2.webp",
+    "size_kb": 5.8
+  },
+  {
+    "id": "pelican-glaucous",
+    "name": "Pelican Glaucous",
+    "filename": "pelican-glaucous.webp",
+    "path": "/Assets/avatars/pelican-glaucous.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "pencil",
+    "name": "Pencil",
+    "filename": "pencil.webp",
+    "path": "/Assets/avatars/pencil.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "penguin-2",
+    "name": "Penguin 2",
+    "filename": "penguin-2.webp",
+    "path": "/Assets/avatars/penguin-2.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "penguin-puffin",
+    "name": "Penguin Puffin",
+    "filename": "penguin-puffin.webp",
+    "path": "/Assets/avatars/penguin-puffin.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "penguin-violet-bg",
+    "name": "Penguin Violet Bg",
+    "filename": "penguin-violet-bg.webp",
+    "path": "/Assets/avatars/penguin-violet-bg.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "penguin",
+    "name": "Penguin",
+    "filename": "penguin.webp",
+    "path": "/Assets/avatars/penguin.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "phoenix-glaucous-2",
+    "name": "Phoenix Glaucous 2",
+    "filename": "phoenix-glaucous-2.webp",
+    "path": "/Assets/avatars/phoenix-glaucous-2.webp",
+    "size_kb": 7.5
+  },
+  {
+    "id": "phoenix-glaucous",
+    "name": "Phoenix Glaucous",
+    "filename": "phoenix-glaucous.webp",
+    "path": "/Assets/avatars/phoenix-glaucous.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "pig",
+    "name": "Pig",
+    "filename": "pig.webp",
+    "path": "/Assets/avatars/pig.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "pinecone",
+    "name": "Pinecone",
+    "filename": "pinecone.webp",
+    "path": "/Assets/avatars/pinecone.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "pitcher-plant-2",
+    "name": "Pitcher Plant 2",
+    "filename": "pitcher-plant-2.webp",
+    "path": "/Assets/avatars/pitcher-plant-2.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "pitcher-plant",
+    "name": "Pitcher Plant",
+    "filename": "pitcher-plant.webp",
+    "path": "/Assets/avatars/pitcher-plant.webp",
+    "size_kb": 6.0
+  },
+  {
+    "id": "platypus-3",
+    "name": "Platypus 3",
+    "filename": "platypus-3.webp",
+    "path": "/Assets/avatars/platypus-3.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "platypus-4",
+    "name": "Platypus 4",
+    "filename": "platypus-4.webp",
+    "path": "/Assets/avatars/platypus-4.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "platypus-6",
+    "name": "Platypus 6",
+    "filename": "platypus-6.webp",
+    "path": "/Assets/avatars/platypus-6.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "platypus",
+    "name": "Platypus",
+    "filename": "platypus.webp",
+    "path": "/Assets/avatars/platypus.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "polar-bear-2",
+    "name": "Polar Bear 2",
+    "filename": "polar-bear-2.webp",
+    "path": "/Assets/avatars/polar-bear-2.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "polar-bear",
+    "name": "Polar Bear",
+    "filename": "polar-bear.webp",
+    "path": "/Assets/avatars/polar-bear.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "popcorn",
+    "name": "Popcorn",
+    "filename": "popcorn.webp",
+    "path": "/Assets/avatars/popcorn.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "porcupine",
+    "name": "Porcupine",
+    "filename": "porcupine.webp",
+    "path": "/Assets/avatars/porcupine.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "potential-acorn",
+    "name": "Potential Acorn",
+    "filename": "potential-acorn.webp",
+    "path": "/Assets/avatars/potential-acorn.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "praying-mantis",
+    "name": "Praying Mantis",
+    "filename": "praying-mantis.webp",
+    "path": "/Assets/avatars/praying-mantis.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "protea-flower",
+    "name": "Protea Flower",
+    "filename": "protea-flower.webp",
+    "path": "/Assets/avatars/protea-flower.webp",
+    "size_kb": 5.8
+  },
+  {
+    "id": "pufferfish-2",
+    "name": "Pufferfish 2",
+    "filename": "pufferfish-2.webp",
+    "path": "/Assets/avatars/pufferfish-2.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "pufferfish-3",
+    "name": "Pufferfish 3",
+    "filename": "pufferfish-3.webp",
+    "path": "/Assets/avatars/pufferfish-3.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "pufferfish-5",
+    "name": "Pufferfish 5",
+    "filename": "pufferfish-5.webp",
+    "path": "/Assets/avatars/pufferfish-5.webp",
+    "size_kb": 7.0
+  },
+  {
+    "id": "puffin-3",
+    "name": "Puffin 3",
+    "filename": "puffin-3.webp",
+    "path": "/Assets/avatars/puffin-3.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "puffin-4",
+    "name": "Puffin 4",
+    "filename": "puffin-4.webp",
+    "path": "/Assets/avatars/puffin-4.webp",
+    "size_kb": 5.4
+  },
+  {
+    "id": "pumpkin",
+    "name": "Pumpkin",
+    "filename": "pumpkin.webp",
+    "path": "/Assets/avatars/pumpkin.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "quokka-2",
+    "name": "Quokka 2",
+    "filename": "quokka-2.webp",
+    "path": "/Assets/avatars/quokka-2.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "quokka-3",
+    "name": "Quokka 3",
+    "filename": "quokka-3.webp",
+    "path": "/Assets/avatars/quokka-3.webp",
+    "size_kb": 2.6
+  },
+  {
+    "id": "quokka",
+    "name": "Quokka",
+    "filename": "quokka.webp",
+    "path": "/Assets/avatars/quokka.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "rabbit-muted-burgundy",
+    "name": "Rabbit Muted Burgundy",
+    "filename": "rabbit-muted-burgundy.webp",
+    "path": "/Assets/avatars/rabbit-muted-burgundy.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "rabbit",
+    "name": "Rabbit",
+    "filename": "rabbit.webp",
+    "path": "/Assets/avatars/rabbit.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "raccoon-2",
+    "name": "Raccoon 2",
+    "filename": "raccoon-2.webp",
+    "path": "/Assets/avatars/raccoon-2.webp",
+    "size_kb": 5.6
+  },
+  {
+    "id": "raccoon-3",
+    "name": "Raccoon 3",
+    "filename": "raccoon-3.webp",
+    "path": "/Assets/avatars/raccoon-3.webp",
+    "size_kb": 3.7
+  },
+  {
+    "id": "raccoon-5",
+    "name": "Raccoon 5",
+    "filename": "raccoon-5.webp",
+    "path": "/Assets/avatars/raccoon-5.webp",
+    "size_kb": 6.1
+  },
+  {
+    "id": "raccoon-terracotta",
+    "name": "Raccoon Terracotta",
+    "filename": "raccoon-terracotta.webp",
+    "path": "/Assets/avatars/raccoon-terracotta.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "raccoon",
+    "name": "Raccoon",
+    "filename": "raccoon.webp",
+    "path": "/Assets/avatars/raccoon.webp",
+    "size_kb": 5.6
+  },
+  {
+    "id": "rain-boot",
+    "name": "Rain Boot",
+    "filename": "rain-boot.webp",
+    "path": "/Assets/avatars/rain-boot.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "rainbow",
+    "name": "Rainbow",
+    "filename": "rainbow.webp",
+    "path": "/Assets/avatars/rainbow.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "ram-4",
+    "name": "Ram 4",
+    "filename": "ram-4.webp",
+    "path": "/Assets/avatars/ram-4.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "ram-lime-cream-2",
+    "name": "Ram Lime Cream 2",
+    "filename": "ram-lime-cream-2.webp",
+    "path": "/Assets/avatars/ram-lime-cream-2.webp",
+    "size_kb": 6.8
+  },
+  {
+    "id": "ram-lime-cream",
+    "name": "Ram Lime Cream",
+    "filename": "ram-lime-cream.webp",
+    "path": "/Assets/avatars/ram-lime-cream.webp",
+    "size_kb": 6.8
+  },
+  {
+    "id": "red-panda-2",
+    "name": "Red Panda 2",
+    "filename": "red-panda-2.webp",
+    "path": "/Assets/avatars/red-panda-2.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "red-panda-3",
+    "name": "Red Panda 3",
+    "filename": "red-panda-3.webp",
+    "path": "/Assets/avatars/red-panda-3.webp",
+    "size_kb": 6.3
+  },
+  {
+    "id": "red-panda-4",
+    "name": "Red Panda 4",
+    "filename": "red-panda-4.webp",
+    "path": "/Assets/avatars/red-panda-4.webp",
+    "size_kb": 6.2
+  },
+  {
+    "id": "red-panda-5",
+    "name": "Red Panda 5",
+    "filename": "red-panda-5.webp",
+    "path": "/Assets/avatars/red-panda-5.webp",
+    "size_kb": 6.6
+  },
+  {
+    "id": "red-panda",
+    "name": "Red Panda",
+    "filename": "red-panda.webp",
+    "path": "/Assets/avatars/red-panda.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "resilient-cactus",
+    "name": "Resilient Cactus",
+    "filename": "resilient-cactus.webp",
+    "path": "/Assets/avatars/resilient-cactus.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "rhino",
+    "name": "Rhino",
+    "filename": "rhino.webp",
+    "path": "/Assets/avatars/rhino.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "rhinoceros-2",
+    "name": "Rhinoceros 2",
+    "filename": "rhinoceros-2.webp",
+    "path": "/Assets/avatars/rhinoceros-2.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "rhinoceros",
+    "name": "Rhinoceros",
+    "filename": "rhinoceros.webp",
+    "path": "/Assets/avatars/rhinoceros.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "rice-cooker-bot",
+    "name": "Rice Cooker Bot",
+    "filename": "rice-cooker-bot.webp",
+    "path": "/Assets/avatars/rice-cooker-bot.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "rice-cooker",
+    "name": "Rice Cooker",
+    "filename": "rice-cooker.webp",
+    "path": "/Assets/avatars/rice-cooker.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "ringed-planet",
+    "name": "Ringed Planet",
+    "filename": "ringed-planet.webp",
+    "path": "/Assets/avatars/ringed-planet.webp",
+    "size_kb": 5.3
+  },
+  {
+    "id": "river-otter",
+    "name": "River Otter",
+    "filename": "river-otter.webp",
+    "path": "/Assets/avatars/river-otter.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "robot-10",
+    "name": "Robot 10",
+    "filename": "robot-10.webp",
+    "path": "/Assets/avatars/robot-10.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "robot-4",
+    "name": "Robot 4",
+    "filename": "robot-4.webp",
+    "path": "/Assets/avatars/robot-4.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "robot-7",
+    "name": "Robot 7",
+    "filename": "robot-7.webp",
+    "path": "/Assets/avatars/robot-7.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "robot-8",
+    "name": "Robot 8",
+    "filename": "robot-8.webp",
+    "path": "/Assets/avatars/robot-8.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "robot-cream",
+    "name": "Robot Cream",
+    "filename": "robot-cream.webp",
+    "path": "/Assets/avatars/robot-cream.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "rocket-indigo",
+    "name": "Rocket Indigo",
+    "filename": "rocket-indigo.webp",
+    "path": "/Assets/avatars/rocket-indigo.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "rocket",
+    "name": "Rocket",
+    "filename": "rocket.webp",
+    "path": "/Assets/avatars/rocket.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "rolling-pin",
+    "name": "Rolling Pin",
+    "filename": "rolling-pin.webp",
+    "path": "/Assets/avatars/rolling-pin.webp",
+    "size_kb": 2.7
+  },
+  {
+    "id": "rooster",
+    "name": "Rooster",
+    "filename": "rooster.webp",
+    "path": "/Assets/avatars/rooster.webp",
+    "size_kb": 5.5
+  },
+  {
+    "id": "rubber-duck-2",
+    "name": "Rubber Duck 2",
+    "filename": "rubber-duck-2.webp",
+    "path": "/Assets/avatars/rubber-duck-2.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "sailboat",
+    "name": "Sailboat",
+    "filename": "sailboat.webp",
+    "path": "/Assets/avatars/sailboat.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "salamander-2",
+    "name": "Salamander 2",
+    "filename": "salamander-2.webp",
+    "path": "/Assets/avatars/salamander-2.webp",
+    "size_kb": 5.3
+  },
+  {
+    "id": "salamander-3",
+    "name": "Salamander 3",
+    "filename": "salamander-3.webp",
+    "path": "/Assets/avatars/salamander-3.webp",
+    "size_kb": 5.6
+  },
+  {
+    "id": "salt-shaker",
+    "name": "Salt Shaker",
+    "filename": "salt-shaker.webp",
+    "path": "/Assets/avatars/salt-shaker.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "samoyed",
+    "name": "Samoyed",
+    "filename": "samoyed.webp",
+    "path": "/Assets/avatars/samoyed.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "sandwich-cookie",
+    "name": "Sandwich Cookie",
+    "filename": "sandwich-cookie.webp",
+    "path": "/Assets/avatars/sandwich-cookie.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "satellite",
+    "name": "Satellite",
+    "filename": "satellite.webp",
+    "path": "/Assets/avatars/satellite.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "saturn",
+    "name": "Saturn",
+    "filename": "saturn.webp",
+    "path": "/Assets/avatars/saturn.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "scarab-beetle-2",
+    "name": "Scarab Beetle 2",
+    "filename": "scarab-beetle-2.webp",
+    "path": "/Assets/avatars/scarab-beetle-2.webp",
+    "size_kb": 4.7
+  },
+  {
+    "id": "scooter",
+    "name": "Scooter",
+    "filename": "scooter.webp",
+    "path": "/Assets/avatars/scooter.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "sea-otter-2",
+    "name": "Sea Otter 2",
+    "filename": "sea-otter-2.webp",
+    "path": "/Assets/avatars/sea-otter-2.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "sea-otter-3",
+    "name": "Sea Otter 3",
+    "filename": "sea-otter-3.webp",
+    "path": "/Assets/avatars/sea-otter-3.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "sea-pen",
+    "name": "Sea Pen",
+    "filename": "sea-pen.webp",
+    "path": "/Assets/avatars/sea-pen.webp",
+    "size_kb": 4.7
+  },
+  {
+    "id": "sea-turtle-3",
+    "name": "Sea Turtle 3",
+    "filename": "sea-turtle-3.webp",
+    "path": "/Assets/avatars/sea-turtle-3.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "sea-turtle-4",
+    "name": "Sea Turtle 4",
+    "filename": "sea-turtle-4.webp",
+    "path": "/Assets/avatars/sea-turtle-4.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "sea-turtle",
+    "name": "Sea Turtle",
+    "filename": "sea-turtle.webp",
+    "path": "/Assets/avatars/sea-turtle.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "seahorse-3",
+    "name": "Seahorse 3",
+    "filename": "seahorse-3.webp",
+    "path": "/Assets/avatars/seahorse-3.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "seahorse-5",
+    "name": "Seahorse 5",
+    "filename": "seahorse-5.webp",
+    "path": "/Assets/avatars/seahorse-5.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "seahorse",
+    "name": "Seahorse",
+    "filename": "seahorse.webp",
+    "path": "/Assets/avatars/seahorse.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "seal-2",
+    "name": "Seal 2",
+    "filename": "seal-2.webp",
+    "path": "/Assets/avatars/seal-2.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "seal-3",
+    "name": "Seal 3",
+    "filename": "seal-3.webp",
+    "path": "/Assets/avatars/seal-3.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "seedling",
+    "name": "Seedling",
+    "filename": "seedling.webp",
+    "path": "/Assets/avatars/seedling.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "shark",
+    "name": "Shark",
+    "filename": "shark.webp",
+    "path": "/Assets/avatars/shark.webp",
+    "size_kb": 5.5
+  },
+  {
+    "id": "sheep-2",
+    "name": "Sheep 2",
+    "filename": "sheep-2.webp",
+    "path": "/Assets/avatars/sheep-2.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "sheep-teal",
+    "name": "Sheep Teal",
+    "filename": "sheep-teal.webp",
+    "path": "/Assets/avatars/sheep-teal.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "sheep",
+    "name": "Sheep",
+    "filename": "sheep.webp",
+    "path": "/Assets/avatars/sheep.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "shiba-inu-2",
+    "name": "Shiba Inu 2",
+    "filename": "shiba-inu-2.webp",
+    "path": "/Assets/avatars/shiba-inu-2.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "shiba-inu",
+    "name": "Shiba Inu",
+    "filename": "shiba-inu.webp",
+    "path": "/Assets/avatars/shiba-inu.webp",
+    "size_kb": 4.2
+  },
+  {
+    "id": "shield",
+    "name": "Shield",
+    "filename": "shield.webp",
+    "path": "/Assets/avatars/shield.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "sloth-2",
+    "name": "Sloth 2",
+    "filename": "sloth-2.webp",
+    "path": "/Assets/avatars/sloth-2.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "sloth",
+    "name": "Sloth",
+    "filename": "sloth.webp",
+    "path": "/Assets/avatars/sloth.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "snail-3",
+    "name": "Snail 3",
+    "filename": "snail-3.webp",
+    "path": "/Assets/avatars/snail-3.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "snail-4",
+    "name": "Snail 4",
+    "filename": "snail-4.webp",
+    "path": "/Assets/avatars/snail-4.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "snail-7",
+    "name": "Snail 7",
+    "filename": "snail-7.webp",
+    "path": "/Assets/avatars/snail-7.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "snail-8",
+    "name": "Snail 8",
+    "filename": "snail-8.webp",
+    "path": "/Assets/avatars/snail-8.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "snail-denim-blue",
+    "name": "Snail Denim Blue",
+    "filename": "snail-denim-blue.webp",
+    "path": "/Assets/avatars/snail-denim-blue.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "snow-leopard",
+    "name": "Snow Leopard",
+    "filename": "snow-leopard.webp",
+    "path": "/Assets/avatars/snow-leopard.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "snowflake",
+    "name": "Snowflake",
+    "filename": "snowflake.webp",
+    "path": "/Assets/avatars/snowflake.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "squid",
+    "name": "Squid",
+    "filename": "squid.webp",
+    "path": "/Assets/avatars/squid.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "squirrel-2",
+    "name": "Squirrel 2",
+    "filename": "squirrel-2.webp",
+    "path": "/Assets/avatars/squirrel-2.webp",
+    "size_kb": 5.5
+  },
+  {
+    "id": "squirrel",
+    "name": "Squirrel",
+    "filename": "squirrel.webp",
+    "path": "/Assets/avatars/squirrel.webp",
+    "size_kb": 4.7
+  },
+  {
+    "id": "stapler",
+    "name": "Stapler",
+    "filename": "stapler.webp",
+    "path": "/Assets/avatars/stapler.webp",
+    "size_kb": 3.2
+  },
+  {
+    "id": "starfish",
+    "name": "Starfish",
+    "filename": "starfish.webp",
+    "path": "/Assets/avatars/starfish.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "strawberry",
+    "name": "Strawberry",
+    "filename": "strawberry.webp",
+    "path": "/Assets/avatars/strawberry.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "submarine-lime-cream",
+    "name": "Submarine Lime Cream",
+    "filename": "submarine-lime-cream.webp",
+    "path": "/Assets/avatars/submarine-lime-cream.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "submarine",
+    "name": "Submarine",
+    "filename": "submarine.webp",
+    "path": "/Assets/avatars/submarine.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "sugar-glider",
+    "name": "Sugar Glider",
+    "filename": "sugar-glider.webp",
+    "path": "/Assets/avatars/sugar-glider.webp",
+    "size_kb": 7.1
+  },
+  {
+    "id": "sun",
+    "name": "Sun",
+    "filename": "sun.webp",
+    "path": "/Assets/avatars/sun.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "sundew-plant",
+    "name": "Sundew Plant",
+    "filename": "sundew-plant.webp",
+    "path": "/Assets/avatars/sundew-plant.webp",
+    "size_kb": 5.1
+  },
+  {
+    "id": "sushi-roll-2",
+    "name": "Sushi Roll 2",
+    "filename": "sushi-roll-2.webp",
+    "path": "/Assets/avatars/sushi-roll-2.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "sushi-roll",
+    "name": "Sushi Roll",
+    "filename": "sushi-roll.webp",
+    "path": "/Assets/avatars/sushi-roll.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "swan-3",
+    "name": "Swan 3",
+    "filename": "swan-3.webp",
+    "path": "/Assets/avatars/swan-3.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "swan",
+    "name": "Swan",
+    "filename": "swan.webp",
+    "path": "/Assets/avatars/swan.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "tabby-cat",
+    "name": "Tabby Cat",
+    "filename": "tabby-cat.webp",
+    "path": "/Assets/avatars/tabby-cat.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "taco-2",
+    "name": "Taco 2",
+    "filename": "taco-2.webp",
+    "path": "/Assets/avatars/taco-2.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "taco",
+    "name": "Taco",
+    "filename": "taco.webp",
+    "path": "/Assets/avatars/taco.webp",
+    "size_kb": 3.9
+  },
+  {
+    "id": "takeout-box",
+    "name": "Takeout Box",
+    "filename": "takeout-box.webp",
+    "path": "/Assets/avatars/takeout-box.webp",
+    "size_kb": 2.6
+  },
+  {
+    "id": "tape-dispenser",
+    "name": "Tape Dispenser",
+    "filename": "tape-dispenser.webp",
+    "path": "/Assets/avatars/tape-dispenser.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "tapir-3",
+    "name": "Tapir 3",
+    "filename": "tapir-3.webp",
+    "path": "/Assets/avatars/tapir-3.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "tapir-4",
+    "name": "Tapir 4",
+    "filename": "tapir-4.webp",
+    "path": "/Assets/avatars/tapir-4.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "tapir-5",
+    "name": "Tapir 5",
+    "filename": "tapir-5.webp",
+    "path": "/Assets/avatars/tapir-5.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "tea-kettle",
+    "name": "Tea Kettle",
+    "filename": "tea-kettle.webp",
+    "path": "/Assets/avatars/tea-kettle.webp",
+    "size_kb": 3.8
+  },
+  {
+    "id": "teapot-2",
+    "name": "Teapot 2",
+    "filename": "teapot-2.webp",
+    "path": "/Assets/avatars/teapot-2.webp",
+    "size_kb": 3.4
+  },
+  {
+    "id": "teapot-3",
+    "name": "Teapot 3",
+    "filename": "teapot-3.webp",
+    "path": "/Assets/avatars/teapot-3.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "teapot-4",
+    "name": "Teapot 4",
+    "filename": "teapot-4.webp",
+    "path": "/Assets/avatars/teapot-4.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "teapot-5",
+    "name": "Teapot 5",
+    "filename": "teapot-5.webp",
+    "path": "/Assets/avatars/teapot-5.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "teapot-6",
+    "name": "Teapot 6",
+    "filename": "teapot-6.webp",
+    "path": "/Assets/avatars/teapot-6.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "teapot-7",
+    "name": "Teapot 7",
+    "filename": "teapot-7.webp",
+    "path": "/Assets/avatars/teapot-7.webp",
+    "size_kb": 3.5
+  },
+  {
+    "id": "teapot-charcoal",
+    "name": "Teapot Charcoal",
+    "filename": "teapot-charcoal.webp",
+    "path": "/Assets/avatars/teapot-charcoal.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "telescope-2",
+    "name": "Telescope 2",
+    "filename": "telescope-2.webp",
+    "path": "/Assets/avatars/telescope-2.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "thermos",
+    "name": "Thermos",
+    "filename": "thermos.webp",
+    "path": "/Assets/avatars/thermos.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "tiger-cub",
+    "name": "Tiger Cub",
+    "filename": "tiger-cub.webp",
+    "path": "/Assets/avatars/tiger-cub.webp",
+    "size_kb": 5.7
+  },
+  {
+    "id": "timely-alarm-clock",
+    "name": "Timely Alarm Clock",
+    "filename": "timely-alarm-clock.webp",
+    "path": "/Assets/avatars/timely-alarm-clock.webp",
+    "size_kb": 6.3
+  },
+  {
+    "id": "toaster-lime-cream",
+    "name": "Toaster Lime Cream",
+    "filename": "toaster-lime-cream.webp",
+    "path": "/Assets/avatars/toaster-lime-cream.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "tomato",
+    "name": "Tomato",
+    "filename": "tomato.webp",
+    "path": "/Assets/avatars/tomato.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "toolbox",
+    "name": "Toolbox",
+    "filename": "toolbox.webp",
+    "path": "/Assets/avatars/toolbox.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "tooth",
+    "name": "Tooth",
+    "filename": "tooth.webp",
+    "path": "/Assets/avatars/tooth.webp",
+    "size_kb": 3.7
+  },
+  {
+    "id": "toucan-4",
+    "name": "Toucan 4",
+    "filename": "toucan-4.webp",
+    "path": "/Assets/avatars/toucan-4.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "toucan-6",
+    "name": "Toucan 6",
+    "filename": "toucan-6.webp",
+    "path": "/Assets/avatars/toucan-6.webp",
+    "size_kb": 4.8
+  },
+  {
+    "id": "toucan-magenta",
+    "name": "Toucan Magenta",
+    "filename": "toucan-magenta.webp",
+    "path": "/Assets/avatars/toucan-magenta.webp",
+    "size_kb": 4.4
+  },
+  {
+    "id": "toucan",
+    "name": "Toucan",
+    "filename": "toucan.webp",
+    "path": "/Assets/avatars/toucan.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "tulip",
+    "name": "Tulip",
+    "filename": "tulip.webp",
+    "path": "/Assets/avatars/tulip.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "turnip",
+    "name": "Turnip",
+    "filename": "turnip.webp",
+    "path": "/Assets/avatars/turnip.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "turtle-2",
+    "name": "Turtle 2",
+    "filename": "turtle-2.webp",
+    "path": "/Assets/avatars/turtle-2.webp",
+    "size_kb": 4.9
+  },
+  {
+    "id": "turtle-lavender",
+    "name": "Turtle Lavender",
+    "filename": "turtle-lavender.webp",
+    "path": "/Assets/avatars/turtle-lavender.webp",
+    "size_kb": 2.8
+  },
+  {
+    "id": "turtle",
+    "name": "Turtle",
+    "filename": "turtle.webp",
+    "path": "/Assets/avatars/turtle.webp",
+    "size_kb": 3.0
+  },
+  {
+    "id": "two-leaf-sprout",
+    "name": "Two Leaf Sprout",
+    "filename": "two-leaf-sprout.webp",
+    "path": "/Assets/avatars/two-leaf-sprout.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "umbrella",
+    "name": "Umbrella",
+    "filename": "umbrella.webp",
+    "path": "/Assets/avatars/umbrella.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "waffle",
+    "name": "Waffle",
+    "filename": "waffle.webp",
+    "path": "/Assets/avatars/waffle.webp",
+    "size_kb": 4.3
+  },
+  {
+    "id": "walrus-2",
+    "name": "Walrus 2",
+    "filename": "walrus-2.webp",
+    "path": "/Assets/avatars/walrus-2.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "walrus",
+    "name": "Walrus",
+    "filename": "walrus.webp",
+    "path": "/Assets/avatars/walrus.webp",
+    "size_kb": 4.1
+  },
+  {
+    "id": "warm-service-teapot",
+    "name": "Warm Service Teapot",
+    "filename": "warm-service-teapot.webp",
+    "path": "/Assets/avatars/warm-service-teapot.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "watering-can-2",
+    "name": "Watering Can 2",
+    "filename": "watering-can-2.webp",
+    "path": "/Assets/avatars/watering-can-2.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "watermelon",
+    "name": "Watermelon",
+    "filename": "watermelon.webp",
+    "path": "/Assets/avatars/watermelon.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "whale-11",
+    "name": "Whale 11",
+    "filename": "whale-11.webp",
+    "path": "/Assets/avatars/whale-11.webp",
+    "size_kb": 5.2
+  },
+  {
+    "id": "whale-12",
+    "name": "Whale 12",
+    "filename": "whale-12.webp",
+    "path": "/Assets/avatars/whale-12.webp",
+    "size_kb": 3.6
+  },
+  {
+    "id": "whale-13",
+    "name": "Whale 13",
+    "filename": "whale-13.webp",
+    "path": "/Assets/avatars/whale-13.webp",
+    "size_kb": 4.6
+  },
+  {
+    "id": "whale-4",
+    "name": "Whale 4",
+    "filename": "whale-4.webp",
+    "path": "/Assets/avatars/whale-4.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "whale-5",
+    "name": "Whale 5",
+    "filename": "whale-5.webp",
+    "path": "/Assets/avatars/whale-5.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "whale-6",
+    "name": "Whale 6",
+    "filename": "whale-6.webp",
+    "path": "/Assets/avatars/whale-6.webp",
+    "size_kb": 3.1
+  },
+  {
+    "id": "whale-7",
+    "name": "Whale 7",
+    "filename": "whale-7.webp",
+    "path": "/Assets/avatars/whale-7.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "whale-9",
+    "name": "Whale 9",
+    "filename": "whale-9.webp",
+    "path": "/Assets/avatars/whale-9.webp",
+    "size_kb": 2.7
+  },
+  {
+    "id": "whale-fog-blue",
+    "name": "Whale Fog Blue",
+    "filename": "whale-fog-blue.webp",
+    "path": "/Assets/avatars/whale-fog-blue.webp",
+    "size_kb": 2.2
+  },
+  {
+    "id": "whale-teal-no-blowhole",
+    "name": "Whale Teal No Blowhole",
+    "filename": "whale-teal-no-blowhole.webp",
+    "path": "/Assets/avatars/whale-teal-no-blowhole.webp",
+    "size_kb": 2.5
+  },
+  {
+    "id": "whale-terracotta-no-blowhole",
+    "name": "Whale Terracotta No Blowhole",
+    "filename": "whale-terracotta-no-blowhole.webp",
+    "path": "/Assets/avatars/whale-terracotta-no-blowhole.webp",
+    "size_kb": 2.9
+  },
+  {
+    "id": "whale-warm-gray",
+    "name": "Whale Warm Gray",
+    "filename": "whale-warm-gray.webp",
+    "path": "/Assets/avatars/whale-warm-gray.webp",
+    "size_kb": 2.0
+  },
+  {
+    "id": "whale",
+    "name": "Whale",
+    "filename": "whale.webp",
+    "path": "/Assets/avatars/whale.webp",
+    "size_kb": 3.3
+  },
+  {
+    "id": "wolf-pup",
+    "name": "Wolf Pup",
+    "filename": "wolf-pup.webp",
+    "path": "/Assets/avatars/wolf-pup.webp",
+    "size_kb": 4.0
+  },
+  {
+    "id": "wombat-2",
+    "name": "Wombat 2",
+    "filename": "wombat-2.webp",
+    "path": "/Assets/avatars/wombat-2.webp",
+    "size_kb": 5.0
+  },
+  {
+    "id": "wombat-5",
+    "name": "Wombat 5",
+    "filename": "wombat-5.webp",
+    "path": "/Assets/avatars/wombat-5.webp",
+    "size_kb": 4.5
+  },
+  {
+    "id": "zebra-2",
+    "name": "Zebra 2",
+    "filename": "zebra-2.webp",
+    "path": "/Assets/avatars/zebra-2.webp",
+    "size_kb": 6.2
+  },
+  {
+    "id": "zebra",
+    "name": "Zebra",
+    "filename": "zebra.webp",
+    "path": "/Assets/avatars/zebra.webp",
+    "size_kb": 6.1
+  }
+]

@@ -2,24 +2,39 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { MoreHorizontal, Wallet } from "lucide-react";
+import { MoreHorizontal, Wallet, Bell, Plus, Lightbulb, ArrowRight, CalendarDays } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
-import { greeting } from "@/lib/format";
+import { greeting, formatRupees, formatTime } from "@/lib/format";
 import { isToday, sumAmount, entityLabel } from "@/lib/selectors";
+import {
+  categorized,
+  categoryBreakdown,
+  conicGradient,
+  dailyTotals,
+  inRange,
+  periodRange,
+  buildInsightCards,
+} from "@/lib/insights";
+import { getCategory, getCategoryIcon } from "@/lib/categories";
 import { HisabInput } from "@/components/hisab/HisabInput";
 import { TransactionRow } from "@/components/hisab/TransactionRow";
 import { TransactionDetailSheet } from "@/components/hisab/TransactionDetailSheet";
+import { DesktopEntryTable } from "@/components/hisab/DesktopEntryTable";
+import { HomeSpendChart } from "@/components/hisab/HomeSpendChart";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { Card } from "@/components/ui/Card";
+import { Sheet } from "@/components/ui/Sheet";
 import { PageTransition } from "@/components/ui/MotionWrapper";
 import { triggerHaptic } from "@/lib/haptics";
 
 const PREVIEW_COUNT = 5;
 
 export default function HomePage() {
-  const { transactions, entities, business } = useHisab();
+  const { transactions, entities, categories, business } = useHisab();
   const [selectedTxId, setSelectedTxId] = useState<string | null>(null);
+  const [showAddSheet, setShowAddSheet] = useState(false);
 
   const todays = useMemo(
     () =>
@@ -30,114 +45,346 @@ export default function HomePage() {
   );
 
   const todayTotal = sumAmount(todays);
+  const avgExpense = todays.length > 0 ? todayTotal / todays.length : 0;
+
+  // Desktop-only widgets (spend trend, monthly insight, top category, vs.
+  // yesterday) — computed unconditionally since it's cheap, but only ever
+  // rendered inside the `hidden lg:block` desktop tree below.
+  const desktopData = useMemo(() => {
+    const now = new Date();
+
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - 6);
+    const trend = dailyTotals(transactions, weekStart, now);
+
+    const yStart = new Date(now);
+    yStart.setDate(now.getDate() - 1);
+    const yesterdayStart = new Date(yStart.getFullYear(), yStart.getMonth(), yStart.getDate());
+    const yesterdayEnd = new Date(yStart.getFullYear(), yStart.getMonth(), yStart.getDate(), 23, 59, 59, 999);
+    const yesterdayTotal = sumAmount(inRange(transactions, yesterdayStart, yesterdayEnd));
+
+    const monthRange = periodRange("this_month");
+    const prevMonthRange = periodRange("last_month");
+    const catTx = categorized(transactions);
+    const currentMonthTx = inRange(catTx, monthRange.start, monthRange.end);
+    const prevMonthTx = inRange(catTx, prevMonthRange.start, prevMonthRange.end);
+    const currentSlices = categoryBreakdown(currentMonthTx, categories);
+    const prevSlices = categoryBreakdown(prevMonthTx, categories);
+    const insightCards = buildInsightCards(currentSlices, prevSlices, sumAmount(currentMonthTx), sumAmount(prevMonthTx));
+
+    const todaySlices = categoryBreakdown(categorized(todays), categories);
+    const topCategory = todaySlices[0];
+
+    return { trend, yesterdayTotal, insightCards, todaySlices, topCategory };
+  }, [transactions, categories, todays]);
+
+  const vsYesterdayPct =
+    desktopData.yesterdayTotal > 0
+      ? Math.round(((todayTotal - desktopData.yesterdayTotal) / desktopData.yesterdayTotal) * 100)
+      : null;
+
+  const topCategoryFull = desktopData.topCategory ? getCategory(categories, desktopData.topCategory.id) : null;
+  const TopCategoryIcon = topCategoryFull ? getCategoryIcon(topCategoryFull.icon) : null;
 
   return (
-    <PageTransition>
-      <div className="flex items-start justify-between px-5 pt-6">
-        <div>
-          <h1 className="text-xl font-semibold text-ink">{greeting()}, Mayank 👋</h1>
-          <p className="text-sm text-muted">Here&rsquo;s your {business.name} Hisab</p>
-        </div>
-        <Link
-          href="/more"
-          aria-label="More"
-          onClick={() => triggerHaptic("light")}
-          className="tap-active flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted transition-colors active:bg-primary-soft/40"
-        >
-          <MoreHorizontal size={18} />
-        </Link>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="mx-5 mt-4 flex items-center justify-between rounded-2xl bg-mint-soft px-5 py-4 shadow-xs"
-      >
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-mint">Today</p>
-          <p className="mt-1 text-3xl font-semibold text-ink">
-            <AnimatedNumber value={todayTotal} />
-          </p>
-          <p className="text-sm text-muted">spent so far</p>
-        </div>
-        <motion.div
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-surface shadow-xs"
-        >
-          <Wallet size={26} className="text-mint" />
-        </motion.div>
-      </motion.div>
-
-      <div className="mx-5 mt-4">
-        <HisabInput />
-      </div>
-
-      <div className="mt-6 flex items-center justify-between px-5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted">Today&rsquo;s entries</p>
-        <Link
-          href="/entries"
-          onClick={() => triggerHaptic("light")}
-          className="text-sm font-medium text-primary hover:underline active:opacity-75"
-        >
-          View all
-        </Link>
-      </div>
-
-      <div className="mt-2">
-        {todays.length === 0 ? (
-          <div className="px-5">
-            <EmptyState
-              title="Your Hisab starts here."
-              subtitle="Nothing recorded today. Tell me what you spent."
-            />
+    <>
+      <PageTransition className="lg:hidden">
+        <div className="flex items-start justify-between px-5 pt-6">
+          <div>
+            <h1 className="text-xl font-semibold text-ink">{greeting()}, {business.userName || "BudgetMafia"} 👋</h1>
+            <p className="text-sm text-muted">Here&rsquo;s your Hisab</p>
           </div>
-        ) : (
-          <div className="mx-5 overflow-hidden rounded-2xl border border-border bg-surface shadow-xs">
-            <AnimatePresence initial={false}>
-              {todays.slice(0, PREVIEW_COUNT).map((tx) => (
-                <motion.div
-                  key={tx.id}
-                  layout
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ type: "spring", stiffness: 450, damping: 30 }}
-                >
-                  <TransactionRow
-                    tx={tx}
-                    entityName={entityLabel(entities, tx.entityId)}
-                    onClick={() => setSelectedTxId(tx.id)}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
-      </div>
+          <Link
+            href="/more"
+            aria-label="More"
+            onClick={() => triggerHaptic("light")}
+            className="tap-active flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted transition-colors active:bg-primary-soft/40"
+          >
+            <MoreHorizontal size={18} />
+          </Link>
+        </div>
 
-      {todays.length > 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="mx-5 mt-4 mb-6 flex items-center justify-between rounded-2xl border border-border bg-surface px-5 py-4 shadow-xs"
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="mx-5 mt-4 flex items-center justify-between rounded-2xl bg-mint-soft px-5 py-4 shadow-xs"
         >
           <div>
-            <p className="text-sm text-muted">Today&rsquo;s total</p>
-            <p className="text-2xl font-semibold text-ink">
+            <p className="text-xs font-semibold uppercase tracking-wide text-mint">Today</p>
+            <p className="mt-1 text-3xl font-semibold text-ink">
               <AnimatedNumber value={todayTotal} />
             </p>
+            <p className="text-sm text-muted">spent so far</p>
           </div>
-          <span className="rounded-full bg-mint-soft px-3 py-1.5 text-sm font-medium text-mint">
-            {todays.length} {todays.length === 1 ? "expense" : "expenses"}
-          </span>
+          <motion.div
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-surface shadow-xs"
+          >
+            <Wallet size={26} className="text-mint" />
+          </motion.div>
         </motion.div>
-      )}
+
+        <div className="mx-5 mt-4">
+          <HisabInput />
+        </div>
+
+        <div className="mt-6 flex items-center justify-between px-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Today&rsquo;s entries</p>
+          <Link
+            href="/entries"
+            onClick={() => triggerHaptic("light")}
+            className="text-sm font-medium text-primary hover:underline active:opacity-75"
+          >
+            View all
+          </Link>
+        </div>
+
+        <div className="mt-2">
+          {todays.length === 0 ? (
+            <div className="px-5">
+              <EmptyState
+                title="Your Hisab starts here."
+                subtitle="Nothing recorded today. Tell me what you spent."
+              />
+            </div>
+          ) : (
+            <div className="mx-5 overflow-hidden rounded-2xl border border-border bg-surface shadow-xs">
+              <AnimatePresence initial={false}>
+                {todays.slice(0, PREVIEW_COUNT).map((tx) => (
+                  <motion.div
+                    key={tx.id}
+                    layout
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ type: "spring", stiffness: 450, damping: 30 }}
+                  >
+                    <TransactionRow
+                      tx={tx}
+                      entityName={entityLabel(entities, tx.entityId)}
+                      onClick={() => setSelectedTxId(tx.id)}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+
+        {todays.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mx-5 mt-4 mb-6 flex items-center justify-between rounded-2xl border border-border bg-surface px-5 py-4 shadow-xs"
+          >
+            <div>
+              <p className="text-sm text-muted">Today&rsquo;s total</p>
+              <p className="text-2xl font-semibold text-ink">
+                <AnimatedNumber value={todayTotal} />
+              </p>
+            </div>
+            <span className="rounded-full bg-mint-soft px-3 py-1.5 text-sm font-medium text-mint">
+              {todays.length} {todays.length === 1 ? "expense" : "expenses"}
+            </span>
+          </motion.div>
+        )}
+      </PageTransition>
+
+      <div className="hidden lg:block">
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-ink">{greeting()}, {business.userName || "BudgetMafia"} 👋</h1>
+            <p className="mt-1 text-sm text-muted">Here&rsquo;s your Hisab</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-ink shadow-2xs">
+              <CalendarDays size={16} className="text-muted" />
+              {new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+            </span>
+            <button
+              type="button"
+              aria-label="Notifications"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted transition-colors hover:bg-canvas hover:text-ink"
+            >
+              <Bell size={17} />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic("light");
+                setShowAddSheet(true);
+              }}
+              className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark"
+            >
+              <Plus size={16} />
+              Add expense
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-6 grid grid-cols-[1fr_320px] items-start gap-6">
+          <div className="min-w-0">
+            <Card className="p-6 shadow-xs">
+              <div className="flex items-center gap-8">
+                <div className="shrink-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">Today&rsquo;s spend</p>
+                  <p className="mt-2 text-3xl font-semibold text-ink">
+                    <AnimatedNumber value={todayTotal} />
+                  </p>
+                  <p className="text-sm text-muted">spent so far</p>
+                  {vsYesterdayPct !== null && (
+                    <p className={`mt-1 text-xs font-medium ${vsYesterdayPct >= 0 ? "text-mint" : "text-rose"}`}>
+                      {vsYesterdayPct >= 0 ? "↑" : "↓"} {Math.abs(vsYesterdayPct)}%{" "}
+                      {vsYesterdayPct >= 0 ? "more" : "less"} than yesterday
+                    </p>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <HomeSpendChart points={desktopData.trend} />
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-sm text-ink">
+                    <span className="font-semibold">{todays.length}</span> {todays.length === 1 ? "expense" : "expenses"}
+                  </p>
+                  <p className="mt-2 text-xs text-muted">Avg. expense</p>
+                  <p className="text-sm font-semibold text-ink">{formatRupees(avgExpense)}</p>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="mt-5 border-primary/30 p-6 shadow-xs">
+              <p className="mb-3 text-base font-semibold text-ink">What did you spend?</p>
+              <HisabInput />
+            </Card>
+
+            <div className="mt-6">
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">Today&rsquo;s entries</p>
+                <Link href="/entries" className="text-sm font-medium text-primary hover:underline">
+                  View all entries
+                </Link>
+              </div>
+              <Card className="overflow-hidden shadow-xs">
+                <DesktopEntryTable
+                  transactions={todays}
+                  entities={entities}
+                  onSelect={setSelectedTxId}
+                  emptyTitle="Your Hisab starts here."
+                  emptySubtitle="Nothing recorded today. Tell me what you spent."
+                />
+              </Card>
+              {todays.length > 0 && (
+                <div className="mt-4 flex items-center justify-between rounded-2xl border border-border bg-surface px-6 py-4 shadow-xs">
+                  <p className="text-base font-semibold text-ink">Today&rsquo;s total</p>
+                  <div className="flex items-center gap-3">
+                    <p className="text-xl font-semibold text-ink">
+                      <AnimatedNumber value={todayTotal} />
+                    </p>
+                    <span className="rounded-full bg-mint-soft px-3 py-1.5 text-sm font-medium text-mint">
+                      {todays.length} {todays.length === 1 ? "expense" : "expenses"}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-5">
+            <Card className="p-5 shadow-xs">
+              <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+                <Lightbulb size={16} className="text-amber" />
+                Quick insight
+              </p>
+              {desktopData.insightCards[0] ? (
+                <>
+                  <p className="mt-3 text-sm text-ink">{desktopData.insightCards[0].title}.</p>
+                  <p className="mt-1 text-sm text-muted">{desktopData.insightCards[0].body}</p>
+                  <Link
+                    href="/insights"
+                    className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+                  >
+                    View insight <ArrowRight size={14} />
+                  </Link>
+                </>
+              ) : (
+                <p className="mt-3 text-sm text-muted">
+                  Add a few more expenses and Hisab will start spotting patterns here.
+                </p>
+              )}
+            </Card>
+
+            <Card className="p-5 shadow-xs">
+              <p className="text-sm font-semibold text-ink">Top category today</p>
+              {desktopData.topCategory && TopCategoryIcon ? (
+                <div className="mt-3 flex items-center gap-4">
+                  <div
+                    className="relative h-16 w-16 shrink-0 rounded-full"
+                    style={{ backgroundImage: conicGradient(desktopData.todaySlices) }}
+                  >
+                    <div className="absolute inset-[22%] rounded-full bg-surface" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+                      <TopCategoryIcon size={15} style={{ color: desktopData.topCategory.fg }} />
+                      <span className="truncate">{desktopData.topCategory.label}</span>
+                    </p>
+                    <p className="mt-1 text-base font-semibold text-ink">
+                      {formatRupees(desktopData.topCategory.amount)}
+                    </p>
+                    <p className="text-xs text-muted">{desktopData.topCategory.pct}% of total</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-3 text-sm text-muted">No categorized expenses yet today.</p>
+              )}
+            </Card>
+
+            <Card className="p-5 shadow-xs">
+              <p className="text-sm font-semibold text-ink">Recent activity</p>
+              {todays.length === 0 ? (
+                <p className="mt-3 text-sm text-muted">Nothing recorded yet today.</p>
+              ) : (
+                <ul className="mt-3 space-y-4">
+                  {todays.slice(0, 3).map((tx) => {
+                    const isEntity = Boolean(tx.entityId);
+                    const label = isEntity
+                      ? entityLabel(entities, tx.entityId) ?? tx.description
+                      : getCategory(categories, tx.categoryId).label;
+                    const actionLabel = tx.source === "settlement" ? "Settlement added" : "Expense added";
+                    return (
+                      <li key={tx.id} className="flex gap-3">
+                        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-mint" />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-ink">{actionLabel}</p>
+                          <p className="truncate text-xs text-muted">
+                            {label} · {formatRupees(tx.amount)} · {formatTime(tx.createdAt)}
+                          </p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              <Link
+                href="/entries"
+                className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+              >
+                View all activity <ArrowRight size={14} />
+              </Link>
+            </Card>
+          </div>
+        </div>
+      </div>
 
       <TransactionDetailSheet txId={selectedTxId} onClose={() => setSelectedTxId(null)} />
-    </PageTransition>
+
+      <Sheet open={showAddSheet} onClose={() => setShowAddSheet(false)}>
+        <p className="mb-3 text-base font-semibold text-ink">Add an expense</p>
+        <HisabInput onAdded={() => setShowAddSheet(false)} />
+      </Sheet>
+    </>
   );
 }
-

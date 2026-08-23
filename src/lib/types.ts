@@ -12,6 +12,7 @@ export interface Entity {
   name: string;
   aliases: string[];
   type: EntityType;
+  avatar?: string;
   relationship?: string;
   phone?: string;
   notes?: string;
@@ -45,6 +46,8 @@ export type AccountKind = "business" | "individual";
 
 export interface BusinessProfile {
   name: string;
+  userName?: string;
+  avatar?: string;
   type: string;
   currency: string;
   accountKind: AccountKind;

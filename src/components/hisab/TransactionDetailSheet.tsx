@@ -4,8 +4,9 @@ import { useMemo, useRef, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, User, Tag } from "lucide-react";
 import { Sheet } from "@/components/ui/Sheet";
 import { useHisab } from "@/lib/store";
-import { getCategory } from "@/lib/categories";
+import { getCategory, getCategoryIcon, getCategoryColors, getCategoryImage } from "@/lib/categories";
 import { formatRupees } from "@/lib/format";
+import { IconBadge, InitialsBadge } from "@/components/ui/IconBadge";
 import type { Direction, PaymentMethod, Transaction } from "@/lib/types";
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -308,6 +309,19 @@ export function TransactionDetailSheet({
         </div>
       ) : (
         <div className="flex flex-col gap-1 pt-2">
+          <div className="mb-2 flex justify-center">
+            {entity ? (
+              <InitialsBadge name={entity.name} avatarUrl={entity.avatar} size={58} />
+            ) : (
+              <IconBadge
+                icon={getCategoryIcon(getCategory(categories, displayTx.categoryId).icon)}
+                imageSrc={getCategoryImage(displayTx.categoryId)}
+                bg={getCategoryColors(getCategory(categories, displayTx.categoryId).color).bg}
+                fg={getCategoryColors(getCategory(categories, displayTx.categoryId).color).fg}
+                size={58}
+              />
+            )}
+          </div>
           <p className="text-center text-3xl font-semibold text-ink">{formatRupees(displayTx.amount)}</p>
           <p className="text-center text-sm text-muted">{label}</p>
 

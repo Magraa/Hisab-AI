@@ -12,6 +12,8 @@ import {
 } from "react";
 import type { BusinessProfile, Category, Direction, Entity, EntityType, PaymentMethod, Transaction, TxSource } from "./types";
 import { cloneDefaultCategories } from "./categories";
+import { getRandomCreativeName } from "./creativeNames";
+import { getAvatarForName } from "./avatars";
 // Demo-data seeding is disabled below so a fresh signed-out user goes through
 // real onboarding instead of landing on pre-filled demo data (see
 // OnboardingGate). To restore it for testing, uncomment this import and the
@@ -51,7 +53,7 @@ function defaultState(): PersistedState {
     entities: [], // seedEntities(),
     transactions: [], // seedTransactions(),
     categories: cloneDefaultCategories(),
-    business: { name: "", type: "", currency: "INR", accountKind: "individual" }, // seedBusiness(),
+    business: { name: "", userName: "Hisab User", type: "", currency: "INR", accountKind: "individual" }, // seedBusiness(),
     enabledPaymentMethods: ["cash", "upi", "bank", "card", "credit"],
     hasOnboarded: false,
     geminiApiKey: null,
@@ -67,7 +69,7 @@ function emptyCloudState(): PersistedState {
     entities: [],
     transactions: [],
     categories: cloneDefaultCategories(),
-    business: { name: "", type: "", currency: "INR", accountKind: "individual" },
+    business: { name: "", userName: "Hisab User", type: "", currency: "INR", accountKind: "individual" },
     enabledPaymentMethods: ["cash", "upi", "bank", "card", "credit"],
     hasOnboarded: false,
     geminiApiKey: null,
@@ -159,6 +161,11 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as PersistedState;
+        if (!parsed.business) {
+          parsed.business = { name: "", userName: getRandomCreativeName(), type: "", currency: "INR", accountKind: "individual" };
+        } else if (!parsed.business.userName) {
+          parsed.business.userName = getRandomCreativeName();
+        }
         // Older snapshots (saved before categories were user-editable) won't
         // have this field — backfill the defaults rather than starting empty.
         if (!parsed.categories || parsed.categories.length === 0) {
@@ -332,6 +339,7 @@ export function HisabProvider({ children }: { children: ReactNode }) {
         name: clean,
         aliases: [],
         type,
+        avatar: getAvatarForName(clean).path,
         createdAt: new Date().toISOString(),
       };
 
@@ -367,6 +375,7 @@ export function HisabProvider({ children }: { children: ReactNode }) {
           name: input.entityName,
           aliases: [],
           type: "person",
+          avatar: getAvatarForName(input.entityName).path,
           createdAt: new Date().toISOString(),
         };
         entityId = newEntity.id;
@@ -433,6 +442,7 @@ export function HisabProvider({ children }: { children: ReactNode }) {
             name: input.entityName.trim(),
             aliases: [],
             type: "person",
+            avatar: getAvatarForName(input.entityName.trim()).path,
             createdAt: new Date().toISOString(),
           };
           tempEntities.push(existing);

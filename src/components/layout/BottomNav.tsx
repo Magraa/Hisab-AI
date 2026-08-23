@@ -7,7 +7,7 @@ import type { LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { triggerHaptic } from "@/lib/haptics";
 
-const TABS: Array<{ href: string; label: string; icon: LucideIcon }> = [
+export const NAV_TABS: Array<{ href: string; label: string; icon: LucideIcon }> = [
   { href: "/", label: "Home", icon: Home },
   { href: "/accounts", label: "Accounts", icon: Users },
   { href: "/entries", label: "Entries", icon: BookOpen },
@@ -20,11 +20,11 @@ export function BottomNav() {
 
   return (
     <nav
-      className="sticky bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur-md"
+      className="sticky bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur-md lg:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="relative flex items-stretch justify-between px-1">
-        {TABS.map((tab) => {
+        {NAV_TABS.map((tab) => {
           const active = tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
           const Icon = tab.icon;
           return (

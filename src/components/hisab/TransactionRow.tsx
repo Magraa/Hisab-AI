@@ -2,7 +2,7 @@
 
 import type { Transaction } from "@/lib/types";
 import { useHisab } from "@/lib/store";
-import { getCategory, getCategoryColors, getCategoryIcon } from "@/lib/categories";
+import { getCategory, getCategoryColors, getCategoryIcon, getCategoryImage } from "@/lib/categories";
 import { formatRupees, formatTime } from "@/lib/format";
 import { IconBadge, InitialsBadge } from "@/components/ui/IconBadge";
 import { ChevronRight, ArrowDownLeft, ArrowUpRight } from "lucide-react";
@@ -48,7 +48,12 @@ export function TransactionRow({
         {isEntity ? (
           <InitialsBadge name={label} />
         ) : (
-          <IconBadge icon={getCategoryIcon(category.icon)} bg={categoryColors.bg} fg={categoryColors.fg} />
+          <IconBadge
+            icon={getCategoryIcon(category.icon)}
+            imageSrc={getCategoryImage(category.id)}
+            bg={categoryColors.bg}
+            fg={categoryColors.fg}
+          />
         )}
         <span
           className={`absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-surface ${

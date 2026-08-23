@@ -45,3 +45,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# asset source pngs (only optimized webp tracked)
+/public/Assets/*.png
+public/Assets/*.png
+/public/Assets/categories/*.png
+public/Assets/categories/*.png
+/public/Assets/onboarding/*.png
+public/Assets/onboarding/*.png

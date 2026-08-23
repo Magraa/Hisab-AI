@@ -16,6 +16,7 @@ import {
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
 import { ThemePicker } from "@/components/theme/ThemePicker";
 import { BackupPromoCard } from "@/components/layout/BackupPromoCard";
+import { InstallSettingsRow } from "@/components/pwa/InstallPrompt";
 import { createClient } from "@/lib/supabase/client";
 import { useHisab } from "@/lib/store";
 import { triggerHaptic } from "@/lib/haptics";
@@ -287,6 +288,7 @@ export default function SettingsPage() {
             <span className="h-5 w-5 rounded-full bg-white shadow" />
           </span>
         </button>
+        <InstallSettingsRow />
       </div>
 
       <p className="mx-5 mt-4 text-xs text-muted">

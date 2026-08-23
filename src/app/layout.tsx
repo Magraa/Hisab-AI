@@ -56,9 +56,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <ThemeScript />
+      </head>
       <body className="flex min-h-full justify-center bg-canvas">
         <PointerPatch />
-        <ThemeScript />
         <ThemeProvider>
           <HisabProvider>{children}</HisabProvider>
         </ThemeProvider>

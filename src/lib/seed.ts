@@ -89,5 +89,5 @@ export function seedTransactions(): Transaction[] {
 }
 
 export function seedBusiness(): BusinessProfile {
-  return { name: "Sharma Traders", type: "Retail", currency: "INR", accountKind: "business" };
+  return { name: "Sharma Traders", userName: "BudgetMafia", type: "Retail", currency: "INR", accountKind: "business" };
 }
