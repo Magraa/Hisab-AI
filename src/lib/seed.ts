@@ -1,5 +1,7 @@
 import type { BusinessProfile, Entity, Transaction } from "./types";
 
+export const SEED_ENTITY_IDS = new Set(["ent-ramesh", "ent-abc", "ent-suresh", "ent-sharma"]);
+
 function daysAgo(days: number, hour: number, minute: number): string {
   const d = new Date();
   d.setDate(d.getDate() - days);

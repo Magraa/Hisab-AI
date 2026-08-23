@@ -31,7 +31,6 @@ export default function LoginPage() {
         return;
       }
       router.push("/");
-      router.refresh();
     } else {
       const { data, error } = await supabase.auth.signUp({ email, password });
       setLoading(false);
@@ -44,7 +43,6 @@ export default function LoginPage() {
         return;
       }
       router.push("/");
-      router.refresh();
     }
   }
 

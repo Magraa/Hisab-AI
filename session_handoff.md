@@ -12,7 +12,7 @@ Two top-level folders:
 
 ## Current state: what's actually built
 
-A real, running mobile web app (not a mockup) — Next.js 16.3.2 (App Router, Turbopack), React 19, TypeScript, Tailwind v4. **No backend** — everything is client-only, persisted to `localStorage`. Dev server runs on port 3100.
+A real, running mobile web app (not a mockup) — Next.js 16.3.2 (App Router, Turbopack), React 19, TypeScript, Tailwind v4. Client-only `localStorage` persistence when signed out; **real Supabase cloud sync when signed in** (see the Backend section below — this is no longer aspirational, it's built and tested). Dev server runs on port 3100.
 
 Screens implemented, all matching their respective mockups:
 - **Onboarding** (`/onboarding`) — Welcome → Name (with a Business/Individual toggle — Individual skips the next step) → Business Type (business only) → How-do-you-record → First Expense (reuses the real input component). Own cream/green chrome, no bottom nav.
@@ -48,25 +48,29 @@ BusinessProfile: { name, type, currency, accountKind: "business" | "individual" 
 app/
   layout.tsx                 root layout: fonts, ThemeScript, ThemeProvider, HisabProvider (no visual shell)
   globals.css                theme tokens + [data-theme="sage"] override
+  login/
+    layout.tsx, page.tsx     email/password sign-in + sign-up, own chrome
+  auth/confirm/route.ts      email-confirmation link handler
   onboarding/
     layout.tsx, page.tsx     own chrome, renders OnboardingFlow
   (app)/
-    layout.tsx                the shell: max-w-[440px] column + BottomNav
+    layout.tsx                the shell: max-w-[440px] column + OnboardingGate + CloudErrorBanner + BottomNav
     page.tsx                  Home
     accounts/page.tsx, accounts/[id]/page.tsx
     entries/page.tsx
     insights/page.tsx
     more/page.tsx + about/, business/, categories/, export/, help/, payment-methods/, settings/, subscription/
+middleware.ts                 calls lib/supabase/middleware.ts, session-refresh only, no route gating
 components/
   hisab/     AccountDetailScreen, AccountRow, HisabInput, TransactionRow, TransactionDetailSheet, TrendChart
-  layout/    BottomNav, PageHeader, SubPageHeader
+  layout/    BottomNav, PageHeader, SubPageHeader, CloudErrorBanner, OnboardingGate
   onboarding/ OnboardingFlow, OnboardingShell, WelcomeStep, NameStep, TypeStep, RecordStep, FirstExpenseStep
   theme/     ThemeProvider, ThemeScript, ThemePicker
   ui/        Card, Chip, EmptyState, IconBadge, Sheet
 lib/
-  store.tsx       HisabProvider / useHisab() — the whole app's state + actions
+  store.tsx       HisabProvider / useHisab() — dual-mode (localStorage signed-out, Supabase signed-in), same public interface either way
   types.ts        Entity / Transaction / BusinessProfile
-  seed.ts         demo data
+  seed.ts         demo data + SEED_ENTITY_IDS (used to exclude seed rows from cloud import)
   parser.ts       local NLP-ish parsing engine
   categories.ts   category keyword dictionary + icons
   selectors.ts    computeBalance, groupByDay, etc.
@@ -76,6 +80,10 @@ lib/
   statementPdf.ts PDF statement generator
   whatsapp.ts     best-effort WhatsApp send
   themes.ts       theme registry
+  supabase/
+    client.ts, server.ts, middleware.ts   browser/server/middleware Supabase clients (@supabase/ssr pattern)
+    types.ts        generated Database types — regenerate after any schema change
+    queries.ts       row↔model mappers, CRUD functions, importLocalData()
 ```
 
 ## Known bugs fixed this session (don't reintroduce these)
@@ -87,30 +95,34 @@ lib/
 
 ## Known limitations (honest, not accidental)
 
-- No backend/auth/cloud sync — single device, `localStorage` only. Clearing browser data wipes everything (Export/Download PDF are the only backup path right now).
+- Signed-out mode is still single-device `localStorage` only — clearing browser data wipes everything unless the user has signed in (Export/Download PDF are the only backup path signed-out). Signing in backs data up to Supabase; see the Backend section.
 - Receipt scanning is a stub — opens the camera/file picker but doesn't OCR anything yet (says so honestly in the UI and in Help).
 - Voice input needs a browser with the Web Speech API (mic button just greys out otherwise).
 - WhatsApp send can't both target a specific number *and* attach a file (browser platform limitation, not a bug — see `whatsapp.ts` comment).
 - Categories are a fixed built-in dictionary, not yet user-customizable.
 - "Log in" on the Welcome screen and "View Plans" (Subscription) are inert — no real auth or billing.
 
-## Backend: Supabase — schema + auth built, data migration not started
+## Backend: Supabase — schema, auth, and full cloud sync, all built and tested
 
 Compared Supabase vs Firebase free tiers for this project specifically: **Supabase** won — the data is relational (`entityId` FK, category/day aggregations), Firebase removed free file storage in 2026 (a problem given planned receipt scanning), and Firestore's daily read quota is a worse fit for a read-heavy Insights page than Supabase's unmetered-by-operation free tier.
 
-**What's actually built (2026-08-23):**
-- Supabase project **"hisab"** (id `uwyjvhwdhadsakkaguhg`, region `ap-south-1`, org `hljqsanbmbpwqgohtmno`/"Magraa's Org", free tier). Note: this reused a placeholder project named "Magraa's Project" in the dashboard — the account is capped at 2 free projects and one was already used by an unrelated "ProperCoupons" project, so creating a brand-new one wasn't possible without pausing/deleting something. Consider renaming it to "hisab" in the dashboard for clarity; the MCP tools have no rename call.
-- Schema (`public.profiles`, `public.entities`, `public.transactions`) mirroring `src/lib/types.ts`'s `BusinessProfile`/`Entity`/`Transaction` almost 1:1 (snake_case columns, text+check-constraint enums instead of Postgres enums for easy iteration). Full RLS on all three tables (`user_id = auth.uid()` / `id = auth.uid()` for profiles), a `handle_new_user()` trigger that auto-inserts a `profiles` row on signup (EXECUTE revoked from `public`/`anon`/`authenticated` so it's not RPC-callable), and `(select auth.uid())` in every policy per the Supabase performance advisor. `categories` was deliberately *not* turned into a table — stays the static `src/lib/categories.ts` dictionary since it's not user-customizable yet; migrating that is a separate future decision.
-- App wiring: `@supabase/supabase-js` + `@supabase/ssr` installed. `src/lib/supabase/{client,server,middleware,types}.ts` follow the standard Next.js App Router pattern (browser client, server client via `cookies()`, middleware session-refresh helper). Root `middleware.ts` calls it but **does not gate routes** — it only keeps the session cookie fresh, on purpose (see below). `.env.local` has `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (the modern `sb_publishable_...` key, not the legacy anon JWT), already covered by the repo's blanket `.env*` gitignore rule.
-- Real auth UI: `/login` (own chrome, no bottom nav, matches onboarding's visual style) with email/password sign-in and sign-up tabs, wired to `supabase.auth.signInWithPassword`/`signUp`. `/auth/confirm/route.ts` handles the email-confirmation link (`verifyOtp`). Settings (`more/settings`) has a new "Account" section showing signed-in email + Sign out, or a Log in link when signed out. Welcome screen's "Log in" text is now a real link to `/login`.
-- **Tested live in-browser end to end** (then cleaned up): sign-up → confirmation-required message shown → verified in DB that `auth.users` row + auto-created `profiles` row exist with correct defaults → sign-in attempt on the unconfirmed account correctly rejected with "Email not confirmed" surfaced in the UI → deleted the test user, confirmed the `profiles` row cascade-deleted too.
+**Project**: Supabase project **"hisab"** (id `uwyjvhwdhadsakkaguhg`, region `ap-south-1`, org `hljqsanbmbpwqgohtmno`/"Magraa's Org", free tier). Reused a placeholder project named "Magraa's Project" in the dashboard — the account is capped at 2 free projects and one was already used by an unrelated "ProperCoupons" project. Consider renaming it to "hisab" in the dashboard for clarity; the MCP tools have no rename call.
 
-**Deliberately not done this pass** (scope was "schema + auth", not the full migration):
-- `store.tsx` is still 100% `localStorage` — signing in does not yet sync/replace local data. The app is fully usable signed-out, same as before.
-- Middleware does not redirect unauthenticated users anywhere — there's no reason to force login until there's cloud data worth protecting.
-- No password-reset flow, no OAuth providers, no rate limiting beyond Supabase defaults.
+**Schema** (`public.profiles`, `public.entities`, `public.transactions`) mirrors `src/lib/types.ts`'s `BusinessProfile`/`Entity`/`Transaction` 1:1, including `enabled_payment_methods text[]` and `has_onboarded boolean` on `profiles` (added in the sync pass — the initial schema pass missed these two `PersistedState` fields). Snake_case columns, text+check-constraint enums instead of Postgres enums for easy iteration. Full RLS on all three tables (`(select auth.uid()) = user_id` / `= id` for profiles, wrapped in `select` per the performance advisor), a `handle_new_user()` trigger that auto-inserts a `profiles` row on signup (EXECUTE revoked from `public`/`anon`/`authenticated`). `categories` deliberately stays the static `src/lib/categories.ts` dictionary, not a table — not user-customizable yet.
 
-**Next steps if resuming this thread**: migrate `store.tsx`'s reducer/actions to read/write Supabase (`entities`/`transactions`/`profiles`) instead of `localStorage`, decide on an offline/optimistic-update strategy (the app's whole pitch is speed — don't regress the "type `500 diesel`, done" feel with network round-trips), and decide what happens to existing localStorage data on first sign-in (probably: offer to import it once).
+**Auth UI**: `/login` (own chrome, matches onboarding's visual style) with email/password sign-in/sign-up, wired to `supabase.auth.signInWithPassword`/`signUp`. `/auth/confirm/route.ts` handles the email-confirmation link. Settings (`more/settings`) has an "Account" section (signed-in email + Sign out) or a polished "Back up your Hisab" promo card (signed-out, styled like the More page's "Upgrade to Hisab Pro" card) linking to `/login`. Welcome screen's "Log in" text links to `/login`.
+
+**Cloud sync (`src/lib/store.tsx` + `src/lib/supabase/queries.ts`)** — the full migration off `localStorage` for signed-in users:
+- `HisabProvider`'s public interface (`useHisab()`) is **unchanged** — all 14 consumer components needed zero edits. Internally it now runs one of two modes based on a live `supabase.auth.onAuthStateChange` subscription: signed-out is byte-for-byte the old `localStorage` behavior; signed-in fetches `profiles`/`entities`/`transactions` on mount and every mutator (`addTransaction`, `updateEntity`, `addSettlement`, etc.) does an **optimistic local update first, then a background Supabase write**, rolling back on failure and surfacing a dismissible `cloudError` banner (`src/components/layout/CloudErrorBanner.tsx`, mounted in `(app)/layout.tsx`). No offline queue/service worker — a failed write just reverts and tells the user, deliberately kept simple.
+- `makeId()` was replaced with `crypto.randomUUID()` everywhere (confirmed via grep that nothing anywhere parsed the old `tx-`/`ent-` id prefixes) — the optimistic client-side object *is* the row that gets inserted, no ID-swap needed after the network call resolves.
+- **A brand-new signed-in account starts empty and goes through real onboarding** (`has_onboarded` defaults `false` server-side) rather than getting the demo seed — this needed a new `src/components/layout/OnboardingGate.tsx` (mounted in `(app)/layout.tsx`) that redirects to `/onboarding` whenever `hydrated && !hasOnboarded`, since nothing like that existed before (the local demo always seeded `hasOnboarded: true`, so this code path was previously unreachable except via the manual "Restart onboarding" button).
+- **One-time local→cloud import**: right after the first cloud fetch, if it comes back with zero entities/transactions, `importLocalData()` (in `queries.ts`) reads `hisab_state_v1`, filters out the demo seed (transactions with `id.startsWith("seed-")`, entities in `seed.ts`'s exported `SEED_ENTITY_IDS`), and if anything real remains, bulk-inserts it plus the local `BusinessProfile`/payment-methods/`hasOnboarded` into the new account, then refetches. Verified live: a fake real transaction planted in `localStorage` correctly migrated to a fresh account while ~24 seed rows were correctly excluded.
+
+**Tested live end-to-end in-browser** (all test users/rows cleaned up after): sign-up → confirm email via SQL (hit Supabase's free-tier email-send rate limit after repeated test signups, so later test accounts were seeded directly via SQL with `pgcrypto`'s `crypt()`/`gen_salt('bf')` to match GoTrue's bcrypt format, plus a matching `auth.identities` row — the real `signUp()` UI flow itself was already proven earlier) → sign in → fresh account correctly routed to onboarding instead of showing demo data → completed onboarding, added a category transaction and an entity transaction via the real `HisabInput`, did a Settle Up, toggled a payment method → every one verified via SQL to have landed correctly in Supabase → signed out → instantly reverted to local demo data with no reload → signed back in → cloud data reappeared correctly → tested the import path with planted local data → all clean.
+
+**One thing to know if you see it again**: right after the very first sign-in of a session (StrictMode double-effect territory in Next dev mode), a one-time "Couldn't load your data" `cloudError` banner appeared once despite the data underneath being completely correct and unaffected. Reproduced clean sign-outs/sign-ins afterward with console tracking on and couldn't reproduce it again — treated as a dev-only transient, not a real bug, but worth a second look if it ever recurs with actual data loss attached.
+
+**Still not done**: no password-reset flow, no OAuth providers, no offline queue (a failed write reverts rather than retries), receipt OCR still a stub. Categories are still not user-customizable / not synced (deliberate — see above).
 
 ## How to run it
 
@@ -126,4 +138,4 @@ Dev server log (when run in background this session) was piped to `/tmp/hisab-de
 1. Read `UI Plan/HISAB — COMPLETE UI STRUCTURE.md` and skim the mockup PNGs first — they're the spec.
 2. `npm run build` before touching anything, so you know the baseline is clean.
 3. The plan file at `C:\Users\Magra\.claude\plans\hisab-your-clever-quail.md` currently holds the Supabase-vs-Firebase writeup (the most recent planning session) — it gets overwritten each time plan mode is used, so don't assume it reflects earlier decisions like the Accounts-tab nav work (that's done and merged into the UI Plan doc itself, not just the plan file).
-4. Biggest open door: picking a backend and wiring up real persistence/auth. Second biggest: receipt OCR (needs an AI vision call, not just UI).
+4. Backend/auth/cloud sync is done (see the Backend section above). Biggest open door now: receipt OCR (needs an AI vision call, not just UI). Second: making categories user-customizable and syncing them; a password-reset flow; OAuth providers.

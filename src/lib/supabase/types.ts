@@ -55,6 +55,8 @@ export type Database = {
           account_kind: string
           created_at: string
           currency: string
+          enabled_payment_methods: string[]
+          has_onboarded: boolean
           id: string
           name: string
           type: string
@@ -63,6 +65,8 @@ export type Database = {
           account_kind?: string
           created_at?: string
           currency?: string
+          enabled_payment_methods?: string[]
+          has_onboarded?: boolean
           id: string
           name?: string
           type?: string
@@ -71,6 +75,8 @@ export type Database = {
           account_kind?: string
           created_at?: string
           currency?: string
+          enabled_payment_methods?: string[]
+          has_onboarded?: boolean
           id?: string
           name?: string
           type?: string

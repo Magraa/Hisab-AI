@@ -1,67 +1,68 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
+import { CloudUpload } from "lucide-react";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
 import { ThemePicker } from "@/components/theme/ThemePicker";
 import { createClient } from "@/lib/supabase/client";
+import { useHisab } from "@/lib/store";
 
 export default function SettingsPage() {
-  const router = useRouter();
+  const { cloudUser } = useHisab();
   const [notifications, setNotifications] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
   const [signingOut, setSigningOut] = useState(false);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-    return () => sub.subscription.unsubscribe();
-  }, []);
 
   async function handleSignOut() {
     setSigningOut(true);
     const supabase = createClient();
     await supabase.auth.signOut();
     setSigningOut(false);
-    router.refresh();
   }
 
   return (
     <div className="pb-8">
       <SubPageHeader title="Settings" subtitle="Language, notifications, privacy" />
 
-      <p className="mx-5 mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Account</p>
-      <div className="mx-5 mb-6 overflow-hidden rounded-2xl border border-border bg-surface">
-        {user ? (
-          <div className="flex items-center justify-between px-4 py-3.5">
-            <div>
-              <p className="text-[15px] font-medium text-ink">{user.email}</p>
-              <p className="text-xs text-muted">Signed in</p>
+      {cloudUser ? (
+        <>
+          <p className="mx-5 mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Account</p>
+          <div className="mx-5 mb-6 overflow-hidden rounded-2xl border border-border bg-surface">
+            <div className="flex items-center justify-between px-4 py-3.5">
+              <div className="min-w-0">
+                <p className="truncate text-[15px] font-medium text-ink">{cloudUser.email}</p>
+                <p className="text-xs text-muted">Signed in · synced to the cloud</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                disabled={signingOut}
+                className="shrink-0 rounded-full bg-canvas px-4 py-2 text-sm font-semibold text-ink disabled:opacity-60"
+              >
+                {signingOut ? "Signing out…" : "Sign out"}
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              disabled={signingOut}
-              className="rounded-full bg-canvas px-4 py-2 text-sm font-semibold text-ink disabled:opacity-60"
-            >
-              {signingOut ? "Signing out…" : "Sign out"}
-            </button>
           </div>
-        ) : (
-          <Link href="/login" className="flex items-center justify-between px-4 py-3.5">
+        </>
+      ) : (
+        <div className="mx-5 mb-6 flex items-center justify-between rounded-2xl bg-primary-soft px-5 py-4">
+          <div className="flex items-start gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface">
+              <CloudUpload size={18} className="text-primary" />
+            </span>
             <div>
-              <p className="text-[15px] font-medium text-ink">Not signed in</p>
-              <p className="text-xs text-muted">Log in or create an account</p>
+              <p className="font-semibold text-ink">Back up your Hisab</p>
+              <p className="text-sm text-muted">Your data lives only on this device. Sign in to keep it safe.</p>
             </div>
-            <span className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white">Log in</span>
+          </div>
+          <Link
+            href="/login"
+            className="shrink-0 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white"
+          >
+            Sign in
           </Link>
-        )}
-      </div>
+        </div>
+      )}
 
       <p className="mx-5 mb-2 text-xs font-semibold uppercase tracking-wide text-muted">Theme</p>
       <div className="mx-5 mb-6">
@@ -94,7 +95,9 @@ export default function SettingsPage() {
       </div>
 
       <p className="mx-5 mt-4 text-xs text-muted">
-        Your data is stored on this device. Cloud sync and account recovery are coming in a future update.
+        {cloudUser
+          ? "Your data is backed up to the cloud and available wherever you sign in."
+          : "Your data is stored on this device. Sign in above to back it up and access it anywhere."}
       </p>
     </div>
   );

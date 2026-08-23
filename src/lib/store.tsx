@@ -12,6 +12,17 @@ import {
 } from "react";
 import type { BusinessProfile, Direction, Entity, PaymentMethod, Transaction, TxSource } from "./types";
 import { seedBusiness, seedEntities, seedTransactions } from "./seed";
+import { createClient } from "./supabase/client";
+import {
+  deleteTransactionRow,
+  fetchCloudState,
+  importLocalData,
+  insertEntity,
+  insertTransaction,
+  updateEntityRow,
+  updateProfile,
+  updateTransactionRow,
+} from "./supabase/queries";
 
 const STORAGE_KEY = "hisab_state_v1";
 
@@ -21,10 +32,6 @@ interface PersistedState {
   business: BusinessProfile;
   enabledPaymentMethods: PaymentMethod[];
   hasOnboarded: boolean;
-}
-
-function makeId(prefix: string): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 function defaultState(): PersistedState {
@@ -39,6 +46,19 @@ function defaultState(): PersistedState {
   };
 }
 
+// What a signed-in user sees while their cloud data loads, or if it fails to
+// load — never their device's local/demo data, which could belong to nobody
+// or to a different account entirely.
+function emptyCloudState(): PersistedState {
+  return {
+    entities: [],
+    transactions: [],
+    business: { name: "", type: "", currency: "INR", accountKind: "individual" },
+    enabledPaymentMethods: ["cash", "upi", "bank", "card", "credit"],
+    hasOnboarded: false,
+  };
+}
+
 export interface AddTransactionInput {
   amount: number;
   description: string;
@@ -50,6 +70,11 @@ export interface AddTransactionInput {
   rawInput?: string;
 }
 
+export interface CloudUser {
+  id: string;
+  email: string | null;
+}
+
 interface HisabContextValue {
   entities: Entity[];
   transactions: Transaction[];
@@ -57,6 +82,9 @@ interface HisabContextValue {
   enabledPaymentMethods: PaymentMethod[];
   hasOnboarded: boolean;
   hydrated: boolean;
+  cloudUser: CloudUser | null;
+  cloudError: string | null;
+  dismissCloudError: () => void;
   addTransaction: (input: AddTransactionInput) => Transaction;
   addSettlement: (entityId: string, amount: number, direction: Direction) => void;
   updateTransaction: (id: string, patch: Partial<Transaction>) => void;
@@ -74,32 +102,125 @@ const HisabContext = createContext<HisabContextValue | null>(null);
 export function HisabProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<PersistedState>(defaultState);
   const [hydrated, setHydrated] = useState(false);
-  const loadedOnce = useRef(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [cloudUser, setCloudUser] = useState<CloudUser | null>(null);
+  const [cloudError, setCloudError] = useState<string | null>(null);
+
+  const supabase = useMemo(() => createClient(), []);
+
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
+  // The device's pre-signin local snapshot, frozen at first read — used only
+  // as the source for a possible one-time cloud import. Never touched again.
+  const localSnapshotRef = useRef<PersistedState | null>(null);
+  const loadedLocalOnce = useRef(false);
 
   useEffect(() => {
-    if (loadedOnce.current) return;
-    loadedOnce.current = true;
+    if (loadedLocalOnce.current) return;
+    loadedLocalOnce.current = true;
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as PersistedState;
+        localSnapshotRef.current = parsed;
         setState(parsed);
+        return;
       }
     } catch {
-      // corrupt storage, keep defaults
-    } finally {
-      setHydrated(true);
+      // corrupt storage, fall through to defaults
     }
+    localSnapshotRef.current = defaultState();
   }, []);
 
+  // Track auth state; store.tsx is the single owner of it so other
+  // components (Settings, etc.) read cloudUser from context instead of
+  // subscribing separately.
   useEffect(() => {
-    if (!hydrated) return;
+    let cancelled = false;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      const user = data.session?.user;
+      setCloudUser(user ? { id: user.id, email: user.email ?? null } : null);
+      setAuthChecked(true);
+    });
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user;
+      setCloudUser(user ? { id: user.id, email: user.email ?? null } : null);
+      setAuthChecked(true);
+    });
+
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  // Load the right data source once we know the auth state, and whenever it
+  // changes (sign in / sign out switches the whole data source live).
+  useEffect(() => {
+    if (!authChecked) return;
+    let cancelled = false;
+
+    async function load() {
+      if (!cloudUser) {
+        setState(localSnapshotRef.current ?? defaultState());
+        setCloudError(null);
+        setHydrated(true);
+        return;
+      }
+
+      try {
+        let cloud = await fetchCloudState(supabase, cloudUser.id);
+        if (cloud.entities.length === 0 && cloud.transactions.length === 0) {
+          const imported = await importLocalData(supabase, cloudUser.id, localSnapshotRef.current ?? defaultState());
+          if (imported) {
+            cloud = await fetchCloudState(supabase, cloudUser.id);
+          }
+        }
+        if (cancelled) return;
+        setState(cloud);
+        setCloudError(null);
+        setHydrated(true);
+      } catch {
+        if (cancelled) return;
+        setState(emptyCloudState());
+        setCloudError("Couldn't load your data. Check your connection and reload.");
+        setHydrated(true);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [authChecked, cloudUser, supabase]);
+
+  // Signed-out mode only: mirror state to localStorage, exactly as before.
+  // Signed-in mode never writes here — Supabase is the source of truth and
+  // this key stays untouched so a future sign-out sees it unchanged.
+  useEffect(() => {
+    if (!hydrated || cloudUser) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch {
       // storage full or unavailable, ignore
     }
-  }, [state, hydrated]);
+  }, [state, hydrated, cloudUser]);
+
+  const dismissCloudError = useCallback(() => setCloudError(null), []);
+
+  function runCloudWrite(promise: Promise<void>, rollback: () => void) {
+    promise.catch((err) => {
+      console.error(err);
+      rollback();
+      setCloudError("Couldn't save — check your connection and try again.");
+    });
+  }
 
   const resolveEntityByName = useCallback(
     (name: string): Entity | undefined => {
@@ -113,26 +234,26 @@ export function HisabProvider({ children }: { children: ReactNode }) {
 
   const addTransaction = useCallback((input: AddTransactionInput): Transaction => {
     let entityId: string | undefined;
+    let newEntity: Entity | undefined;
 
     if (input.entityName) {
       const existing = resolveEntityByName(input.entityName);
       if (existing) {
         entityId = existing.id;
       } else {
-        const newEntity: Entity = {
-          id: makeId("ent"),
+        newEntity = {
+          id: crypto.randomUUID(),
           name: input.entityName,
           aliases: [],
           type: "person",
           createdAt: new Date().toISOString(),
         };
         entityId = newEntity.id;
-        setState((s) => ({ ...s, entities: [...s.entities, newEntity] }));
       }
     }
 
     const tx: Transaction = {
-      id: makeId("tx"),
+      id: crypto.randomUUID(),
       amount: input.amount,
       categoryId: input.entityName ? undefined : input.categoryId ?? "other",
       description: input.description,
@@ -144,13 +265,35 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       createdAt: new Date().toISOString(),
     };
 
-    setState((s) => ({ ...s, transactions: [tx, ...s.transactions] }));
+    setState((s) => ({
+      ...s,
+      entities: newEntity ? [...s.entities, newEntity] : s.entities,
+      transactions: [tx, ...s.transactions],
+    }));
+
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      const createdEntity = newEntity;
+      runCloudWrite(
+        (async () => {
+          if (createdEntity) await insertEntity(supabase, uid, createdEntity);
+          await insertTransaction(supabase, uid, tx);
+        })(),
+        () =>
+          setState((s) => ({
+            ...s,
+            entities: createdEntity ? s.entities.filter((e) => e.id !== createdEntity.id) : s.entities,
+            transactions: s.transactions.filter((t) => t.id !== tx.id),
+          }))
+      );
+    }
+
     return tx;
-  }, [resolveEntityByName]);
+  }, [resolveEntityByName, cloudUser, supabase]);
 
   const addSettlement = useCallback((entityId: string, amount: number, direction: Direction) => {
     const tx: Transaction = {
-      id: makeId("tx"),
+      id: crypto.randomUUID(),
       amount,
       entityId,
       direction,
@@ -160,46 +303,114 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       createdAt: new Date().toISOString(),
     };
     setState((s) => ({ ...s, transactions: [tx, ...s.transactions] }));
-  }, []);
+
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        insertTransaction(supabase, uid, tx),
+        () => setState((s) => ({ ...s, transactions: s.transactions.filter((t) => t.id !== tx.id) }))
+      );
+    }
+  }, [cloudUser, supabase]);
 
   const updateTransaction = useCallback((id: string, patch: Partial<Transaction>) => {
+    const previous = stateRef.current.transactions.find((t) => t.id === id);
     setState((s) => ({
       ...s,
       transactions: s.transactions.map((t) => (t.id === id ? { ...t, ...patch } : t)),
     }));
-  }, []);
+
+    if (cloudUser && previous) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        updateTransactionRow(supabase, uid, id, patch),
+        () => setState((s) => ({ ...s, transactions: s.transactions.map((t) => (t.id === id ? previous : t)) }))
+      );
+    }
+  }, [cloudUser, supabase]);
 
   const deleteTransaction = useCallback((id: string) => {
+    const previous = stateRef.current.transactions.find((t) => t.id === id);
     setState((s) => ({ ...s, transactions: s.transactions.filter((t) => t.id !== id) }));
-  }, []);
+
+    if (cloudUser && previous) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        deleteTransactionRow(supabase, uid, id),
+        () => setState((s) => ({ ...s, transactions: [previous, ...s.transactions] }))
+      );
+    }
+  }, [cloudUser, supabase]);
 
   const updateEntity = useCallback((id: string, patch: Partial<Entity>) => {
+    const previous = stateRef.current.entities.find((e) => e.id === id);
     setState((s) => ({
       ...s,
       entities: s.entities.map((e) => (e.id === id ? { ...e, ...patch } : e)),
     }));
-  }, []);
+
+    if (cloudUser && previous) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        updateEntityRow(supabase, uid, id, patch),
+        () => setState((s) => ({ ...s, entities: s.entities.map((e) => (e.id === id ? previous : e)) }))
+      );
+    }
+  }, [cloudUser, supabase]);
 
   const updateBusiness = useCallback((patch: Partial<BusinessProfile>) => {
+    const previous = stateRef.current.business;
     setState((s) => ({ ...s, business: { ...s.business, ...patch } }));
-  }, []);
+
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        updateProfile(supabase, uid, patch),
+        () => setState((s) => ({ ...s, business: previous }))
+      );
+    }
+  }, [cloudUser, supabase]);
 
   const togglePaymentMethod = useCallback((method: PaymentMethod) => {
-    setState((s) => ({
-      ...s,
-      enabledPaymentMethods: s.enabledPaymentMethods.includes(method)
-        ? s.enabledPaymentMethods.filter((m) => m !== method)
-        : [...s.enabledPaymentMethods, method],
-    }));
-  }, []);
+    const previous = stateRef.current.enabledPaymentMethods;
+    const next = previous.includes(method) ? previous.filter((m) => m !== method) : [...previous, method];
+    setState((s) => ({ ...s, enabledPaymentMethods: next }));
+
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        updateProfile(supabase, uid, { enabledPaymentMethods: next }),
+        () => setState((s) => ({ ...s, enabledPaymentMethods: previous }))
+      );
+    }
+  }, [cloudUser, supabase]);
 
   const completeOnboarding = useCallback((profile: Partial<BusinessProfile>) => {
+    const previousBusiness = stateRef.current.business;
+    const previousHasOnboarded = stateRef.current.hasOnboarded;
     setState((s) => ({ ...s, business: { ...s.business, ...profile }, hasOnboarded: true }));
-  }, []);
+
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        updateProfile(supabase, uid, { ...profile, hasOnboarded: true }),
+        () => setState((s) => ({ ...s, business: previousBusiness, hasOnboarded: previousHasOnboarded }))
+      );
+    }
+  }, [cloudUser, supabase]);
 
   const resetOnboarding = useCallback(() => {
+    const previous = stateRef.current.hasOnboarded;
     setState((s) => ({ ...s, hasOnboarded: false }));
-  }, []);
+
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        updateProfile(supabase, uid, { hasOnboarded: false }),
+        () => setState((s) => ({ ...s, hasOnboarded: previous }))
+      );
+    }
+  }, [cloudUser, supabase]);
 
   const value = useMemo<HisabContextValue>(
     () => ({
@@ -209,6 +420,9 @@ export function HisabProvider({ children }: { children: ReactNode }) {
       enabledPaymentMethods: state.enabledPaymentMethods,
       hasOnboarded: state.hasOnboarded,
       hydrated,
+      cloudUser,
+      cloudError,
+      dismissCloudError,
       addTransaction,
       addSettlement,
       updateTransaction,
@@ -223,6 +437,9 @@ export function HisabProvider({ children }: { children: ReactNode }) {
     [
       state,
       hydrated,
+      cloudUser,
+      cloudError,
+      dismissCloudError,
       addTransaction,
       addSettlement,
       updateTransaction,
