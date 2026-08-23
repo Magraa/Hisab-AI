@@ -12,6 +12,7 @@ import {
   ChevronUp,
   ShieldCheck,
   Zap,
+  Bot,
 } from "lucide-react";
 import { SubPageHeader } from "@/components/layout/SubPageHeader";
 import { ThemePicker } from "@/components/theme/ThemePicker";
@@ -22,9 +23,9 @@ import { useHisab } from "@/lib/store";
 import { triggerHaptic } from "@/lib/haptics";
 
 const PARSING_MODES = [
-  { value: "local" as const, label: "Local only" },
-  { value: "auto" as const, label: "Smart Auto" },
-  { value: "ai" as const, label: "Always AI" },
+  { value: "local" as const, label: "Local only", icon: Zap },
+  { value: "auto" as const, label: "Smart Auto", icon: Sparkles },
+  { value: "ai" as const, label: "Always AI", icon: Bot },
 ];
 
 export default function SettingsPage() {
@@ -296,22 +297,27 @@ export default function SettingsPage() {
             AI parsing shares your Gemini key from the scanner above but has its own daily free-tier limit.
           </p>
 
-          <div className="flex rounded-xl border border-border bg-canvas p-1">
-            {PARSING_MODES.map((m) => (
-              <button
-                key={m.value}
-                type="button"
-                onClick={() => {
-                  triggerHaptic("light");
-                  setParsingMode(m.value);
-                }}
-                className={`flex-1 rounded-lg py-2 text-xs font-semibold transition-all ${
-                  parsingMode === m.value ? "bg-primary text-white shadow-xs" : "text-muted hover:text-ink"
-                }`}
-              >
-                {m.label}
-              </button>
-            ))}
+          <div className="flex rounded-xl border border-border bg-canvas p-1 gap-1">
+            {PARSING_MODES.map((m) => {
+              const Icon = m.icon;
+              const active = parsingMode === m.value;
+              return (
+                <button
+                  key={m.value}
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic("light");
+                    setParsingMode(m.value);
+                  }}
+                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all ${
+                    active ? "bg-primary text-white shadow-xs" : "text-muted hover:text-ink"
+                  }`}
+                >
+                  <Icon size={14} className={active ? "text-white" : "text-muted"} />
+                  <span>{m.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           <p className="text-[11px] text-subtle">

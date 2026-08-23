@@ -19,6 +19,10 @@ import {
   Settings,
   HelpCircle,
   LayoutGrid,
+  Zap,
+  Sparkles,
+  Bot,
+  Cpu,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useHisab } from "@/lib/store";
@@ -49,8 +53,36 @@ import { triggerHaptic } from "@/lib/haptics";
 
 const PREVIEW_COUNT = 5;
 
+const PARSING_MODES = [
+  {
+    value: "local" as const,
+    label: "Local only",
+    icon: Zap,
+    description: "Fast & 100% offline",
+  },
+  {
+    value: "auto" as const,
+    label: "Smart Auto",
+    icon: Sparkles,
+    description: "Local first · AI fallback",
+  },
+  {
+    value: "ai" as const,
+    label: "Always AI",
+    icon: Bot,
+    description: "Full Gemini AI analysis",
+  },
+];
+
 export default function HomePage() {
-  const { transactions, entities, categories, business } = useHisab();
+  const {
+    transactions,
+    entities,
+    categories,
+    business,
+    parsingMode,
+    setParsingMode,
+  } = useHisab();
   const [selectedTxId, setSelectedTxId] = useState<string | null>(null);
   const [showAddSheet, setShowAddSheet] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
@@ -170,6 +202,72 @@ export default function HomePage() {
                     transition={{ duration: 0.16, ease: [0.2, 0, 0, 1] }}
                     className="absolute right-0 top-11 z-50 w-64 origin-top-right overflow-hidden rounded-2xl border border-border/80 bg-surface/98 p-1.5 shadow-xl backdrop-blur-md"
                   >
+                    {/* Parsing Mode Switcher */}
+                    <div className="mb-1 rounded-xl border border-border/80 bg-canvas/80 p-2 shadow-2xs">
+                      <div className="mb-1.5 flex items-center justify-between px-0.5">
+                        <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted">
+                          <Cpu size={12} className="text-primary" />
+                          Engine
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                            parsingMode === "local"
+                              ? "bg-mint-soft text-mint border border-mint/30"
+                              : parsingMode === "auto"
+                              ? "bg-primary-soft text-primary border border-primary/30"
+                              : "bg-violet-soft text-violet border border-violet/30"
+                          }`}
+                        >
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              parsingMode === "local"
+                                ? "bg-mint"
+                                : parsingMode === "auto"
+                                ? "bg-primary animate-pulse"
+                                : "bg-violet animate-pulse"
+                            }`}
+                          />
+                          {parsingMode === "local" ? "Local" : parsingMode === "auto" ? "Auto" : "AI"}
+                        </span>
+                      </div>
+
+                      {/* 3-way Segmented Switcher - Icons only */}
+                      <div className="relative grid grid-cols-3 gap-1 rounded-lg bg-surface/90 p-1 border border-border/60 shadow-2xs">
+                        {PARSING_MODES.map((mode) => {
+                          const active = parsingMode === mode.value;
+                          const Icon = mode.icon;
+                          return (
+                            <button
+                              key={mode.value}
+                              type="button"
+                              title={mode.label}
+                              aria-label={mode.label}
+                              onClick={() => {
+                                triggerHaptic("medium");
+                                setParsingMode(mode.value);
+                              }}
+                              className={`relative flex items-center justify-center rounded-md py-1.5 transition-colors cursor-pointer select-none ${
+                                active ? "text-white" : "text-muted hover:text-ink active:scale-95"
+                              }`}
+                            >
+                              {active && (
+                                <motion.div
+                                  layoutId="active-parsing-pill"
+                                  className="absolute inset-0 rounded-md bg-primary shadow-xs"
+                                  transition={{ type: "spring", stiffness: 450, damping: 30 }}
+                                />
+                              )}
+                              <span className="relative z-10">
+                                <Icon size={16} className={active ? "text-white" : "text-muted"} />
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="my-1 border-t border-border/60" />
+
                     {/* Quick Actions */}
                     <div className="space-y-0.5">
                       {/* Scan Receipt option - commented out
@@ -439,6 +537,40 @@ export default function HomePage() {
             <p className="mt-1 text-sm text-muted">Here&rsquo;s your Hisab</p>
           </div>
           <div className="flex items-center gap-3">
+            {/* Desktop Parsing Engine Switcher */}
+            <div className="flex items-center rounded-full border border-border bg-surface p-1 shadow-2xs">
+              {PARSING_MODES.map((mode) => {
+                const active = parsingMode === mode.value;
+                const Icon = mode.icon;
+                return (
+                  <button
+                    key={mode.value}
+                    type="button"
+                    title={mode.label}
+                    onClick={() => {
+                      triggerHaptic("medium");
+                      setParsingMode(mode.value);
+                    }}
+                    className={`relative flex items-center justify-center gap-1.5 rounded-full px-2.5 py-1.5 xl:px-3 text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${
+                      active ? "text-white" : "text-muted hover:text-ink"
+                    }`}
+                  >
+                    {active && (
+                      <motion.div
+                        layoutId="desktop-parsing-pill"
+                        className="absolute inset-0 rounded-full bg-primary shadow-xs"
+                        transition={{ type: "spring", stiffness: 450, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">
+                      <Icon size={14} className={active ? "text-white" : "text-muted"} />
+                    </span>
+                    <span className="relative z-10 hidden xl:inline">{mode.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
             <span className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-ink shadow-2xs">
               <CalendarDays size={16} className="text-muted" />
               {new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
