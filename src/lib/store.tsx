@@ -342,6 +342,7 @@ function enrichStateWithMerchants(s: PersistedState): PersistedState {
 
   const setGeminiApiKey = useCallback((key: string | null) => {
     const cleanKey = key?.trim() || null;
+    const previous = stateRef.current.geminiApiKey ?? null;
     setState((s) => ({ ...s, geminiApiKey: cleanKey }));
     try {
       if (cleanKey) {
@@ -352,7 +353,17 @@ function enrichStateWithMerchants(s: PersistedState): PersistedState {
     } catch {
       // ignore
     }
-  }, []);
+
+    // Synced to the profiles table so the same key follows the account
+    // across devices, not just this one's localStorage.
+    if (cloudUser) {
+      const uid = cloudUser.id;
+      runCloudWrite(
+        updateProfile(supabase, uid, { geminiApiKey: cleanKey }),
+        () => setState((s) => ({ ...s, geminiApiKey: previous }))
+      );
+    }
+  }, [cloudUser, supabase]);
 
   const dailyScansRemaining = useMemo(() => {
     if (state.geminiApiKey) return 1500;

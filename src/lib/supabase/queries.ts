@@ -30,12 +30,14 @@ export interface CloudState {
   enabledPaymentMethods: PaymentMethod[];
   hasOnboarded: boolean;
   parsingMode: ParsingMode;
+  geminiApiKey: string | null;
 }
 
 export type ProfilePatch = Partial<BusinessProfile> & {
   enabledPaymentMethods?: PaymentMethod[];
   hasOnboarded?: boolean;
   parsingMode?: ParsingMode;
+  geminiApiKey?: string | null;
 };
 
 function entityFromRow(row: EntityRow): Entity {
@@ -140,6 +142,7 @@ function profilePatchToUpdate(patch: ProfilePatch): TablesUpdate<"profiles"> {
   if (patch.enabledPaymentMethods !== undefined) update.enabled_payment_methods = patch.enabledPaymentMethods;
   if (patch.hasOnboarded !== undefined) update.has_onboarded = patch.hasOnboarded;
   if (patch.parsingMode !== undefined) update.parsing_mode = patch.parsingMode;
+  if (patch.geminiApiKey !== undefined) update.gemini_api_key = patch.geminiApiKey;
   return update;
 }
 
@@ -180,6 +183,7 @@ export async function fetchCloudState(supabase: Client, userId: string): Promise
       enabled_payment_methods: ["cash", "upi", "bank", "card", "credit"],
       has_onboarded: false,
       parsing_mode: "local",
+      gemini_api_key: null,
     };
 
     const { data: createdProfile, error: createError } = await supabase
@@ -205,6 +209,7 @@ export async function fetchCloudState(supabase: Client, userId: string): Promise
     enabledPaymentMethods: (profileRow.enabled_payment_methods as PaymentMethod[]) ?? ["cash", "upi", "bank", "card", "credit"],
     hasOnboarded: profileRow.has_onboarded ?? false,
     parsingMode: (profileRow.parsing_mode as ParsingMode) || "local",
+    geminiApiKey: profileRow.gemini_api_key ?? null,
   };
 }
 
@@ -321,6 +326,7 @@ export async function importLocalData(
     enabledPaymentMethods: PaymentMethod[];
     hasOnboarded: boolean;
     parsingMode?: ParsingMode;
+    geminiApiKey?: string | null;
   },
 ): Promise<boolean> {
   const realEntities = local.entities.filter((e) => !SEED_ENTITY_IDS.has(e.id));
@@ -355,6 +361,7 @@ export async function importLocalData(
     enabledPaymentMethods: local.enabledPaymentMethods,
     hasOnboarded: local.hasOnboarded,
     parsingMode: local.parsingMode,
+    geminiApiKey: local.geminiApiKey,
   });
 
   return true;

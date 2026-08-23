@@ -86,6 +86,7 @@ export type Database = {
           created_at: string
           currency: string
           enabled_payment_methods: string[]
+          gemini_api_key: string | null
           has_onboarded: boolean
           id: string
           name: string
@@ -97,6 +98,7 @@ export type Database = {
           created_at?: string
           currency?: string
           enabled_payment_methods?: string[]
+          gemini_api_key?: string | null
           has_onboarded?: boolean
           id: string
           name?: string
@@ -108,6 +110,7 @@ export type Database = {
           created_at?: string
           currency?: string
           enabled_payment_methods?: string[]
+          gemini_api_key?: string | null
           has_onboarded?: boolean
           id?: string
           name?: string
