@@ -22,16 +22,20 @@ export function TypeStep({
   onContinue: () => void;
 }) {
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="flex flex-col items-center pt-6 text-center">
-        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-soft">
-          <ShoppingBag size={26} className="text-primary" />
+    <div className="flex min-h-0 flex-1 flex-col justify-between overflow-hidden">
+      <div className="flex flex-col items-center pt-[clamp(0.4rem,1.8vh,1rem)] text-center shrink-0">
+        <span className="flex h-[clamp(2.5rem,6vh,3.25rem)] w-[clamp(2.5rem,6vh,3.25rem)] items-center justify-center rounded-full bg-primary-soft shadow-xs">
+          <ShoppingBag size={20} className="text-primary" />
         </span>
-        <h1 className="mt-6 text-[26px] font-bold leading-snug text-ink">What kind of business do you run?</h1>
-        <p className="mt-2 text-sm text-muted">This helps us personalize Hisab for you.</p>
+        <h1 className="mt-[clamp(0.4rem,1.5vh,0.875rem)] text-[clamp(1.15rem,2.8vh,1.4rem)] font-bold leading-snug text-ink">
+          What kind of business do you run?
+        </h1>
+        <p className="mt-[clamp(0.1rem,0.4vh,0.25rem)] text-[clamp(0.72rem,1.5vh,0.82rem)] text-muted">
+          This helps us personalize Hisab for you.
+        </p>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="my-auto grid grid-cols-2 gap-[clamp(0.35rem,1.2vh,0.65rem)] py-[clamp(0.25rem,0.8vh,0.5rem)]">
         {TYPES.map((t) => {
           const selected = value === t.id;
           return (
@@ -39,35 +43,44 @@ export function TypeStep({
               key={t.id}
               type="button"
               onClick={() => onChange(t.id)}
-              className={`relative rounded-2xl border-2 bg-surface p-4 text-left ${
-                selected ? "border-primary" : "border-border"
+              className={`relative rounded-2xl border-2 bg-surface p-[clamp(0.5rem,1.4vh,0.75rem)] text-left transition-all cursor-pointer ${
+                selected ? "border-primary shadow-xs ring-1 ring-primary/20" : "border-border hover:bg-canvas/50"
               }`}
             >
               {selected && (
-                <span className="absolute right-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary">
-                  <Check size={12} className="text-white" />
+                <span className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary">
+                  <Check size={10} className="text-white" />
                 </span>
               )}
-              <span className="flex h-11 w-11 items-center justify-center rounded-full" style={{ backgroundColor: t.bg }}>
-                <t.icon size={20} style={{ color: t.fg }} />
+              <span
+                className="flex h-[clamp(1.75rem,4vh,2.25rem)] w-[clamp(1.75rem,4vh,2.25rem)] items-center justify-center rounded-full"
+                style={{ backgroundColor: t.bg }}
+              >
+                <t.icon size={16} style={{ color: t.fg }} />
               </span>
-              <p className="mt-3 text-[15px] font-semibold text-ink">{t.label}</p>
-              <p className="mt-0.5 text-xs leading-snug text-muted">{t.subtitle}</p>
+              <p className="mt-[clamp(0.3rem,1vh,0.5rem)] text-[clamp(0.78rem,1.7vh,0.9rem)] font-semibold text-ink leading-tight">
+                {t.label}
+              </p>
+              <p className="mt-0.5 text-[clamp(0.62rem,1.3vh,0.7rem)] leading-tight text-muted line-clamp-1">
+                {t.subtitle}
+              </p>
             </button>
           );
         })}
       </div>
 
-      <div className="mt-5 flex items-start gap-3 rounded-2xl bg-primary-soft px-4 py-3.5">
-        <Lightbulb size={18} className="mt-0.5 shrink-0 text-primary" />
-        <p className="text-sm text-ink">Don&rsquo;t worry, you can change this later from Business settings.</p>
+      <div className="flex shrink-0 items-start gap-2 rounded-2xl bg-primary-soft px-[clamp(0.65rem,2.5vw,0.875rem)] py-[clamp(0.4rem,1vh,0.6rem)]">
+        <Lightbulb size={15} className="mt-0.5 shrink-0 text-primary" />
+        <p className="text-[clamp(0.7rem,1.4vh,0.78rem)] text-ink leading-snug">
+          Don&rsquo;t worry, you can change this later from Business settings.
+        </p>
       </div>
 
-      <div className="mt-auto pt-8">
+      <div className="shrink-0 pt-[clamp(0.5rem,1.5vh,0.875rem)]">
         <button
           type="button"
           onClick={onContinue}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-semibold text-white"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-[clamp(0.75rem,2vh,1rem)] text-[clamp(0.95rem,2vh,1.05rem)] font-semibold text-white shadow-md hover:bg-primary-hover active:scale-[0.99] transition-all cursor-pointer"
         >
           Continue <span aria-hidden>→</span>
         </button>

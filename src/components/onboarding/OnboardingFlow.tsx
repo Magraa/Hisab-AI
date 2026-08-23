@@ -84,6 +84,7 @@ export function OnboardingFlow() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.25 }}
+            className="flex h-full min-h-0 flex-1 flex-col overflow-hidden"
           >
             <WelcomeStep onGetStarted={() => setStage("name")} />
           </motion.div>
@@ -96,6 +97,7 @@ export function OnboardingFlow() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.25 }}
+            className="flex h-full min-h-0 flex-1 flex-col overflow-hidden"
           >
             <OnboardingShell step={stepNumber.name} totalSteps={totalSteps} onBack={() => setStage("welcome")}>
               <NameStep
@@ -118,6 +120,7 @@ export function OnboardingFlow() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.25 }}
+            className="flex h-full min-h-0 flex-1 flex-col overflow-hidden"
           >
             <OnboardingShell step={stepNumber.type} totalSteps={totalSteps} onBack={() => setStage("name")}>
               <TypeStep value={businessType} onChange={setBusinessType} onContinue={() => setStage("record")} />
@@ -132,6 +135,7 @@ export function OnboardingFlow() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.25 }}
+            className="flex h-full min-h-0 flex-1 flex-col overflow-hidden"
           >
             <OnboardingShell
               step={stepNumber.record}
@@ -150,6 +154,7 @@ export function OnboardingFlow() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.25 }}
+            className="flex h-full min-h-0 flex-1 flex-col overflow-hidden"
           >
             <OnboardingShell step={stepNumber.first} totalSteps={totalSteps} onBack={() => setStage("record")}>
               <FirstExpenseStep onFinish={() => setShowBackupSheet(true)} />

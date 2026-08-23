@@ -17,8 +17,8 @@ export function OnboardingShell({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-canvas px-6 pb-8 pt-6">
-      <div className="flex items-center gap-4">
+    <div className="flex h-[100dvh] max-h-[100dvh] w-full flex-col justify-between overflow-hidden bg-canvas px-[clamp(1rem,4.5vw,1.5rem)] py-[clamp(0.75rem,2.5vh,1.25rem)]">
+      <div className="flex shrink-0 items-center gap-3">
         <motion.button
           whileTap={{ scale: 0.88 }}
           type="button"
@@ -27,9 +27,9 @@ export function OnboardingShell({
             onBack();
           }}
           aria-label="Back"
-          className="flex h-9 w-9 items-center justify-center text-ink rounded-full active:bg-primary-soft/40"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-ink active:bg-primary-soft/40 cursor-pointer"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={19} />
         </motion.button>
         <div className="flex flex-1 items-center gap-1.5">
           {Array.from({ length: totalSteps }).map((_, i) => (
@@ -47,7 +47,7 @@ export function OnboardingShell({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col">{children}</div>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>
     </div>
   );
 }
