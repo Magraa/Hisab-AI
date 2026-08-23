@@ -9,9 +9,10 @@ import { NameStep } from "./NameStep";
 import { TypeStep } from "./TypeStep";
 import { RecordStep } from "./RecordStep";
 import { FirstExpenseStep } from "./FirstExpenseStep";
+import { BackupPromptStep } from "./BackupPromptStep";
 import { OnboardingShell } from "./OnboardingShell";
 
-type Stage = "welcome" | "name" | "type" | "record" | "first";
+type Stage = "welcome" | "name" | "type" | "record" | "first" | "backup";
 
 export function OnboardingFlow() {
   const router = useRouter();
@@ -30,15 +31,25 @@ export function OnboardingFlow() {
     type: 2,
     record: isBusiness ? 3 : 2,
     first: isBusiness ? 4 : 3,
+    backup: isBusiness ? 4 : 3,
   };
 
-  function finish() {
+  function saveProfile() {
     completeOnboarding({
       name: name.trim() || (isBusiness ? "My Business" : "My Hisab"),
       type: isBusiness ? businessType : "Individual",
       accountKind,
     });
+  }
+
+  function finishLocally() {
+    saveProfile();
     router.push("/");
+  }
+
+  function goToAuth(mode: "signup" | "signin") {
+    saveProfile();
+    router.push(`/login?mode=${mode}`);
   }
 
   if (stage === "welcome") {
@@ -79,9 +90,21 @@ export function OnboardingFlow() {
     );
   }
 
+  if (stage === "first") {
+    return (
+      <OnboardingShell step={stepNumber.first} totalSteps={totalSteps} onBack={() => setStage("record")}>
+        <FirstExpenseStep onFinish={() => setStage("backup")} />
+      </OnboardingShell>
+    );
+  }
+
   return (
-    <OnboardingShell step={stepNumber.first} totalSteps={totalSteps} onBack={() => setStage("record")}>
-      <FirstExpenseStep onFinish={finish} />
+    <OnboardingShell step={stepNumber.backup} totalSteps={totalSteps} onBack={() => setStage("first")}>
+      <BackupPromptStep
+        onSignUp={() => goToAuth("signup")}
+        onLogIn={() => goToAuth("signin")}
+        onSkip={finishLocally}
+      />
     </OnboardingShell>
   );
 }

@@ -100,7 +100,7 @@ lib/
 - Voice input needs a browser with the Web Speech API (mic button just greys out otherwise).
 - WhatsApp send can't both target a specific number *and* attach a file (browser platform limitation, not a bug — see `whatsapp.ts` comment).
 - Categories are a fixed built-in dictionary, not yet user-customizable.
-- "Log in" on the Welcome screen and "View Plans" (Subscription) are inert — no real auth or billing.
+- "View Plans" (Subscription) is inert — no real billing. ("Log in" is real now — see Backend.)
 
 ## Backend: Supabase — schema, auth, and full cloud sync, all built and tested
 
@@ -124,6 +124,12 @@ Compared Supabase vs Firebase free tiers for this project specifically: **Supaba
 
 **Still not done**: no password-reset flow, no OAuth providers, no offline queue (a failed write reverts rather than retries), receipt OCR still a stub. Categories are still not user-customizable / not synced (deliberate — see above).
 
+**Follow-up polish pass (same day)** — closing the gap between "cloud sync works" and "the UI actually reflects it everywhere":
+- **Demo data is now off by default.** `defaultState()` in `store.tsx` used to always seed the demo business (Ramesh/ABC Traders/etc.) with `hasOnboarded: true`, so a fresh signed-out browser skipped onboarding entirely. That's now commented out (not deleted — the `seedEntities()`/`seedTransactions()`/`seedBusiness()` calls and the import are right there, commented, with restore instructions) and `hasOnboarded` starts `false`. Combined with `OnboardingGate` (which already existed for the cloud case), **every fresh user — signed in or out — now goes through real onboarding**, no more special-casing between the two.
+- **New onboarding step**: `BackupPromptStep` (new component) is now the true last step, after `FirstExpenseStep`. It offers "Create account" / "Log in" / "Skip for now" with copy about the data being backed up to the cloud. Both "Continue to Hisab" and "Skip for now" on the *first-expense* step lead here now (that step's copy is about the expense, not the account). Choosing Create account/Log in saves the profile locally first (so it carries over via the existing import-on-first-sign-in path) then routes to `/login?mode=signup` or `?mode=signin` — `/login` reads that query param to pre-select its tab (wrapped the page in `<Suspense>` since `useSearchParams()` requires it for static export).
+- **Fixed a real bug**: the More page (`/more`) had a leftover decorative "Log out" button from the pre-auth mockup days that was unconditional — it showed (and did a fake `router.push("/")`) regardless of actual sign-in state, which read as a bug once real auth existed. It and Settings now both use `cloudUser` from `useHisab()` to show a real "Log out" (calls `supabase.auth.signOut()`) when signed in, or a shared `BackupPromoCard` component (new, `src/components/layout/BackupPromoCard.tsx`) when signed out — same "Back up your Hisab" card in both places now, not just buried in Settings.
+- **Sage is now the default theme**, not Indigo — swapped which palette lives on bare `:root` vs. behind `[data-theme="..."]` in `globals.css`, and flipped `DEFAULT_THEME` in `themes.ts`. Indigo is still fully available, just no longer first.
+
 ## How to run it
 
 ```
@@ -131,7 +137,7 @@ cd E:\Project\HisabAI\web
 npm run dev -- -p 3100     # dev server, http://localhost:3100
 npm run build               # production build (do this after any change — it's the fast way to catch type errors)
 ```
-Dev server log (when run in background this session) was piped to `/tmp/hisab-dev.log`. To reset to fresh seed data in a browser: `localStorage.removeItem('hisab_state_v1')` then reload. Theme preference is a separate key: `localStorage.setItem('hisab_theme', 'indigo' | 'sage')`.
+Dev server log (when run in background this session) was piped to `/tmp/hisab-dev.log`. To reset to a fresh signed-out state in a browser: `localStorage.removeItem('hisab_state_v1')` then reload — this now lands on onboarding, not demo data (see Backend → Follow-up polish pass). To get the old demo data back for testing, uncomment the seed calls in `defaultState()` in `store.tsx`. Theme preference is a separate key: `localStorage.setItem('hisab_theme', 'indigo' | 'sage')` — default is now `sage`.
 
 ## If you're picking this up cold
 

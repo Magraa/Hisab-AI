@@ -31,7 +31,7 @@ export const THEMES: ThemeDef[] = [
   },
 ];
 
-export const DEFAULT_THEME: ThemeId = "indigo";
+export const DEFAULT_THEME: ThemeId = "sage";
 
 export function isThemeId(value: string | null): value is ThemeId {
   return THEMES.some((t) => t.id === value);

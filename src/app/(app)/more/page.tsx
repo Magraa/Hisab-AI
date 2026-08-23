@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Store,
   Grid2x2,
@@ -17,12 +18,22 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useHisab } from "@/lib/store";
+import { createClient } from "@/lib/supabase/client";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { BackupPromoCard } from "@/components/layout/BackupPromoCard";
 
 export default function MorePage() {
-  const { business, resetOnboarding } = useHisab();
+  const { business, resetOnboarding, cloudUser } = useHisab();
   const router = useRouter();
+  const [signingOut, setSigningOut] = useState(false);
   const isIndividual = business.accountKind === "individual";
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setSigningOut(false);
+  }
 
   return (
     <div className="pb-8">
@@ -100,12 +111,19 @@ export default function MorePage() {
         </button>
       </MenuList>
 
-      <button
-        onClick={() => router.push("/")}
-        className="mx-5 mt-6 flex items-center justify-center gap-2 rounded-2xl bg-rose-soft py-3.5 text-sm font-semibold text-rose"
-      >
-        <LogOut size={16} /> Log out
-      </button>
+      {cloudUser ? (
+        <button
+          onClick={handleSignOut}
+          disabled={signingOut}
+          className="mx-5 mt-6 flex items-center justify-center gap-2 rounded-2xl bg-rose-soft py-3.5 text-sm font-semibold text-rose disabled:opacity-60"
+        >
+          <LogOut size={16} /> {signingOut ? "Signing out…" : "Log out"}
+        </button>
+      ) : (
+        <div className="mt-6">
+          <BackupPromoCard />
+        </div>
+      )}
     </div>
   );
 }

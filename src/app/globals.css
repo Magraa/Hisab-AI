@@ -13,17 +13,18 @@
  */
 
 :root {
-  /* Brand & surface — these are what actually change between themes. */
-  --color-canvas: #f4f5fa;
+  /* Brand & surface — these are what actually change between themes.
+     Sage (warm cream + forest-green) is the default look. */
+  --color-canvas: #faf6ec;
   --color-surface: #ffffff;
-  --color-ink: #16171d;
-  --color-muted: #6b7280;
-  --color-subtle: #9ca3af;
-  --color-border: #e8e9f0;
+  --color-ink: #16241b;
+  --color-muted: #6b7566;
+  --color-subtle: #a8b3a2;
+  --color-border: #e4decf;
 
-  --color-primary: #6c5ce7;
-  --color-primary-dark: #5a4bd6;
-  --color-primary-soft: #eeecfd;
+  --color-primary: #2f6b47;
+  --color-primary-dark: #255939;
+  --color-primary-soft: #e4f0e4;
 
   /* Functional — stable across themes. */
   --color-mint: #16a34a;
@@ -45,19 +46,19 @@
   --color-violet-soft: #ece9fe;
 }
 
-/* "Sage" — the warm cream + forest-green look from the onboarding mockups,
-   available anywhere in the app once selected in Settings. */
-[data-theme="sage"] {
-  --color-canvas: #faf6ec;
+/* "Indigo" — the original white-surface + indigo-accent look, now the
+   non-default option, available anywhere in the app once selected in Settings. */
+[data-theme="indigo"] {
+  --color-canvas: #f4f5fa;
   --color-surface: #ffffff;
-  --color-ink: #16241b;
-  --color-muted: #6b7566;
-  --color-subtle: #a8b3a2;
-  --color-border: #e4decf;
+  --color-ink: #16171d;
+  --color-muted: #6b7280;
+  --color-subtle: #9ca3af;
+  --color-border: #e8e9f0;
 
-  --color-primary: #2f6b47;
-  --color-primary-dark: #255939;
-  --color-primary-soft: #e4f0e4;
+  --color-primary: #6c5ce7;
+  --color-primary-dark: #5a4bd6;
+  --color-primary-soft: #eeecfd;
 }
 
 @theme inline {

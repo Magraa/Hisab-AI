@@ -11,7 +11,11 @@ import {
   type ReactNode,
 } from "react";
 import type { BusinessProfile, Direction, Entity, PaymentMethod, Transaction, TxSource } from "./types";
-import { seedBusiness, seedEntities, seedTransactions } from "./seed";
+// Demo-data seeding is disabled below so a fresh signed-out user goes through
+// real onboarding instead of landing on pre-filled demo data (see
+// OnboardingGate). To restore it for testing, uncomment this import and the
+// three seed* calls in defaultState(), then flip hasOnboarded back to true.
+// import { seedBusiness, seedEntities, seedTransactions } from "./seed";
 import { createClient } from "./supabase/client";
 import {
   deleteTransactionRow,
@@ -36,13 +40,11 @@ interface PersistedState {
 
 function defaultState(): PersistedState {
   return {
-    entities: seedEntities(),
-    transactions: seedTransactions(),
-    business: seedBusiness(),
+    entities: [], // seedEntities(),
+    transactions: [], // seedTransactions(),
+    business: { name: "", type: "", currency: "INR", accountKind: "individual" }, // seedBusiness(),
     enabledPaymentMethods: ["cash", "upi", "bank", "card", "credit"],
-    // The seeded demo data above simulates an existing user, so onboarding
-    // stays skipped by default. "Restart onboarding" (More page) flips this.
-    hasOnboarded: true,
+    hasOnboarded: false,
   };
 }
 
