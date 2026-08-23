@@ -115,7 +115,8 @@ If truly nothing usable can be extracted, return { "result": null }.
 
 User input text: "${text}"`;
 
-    const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    // Cheapest models first, falling back to pricier/older ones if unavailable.
+    const models = ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-2.5-flash"];
     let lastError: Error | null = null;
     let resultJson: ParseTextResponse | null = null;
 

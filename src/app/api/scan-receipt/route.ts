@@ -61,7 +61,7 @@ export async function POST(req: Request) {
 
     // MODE: TEST KEY VALIDATION
     if (mode === "test_key") {
-      const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+      const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
       const testRes = await fetch(testUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -156,7 +156,8 @@ Return ONLY a valid JSON object strictly matching this structure:
 }`;
 
     // Use Gemini Flash models (with automatic fallback)
-    const models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    // Cheapest multimodal models first, falling back to pricier/older ones if unavailable.
+    const models = ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-2.5-flash"];
     let lastError: Error | null = null;
     let resultJson: ScanReceiptResponse | null = null;
 

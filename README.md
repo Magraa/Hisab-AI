@@ -15,6 +15,7 @@
     <a href="#-tech-stack"><img src="https://img.shields.io/badge/Database-Supabase%20Postgres-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" /></a>
     <a href="#-tech-stack"><img src="https://img.shields.io/badge/PWA-Installable%20%26%20Offline-FF6B6B?style=for-the-badge&logo=pwa&logoColor=white" alt="PWA Ready" /></a>
     <a href="#-tech-stack"><img src="https://img.shields.io/badge/Avatars-260%2B%20Included-8A2BE2?style=for-the-badge" alt="260+ Avatars" /></a>
+    <a href="#-300-pre-configured-merchant-intelligence"><img src="https://img.shields.io/badge/Merchants-300%2B%20Supported-00C853?style=for-the-badge" alt="300+ Merchants" /></a>
     <a href="#license"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License: MIT" /></a>
   </p>
 
@@ -22,6 +23,7 @@
     <a href="#-live-ui-showcase">UI Showcase</a> •
     <a href="#-superpowers--core-features">Features</a> •
     <a href="#-260-avatar-system">Avatars</a> •
+    <a href="#-300-pre-configured-merchant-intelligence">Merchants</a> •
     <a href="#-architecture">Architecture</a> •
     <a href="#-nlp-engine-in-action">NLP Engine</a> •
     <a href="#-getting-started">Quickstart</a> •
@@ -166,6 +168,48 @@ Hisab includes a built-in library of **260+ vibrant 3D & illustrated WebP avatar
     </tr>
   </table>
   <p><em>...and 244+ more collectible avatars optimized for instant rendering!</em></p>
+</div>
+
+---
+
+## 🏪 300+ Pre-Configured Merchant Intelligence
+
+Hisab includes an extensive built-in dictionary of **300+ top Indian and global merchants** across food delivery, quick commerce, groceries, dining, shopping, utilities, travel, subscriptions, and digital payments. When you mention any brand or alias in your natural language entry, Hisab automatically recognizes the vendor, renders its official brand logo, and pre-categorizes the expense:
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><img src="./public/Assets/merchants/swiggy.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Swiggy" /><br/><sub>Swiggy</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/zomato.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Zomato" /><br/><sub>Zomato</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/blinkit.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Blinkit" /><br/><sub>Blinkit</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/zepto.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Zepto" /><br/><sub>Zepto</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/bigbasket.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="BigBasket" /><br/><sub>BigBasket</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/mcdonalds.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="McDonald's" /><br/><sub>McDonald's</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/dominos.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Domino's" /><br/><sub>Domino's</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/starbucks.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Starbucks" /><br/><sub>Starbucks</sub></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="./public/Assets/merchants/amazon.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Amazon" /><br/><sub>Amazon</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/flipkart.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Flipkart" /><br/><sub>Flipkart</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/myntra.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Myntra" /><br/><sub>Myntra</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/uber.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Uber" /><br/><sub>Uber</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/ola.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Ola" /><br/><sub>Ola</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/apple.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Apple" /><br/><sub>Apple</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/netflix.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Netflix" /><br/><sub>Netflix</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/spotify.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Spotify" /><br/><sub>Spotify</sub></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="./public/Assets/merchants/paytm.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Paytm" /><br/><sub>Paytm</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/phonepe.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="PhonePe" /><br/><sub>PhonePe</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/googlepay.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Google Pay" /><br/><sub>Google Pay</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/airtel.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Airtel" /><br/><sub>Airtel</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/jio.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Jio" /><br/><sub>Jio</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/dmart.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="DMart" /><br/><sub>DMart</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/apollo.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="Apollo 24|7" /><br/><sub>Apollo 24|7</sub></td>
+      <td align="center"><img src="./public/Assets/merchants/irctc.webp" width="48" height="48" style="border-radius:12px; border:1px solid rgba(0,0,0,0.06);" alt="IRCTC" /><br/><sub>IRCTC</sub></td>
+    </tr>
+  </table>
+  <p><em>...and 276+ more pre-mapped merchants with automatic brand colors, aliases & auto-categorization!</em></p>
 </div>
 
 ---
@@ -430,6 +474,7 @@ WITH CHECK (auth.uid() = user_id);
 - [x] **Hybrid AI Text Parsing**: Gemini 2.0 Flash text endpoint (`/api/parse-text`) + 3-Way Mode Switch.
 - [x] **Dynamic Categories**: User-customizable categories with custom keywords.
 - [x] **260+ Deterministic Avatars**: Instant visual identities for contacts & accounts.
+- [x] **300+ Merchant Intelligence**: Instant brand logo matching, alias detection & auto-categorization.
 - [x] **Progressive Web App (PWA)**: Offline service worker caching & install prompt.
 - [x] **PDF & WhatsApp**: Auto-generated statements with direct WhatsApp share.
 - [ ] **Multi-Currency Support**: International currencies beyond INR (`₹`).
