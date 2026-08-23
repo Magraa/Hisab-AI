@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="./public/Assets/logo-with-tagline.png" alt="Hisab AI Logo" width="380" />
+  <img src="./public/Assets/logo-with-tagline.webp" alt="Hisab AI Logo" width="380" />
 
   <p align="center">
     <strong>Your Business. Your Hisab.</strong>
