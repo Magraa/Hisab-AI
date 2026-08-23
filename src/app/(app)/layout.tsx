@@ -7,9 +7,9 @@ import { InstallPwaBanner } from "@/components/pwa/InstallPrompt";
 
 export default function AppShellLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen w-full max-w-[440px] flex-col bg-canvas lg:max-w-[1440px] lg:flex-row">
+    <div className="flex min-h-screen w-full max-w-[440px] flex-col bg-canvas lg:h-screen lg:max-w-[1440px] lg:flex-row lg:overflow-hidden">
       <DesktopSidebar />
-      <div className="flex w-full flex-1 flex-col lg:min-w-0">
+      <div className="flex w-full flex-1 flex-col lg:h-screen lg:min-w-0 lg:overflow-y-auto">
         <OnboardingGate />
         <CloudErrorBanner />
         <InstallPwaBanner />

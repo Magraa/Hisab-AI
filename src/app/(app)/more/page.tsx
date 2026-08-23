@@ -16,6 +16,7 @@ import {
   LogOut,
   Bell,
   Sparkles,
+  Mail,
 } from "lucide-react";
 import { useHisab } from "@/lib/store";
 import { createClient } from "@/lib/supabase/client";
@@ -56,8 +57,18 @@ export default function MorePage() {
             size={48}
           />
           <div className="min-w-0">
-            <p className="truncate font-semibold text-ink">{business.accountKind === "business" ? (business.name || "My Business") : (business.userName || "Your Hisab")}</p>
-            <p className="truncate text-xs text-muted">{isIndividual ? (business.userName ? `${business.userName} · Individual` : "Individual") : `${business.type} · ${business.userName || "Business Owner"}`}</p>
+            <p className="truncate font-semibold text-ink">
+              {business.accountKind === "business"
+                ? (business.name || "My Business")
+                : (business.userName || business.name || "Your Hisab")}
+            </p>
+            <p className="truncate text-xs text-muted">
+              {isIndividual
+                ? (business.userName || business.name
+                    ? `${business.userName || business.name} · Individual`
+                    : "Individual")
+                : `${business.type} · ${business.userName || business.name || "Business Owner"}`}
+            </p>
           </div>
         </div>
         <Link
@@ -120,13 +131,31 @@ export default function MorePage() {
       </MenuList>
 
       {cloudUser ? (
-        <button
-          onClick={handleSignOut}
-          disabled={signingOut}
-          className="mx-5 mt-6 flex items-center justify-center gap-2 rounded-2xl bg-rose-soft py-3.5 text-sm font-semibold text-rose disabled:opacity-60"
-        >
-          <LogOut size={16} /> {signingOut ? "Signing out…" : "Log out"}
-        </button>
+        <>
+          <SectionLabel>Account</SectionLabel>
+          <MenuList>
+            <div className="flex items-center justify-between gap-3 px-4 py-3.5">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-soft">
+                  <Mail size={18} className="text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[15px] font-medium text-ink">Logged in as</p>
+                  <p className="truncate text-xs text-muted">{cloudUser.email || "Active account"}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                disabled={signingOut}
+                className="flex shrink-0 items-center gap-1.5 rounded-xl border border-rose/30 bg-rose-soft/40 px-3.5 py-2 text-xs font-semibold text-rose transition-all hover:bg-rose-soft active:scale-[0.98] cursor-pointer disabled:opacity-60"
+              >
+                <LogOut size={14} />
+                {signingOut ? "Signing out…" : "Sign out"}
+              </button>
+            </div>
+          </MenuList>
+        </>
       ) : (
         <div className="mt-6">
           <BackupPromoCard />

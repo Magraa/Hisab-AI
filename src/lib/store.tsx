@@ -231,23 +231,37 @@ export function HisabProvider({ children }: { children: ReactNode }) {
 
       try {
         let cloud = await fetchCloudState(supabase, cloudUser.id);
-        if (cloud.entities.length === 0 && cloud.transactions.length === 0) {
-          const imported = await importLocalData(supabase, cloudUser.id, localSnapshotRef.current ?? defaultState());
+        const localData = stateRef.current.hasOnboarded
+          ? stateRef.current
+          : localSnapshotRef.current ?? defaultState();
+
+        // Import local state (including onboarding status and profile) into brand new cloud account
+        if (
+          !cloud.hasOnboarded &&
+          (localData.hasOnboarded ||
+            localData.entities.length > 0 ||
+            localData.transactions.length > 0 ||
+            Boolean(localData.business?.name?.trim()))
+        ) {
+          const imported = await importLocalData(supabase, cloudUser.id, localData);
           if (imported) {
             cloud = await fetchCloudState(supabase, cloudUser.id);
           }
         }
+
         // Covers both a brand-new account (import above had nothing to carry
         // over) and an existing account from before categories were synced.
         if (cloud.categories.length === 0) {
           await seedDefaultCategories(supabase, cloudUser.id);
           cloud = await fetchCloudState(supabase, cloudUser.id);
         }
+
         if (cancelled) return;
         setState(cloud);
         setCloudError(null);
         setHydrated(true);
-      } catch {
+      } catch (err) {
+        console.error("Cloud load error:", err);
         if (cancelled) return;
         setState(emptyCloudState());
         setCloudError("Couldn't load your data. Check your connection and reload.");

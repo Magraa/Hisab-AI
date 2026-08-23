@@ -85,11 +85,14 @@ function categoryToInsert(category: Category, userId: string): TablesInsert<"cat
 }
 
 function businessFromRow(row: ProfileRow): BusinessProfile {
+  const isIndividual = row.account_kind === "individual";
+  const name = row.name || "";
   return {
-    name: row.name,
-    type: row.type,
-    currency: row.currency,
-    accountKind: row.account_kind as AccountKind,
+    name,
+    userName: name || "Hisab User",
+    type: row.type || (isIndividual ? "Individual" : "Retail"),
+    currency: row.currency || "INR",
+    accountKind: (row.account_kind as AccountKind) || "individual",
   };
 }
 
@@ -136,24 +139,64 @@ function profilePatchToUpdate(patch: ProfilePatch): TablesUpdate<"profiles"> {
 
 export async function fetchCloudState(supabase: Client, userId: string): Promise<CloudState> {
   const [profileResult, entitiesResult, transactionsResult, categoriesResult] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", userId).single(),
+    supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
     supabase.from("entities").select("*").eq("user_id", userId).order("created_at", { ascending: true }),
     supabase.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
     supabase.from("categories").select("*").eq("user_id", userId).order("created_at", { ascending: true }),
   ]);
 
-  if (profileResult.error) throw profileResult.error;
-  if (entitiesResult.error) throw entitiesResult.error;
-  if (transactionsResult.error) throw transactionsResult.error;
-  if (categoriesResult.error) throw categoriesResult.error;
+  if (entitiesResult.error) {
+    console.error("Failed to fetch entities:", entitiesResult.error);
+    throw entitiesResult.error;
+  }
+  if (transactionsResult.error) {
+    console.error("Failed to fetch transactions:", transactionsResult.error);
+    throw transactionsResult.error;
+  }
+  if (categoriesResult.error) {
+    console.error("Failed to fetch categories:", categoriesResult.error);
+    throw categoriesResult.error;
+  }
+  if (profileResult.error) {
+    console.error("Failed to fetch profile:", profileResult.error);
+    throw profileResult.error;
+  }
+
+  let profileRow = profileResult.data;
+  if (!profileRow) {
+    // Brand new cloud account without a profiles row yet
+    const initialProfile: TablesInsert<"profiles"> = {
+      id: userId,
+      name: "Hisab User",
+      type: "Retail",
+      currency: "INR",
+      account_kind: "individual",
+      enabled_payment_methods: ["cash", "upi", "bank", "card", "credit"],
+      has_onboarded: false,
+    };
+
+    const { data: createdProfile, error: createError } = await supabase
+      .from("profiles")
+      .upsert(initialProfile)
+      .select()
+      .maybeSingle();
+
+    if (createError) {
+      console.error("Failed to initialize profile:", createError);
+      // Even if upserting fails (e.g., schema constraint), we can use fallback object
+      profileRow = initialProfile as Tables<"profiles">;
+    } else {
+      profileRow = createdProfile ?? (initialProfile as Tables<"profiles">);
+    }
+  }
 
   return {
     entities: (entitiesResult.data ?? []).map(entityFromRow),
     transactions: (transactionsResult.data ?? []).map(transactionFromRow),
     categories: (categoriesResult.data ?? []).map(categoryFromRow),
-    business: businessFromRow(profileResult.data),
-    enabledPaymentMethods: profileResult.data.enabled_payment_methods as PaymentMethod[],
-    hasOnboarded: profileResult.data.has_onboarded,
+    business: businessFromRow(profileRow),
+    enabledPaymentMethods: (profileRow.enabled_payment_methods as PaymentMethod[]) ?? ["cash", "upi", "bank", "card", "credit"],
+    hasOnboarded: profileRow.has_onboarded ?? false,
   };
 }
 
@@ -208,8 +251,10 @@ export async function deleteCategoryRow(supabase: Client, userId: string, id: st
 export async function seedDefaultCategories(supabase: Client, userId: string): Promise<void> {
   const { error } = await supabase
     .from("categories")
-    .insert(DEFAULT_CATEGORIES.map((c) => categoryToInsert(c, userId)));
-  if (error) throw error;
+    .upsert(DEFAULT_CATEGORIES.map((c) => categoryToInsert(c, userId)));
+  if (error) {
+    console.error("Failed to seed default categories:", error);
+  }
 }
 
 export async function insertTransaction(supabase: Client, userId: string, tx: Transaction): Promise<void> {
@@ -244,8 +289,11 @@ export async function deleteTransactionRow(supabase: Client, userId: string, id:
 export async function updateProfile(supabase: Client, userId: string, patch: ProfilePatch): Promise<void> {
   const update = profilePatchToUpdate(patch);
   if (Object.keys(update).length === 0) return;
-  const { error } = await supabase.from("profiles").update(update).eq("id", userId);
-  if (error) throw error;
+  const { error } = await supabase.from("profiles").upsert({ id: userId, ...update });
+  if (error) {
+    console.error("Failed to update profile:", error);
+    throw error;
+  }
 }
 
 /**
@@ -267,26 +315,29 @@ export async function importLocalData(
 ): Promise<boolean> {
   const realEntities = local.entities.filter((e) => !SEED_ENTITY_IDS.has(e.id));
   const realTransactions = local.transactions.filter((t) => !t.id.startsWith("seed-"));
+  const hasProfileData = local.hasOnboarded || (local.business?.name && local.business.name.trim().length > 0);
 
-  if (realEntities.length === 0 && realTransactions.length === 0) return false;
+  if (realEntities.length === 0 && realTransactions.length === 0 && !hasProfileData) {
+    return false;
+  }
 
   if (realEntities.length > 0) {
-    const { error } = await supabase.from("entities").insert(realEntities.map((e) => entityToInsert(e, userId)));
-    if (error) throw error;
+    const { error } = await supabase.from("entities").upsert(realEntities.map((e) => entityToInsert(e, userId)));
+    if (error) console.error("import entities error:", error);
   }
 
   if (realTransactions.length > 0) {
     const { error } = await supabase
       .from("transactions")
-      .insert(realTransactions.map((t) => transactionToInsert(t, userId)));
-    if (error) throw error;
+      .upsert(realTransactions.map((t) => transactionToInsert(t, userId)));
+    if (error) console.error("import transactions error:", error);
   }
 
-  if (local.categories.length > 0) {
+  if (local.categories && local.categories.length > 0) {
     const { error } = await supabase
       .from("categories")
-      .insert(local.categories.map((c) => categoryToInsert(c, userId)));
-    if (error) throw error;
+      .upsert(local.categories.map((c) => categoryToInsert(c, userId)));
+    if (error) console.error("import categories error:", error);
   }
 
   await updateProfile(supabase, userId, {

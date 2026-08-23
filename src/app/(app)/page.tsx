@@ -91,7 +91,7 @@ export default function HomePage() {
       <PageTransition className="lg:hidden">
         <div className="flex items-start justify-between px-5 pt-6">
           <div>
-            <h1 className="text-xl font-semibold text-ink">{greeting()}, {business.userName || "BudgetMafia"} 👋</h1>
+            <h1 className="text-xl font-semibold text-ink">{greeting()}, {business.userName || business.name || "Hisab User"} 👋</h1>
             <p className="text-sm text-muted">Here&rsquo;s your Hisab</p>
           </div>
           <Link
@@ -196,7 +196,7 @@ export default function HomePage() {
       <div className="hidden lg:block">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-ink">{greeting()}, {business.userName || "BudgetMafia"} 👋</h1>
+            <h1 className="text-2xl font-semibold text-ink">{greeting()}, {business.userName || business.name || "Hisab User"} 👋</h1>
             <p className="mt-1 text-sm text-muted">Here&rsquo;s your Hisab</p>
           </div>
           <div className="flex items-center gap-3">
